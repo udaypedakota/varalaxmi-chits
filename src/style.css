@@ -3260,7 +3260,7 @@ body {
 .login-gold-sheet-card {
   position: relative;
   z-index: 10;
-  margin: 1.5rem 1.25rem 1.5rem 1.25rem;
+  margin: 3.75rem 1.25rem 2rem 1.25rem;
   background: linear-gradient(165deg, rgba(17, 26, 51, 0.97) 0%, rgba(9, 14, 28, 0.99) 100%);
   border: 1.5px solid rgba(245, 158, 11, 0.42);
   border-radius: 28px;
