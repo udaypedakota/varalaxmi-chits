@@ -45,7 +45,7 @@
 }
 
 html {
-  overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100vw;
   width: 100%;
 }
@@ -56,7 +56,7 @@ body {
   color: var(--text-primary);
   min-height: 100vh;
   line-height: 1.5;
-  overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100vw;
   width: 100%;
   position: relative;
@@ -65,10 +65,12 @@ body {
     radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.06) 0%, transparent 40%),
     linear-gradient(180deg, #070B19 0%, #0A1128 100%);
   background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .app-layout {
-  overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100vw;
   width: 100%;
 }
@@ -126,7 +128,11 @@ body {
   background: #070D1F;
   border-bottom: 1.5px solid var(--navy-border-gold);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-  padding-top: env(safe-area-inset-top, 0px);
+  padding-top: max(env(safe-area-inset-top, 0px), 6px);
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .navbar-container {
@@ -177,14 +183,46 @@ body {
 }
 
 .brand-logo-coin {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
   overflow: hidden;
+  flex-shrink: 0;
+}
+
+.brand-logo-coin.luxury {
+  background: radial-gradient(circle at 35% 28%, #FFFDF5 0%, #FEF08A 22%, #F59E0B 54%, #D97706 78%, #78350F 100%);
+  border: 2px solid #FDE68A;
+  box-shadow: 
+    0 4px 14px rgba(245, 158, 11, 0.45), 
+    inset 0 2px 3px rgba(255, 255, 255, 0.85), 
+    inset 0 -2.5px 4px rgba(120, 53, 15, 0.7);
+  user-select: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.brand-logo-coin.luxury:active {
+  transform: scale(0.96);
+}
+
+.brand-coin-symbol {
+  font-size: 1.35rem;
+  font-weight: 900;
+  font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  color: #3D1300;
+  line-height: 1;
+  text-shadow: 
+    0 1px 1px rgba(254, 240, 138, 0.85), 
+    0 -0.5px 0.5px rgba(255, 255, 255, 0.8);
+  display: block;
+  transform: translateY(-0.5px);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .brand-app-icon-img {
@@ -216,8 +254,18 @@ body {
   gap: 0.45rem;
   font-size: 1.2rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   color: #FFFFFF;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.brand-title span:first-child {
+  color: #FFFFFF;
+  font-weight: 800;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .brand-group-pill {
@@ -2077,18 +2125,6 @@ body {
   background: radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
-}
-
-.brand-logo-coin.luxury {
-  background: radial-gradient(circle at 35% 30%, #FEF08A 0%, #F59E0B 50%, #B45309 95%);
-  box-shadow: 
-    0 8px 24px rgba(245, 158, 11, 0.45), 
-    inset 0 2px 4px rgba(255, 255, 255, 0.7), 
-    inset 0 -3px 6px rgba(113, 44, 4, 0.6);
-  border: 2px solid #FDE68A;
-  color: #451A03;
-  font-weight: 900;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
 }
 
 .login-modal-top-bar {
@@ -4180,7 +4216,7 @@ body {
    ========================================================================== */
 @media (max-width: 768px) {
   .app-navbar {
-    padding-top: max(env(safe-area-inset-top, 0px), 0px);
+    padding-top: max(env(safe-area-inset-top, 0px), 8px);
   }
 
   .navbar-container {
@@ -4217,8 +4253,20 @@ body {
     width: 36px;
     height: 36px;
     min-width: 36px;
-    border-radius: 10px;
+    border-radius: 50%;
     flex-shrink: 0;
+  }
+
+  .brand-logo-coin.luxury {
+    border-width: 1.8px;
+    box-shadow: 
+      0 3px 10px rgba(245, 158, 11, 0.4), 
+      inset 0 1.5px 2.5px rgba(255, 255, 255, 0.85), 
+      inset 0 -1.5px 3px rgba(120, 53, 15, 0.7);
+  }
+
+  .brand-coin-symbol {
+    font-size: 1.18rem;
   }
 
   .brand-text {

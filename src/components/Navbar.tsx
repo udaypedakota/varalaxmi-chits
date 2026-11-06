@@ -23,8 +23,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenLogin, onOpenInstall, isSt
         {/* Main Row: Brand on Left, User on Right */}
         <div className="navbar-main-row">
           <div className="navbar-brand">
-            <div className="brand-logo-coin">
-              <img src="/app-icon.svg" alt="Varalaxmi Chits App Icon" className="brand-app-icon-img" />
+            <div className="brand-logo-coin luxury" aria-label="Varalaxmi Chits Gold Coin">
+              <span className="brand-coin-symbol">₹</span>
             </div>
             <div className="brand-text">
               <h1 className="brand-title">
