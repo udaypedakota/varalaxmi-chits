@@ -1,25 +1,62 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useChit } from '../context/ChitContext';
-import { Bell, CheckCircle2, Trophy, X, AlertCircle } from 'lucide-react';
+import { Bell, CheckCircle2, Trophy, X } from 'lucide-react';
 
 export const MobileNotificationToast: React.FC = () => {
   const { activeToast, dismissToast, language } = useChit();
+  const [isExiting, setIsExiting] = useState(false);
+  const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Auto-dismiss smoothly after 4 seconds
   useEffect(() => {
-    if (!activeToast) return;
-    const timer = setTimeout(() => {
-      dismissToast();
-    }, 4500);
-    return () => clearTimeout(timer);
-  }, [activeToast, dismissToast]);
+    if (!activeToast) {
+      setIsExiting(false);
+      return;
+    }
+
+    setIsExiting(false);
+
+    if (dismissTimerRef.current) {
+      clearTimeout(dismissTimerRef.current);
+    }
+
+    dismissTimerRef.current = setTimeout(() => {
+      setIsExiting(true);
+      setTimeout(() => {
+        dismissToast();
+        setIsExiting(false);
+      }, 350);
+    }, 4000);
+
+    return () => {
+      if (dismissTimerRef.current) {
+        clearTimeout(dismissTimerRef.current);
+      }
+    };
+  }, [activeToast?.id, dismissToast]);
 
   if (!activeToast) return null;
+
+  const handleManualDismiss = () => {
+    if (dismissTimerRef.current) {
+      clearTimeout(dismissTimerRef.current);
+    }
+    setIsExiting(true);
+    setTimeout(() => {
+      dismissToast();
+      setIsExiting(false);
+    }, 250);
+  };
 
   const isLottery = activeToast.type === 'lottery';
   const isPayment = activeToast.type === 'payment';
 
   return (
-    <div className="mobile-push-banner" onClick={dismissToast}>
+    <div 
+      className={`mobile-push-banner ${isExiting ? 'push-banner-exit' : ''}`} 
+      onClick={handleManualDismiss}
+      role="alert"
+    >
       <div className="push-banner-icon">
         {isLottery ? (
           <Trophy size={22} className="text-gray-950" />
@@ -49,7 +86,7 @@ export const MobileNotificationToast: React.FC = () => {
         className="push-banner-close"
         onClick={(e) => {
           e.stopPropagation();
-          dismissToast();
+          handleManualDismiss();
         }}
         aria-label="Close"
       >
@@ -58,4 +95,3 @@ export const MobileNotificationToast: React.FC = () => {
     </div>
   );
 };
-

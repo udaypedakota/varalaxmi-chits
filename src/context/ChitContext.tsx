@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { ChitGroup, Member, PaymentRecord, LotteryRecord, ChitNotification, ChitLiftingRecord } from '../types/chit';
 import { DEFAULT_GROUPS } from '../data/defaultGroups';
 import { DEFAULT_MEMBERS } from '../data/defaultMembers';
@@ -293,7 +293,9 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Floating Mobile Push Toast State
   const [activeToast, setActiveToast] = useState<ChitNotification | null>(null);
 
-  const dismissToast = () => setActiveToast(null);
+  const dismissToast = useCallback(() => {
+    setActiveToast(null);
+  }, []);
 
   // Play subtle audio chime for real mobile app feeling
   const playChimeAudio = () => {

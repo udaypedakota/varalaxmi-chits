@@ -103,30 +103,51 @@ const AppContent: React.FC = () => {
             {/* Ambient Gold Aura */}
             <div className="landing-ambient-glow center"></div>
 
-            {/* Top Language Bar & Install Pill */}
+            {/* Top Branded Header Row: Auspicious Crest & Language Bar */}
             <header className="landing-header-row">
-              {!isStandalone && (
-                <button
-                  type="button"
-                  className="landing-install-pill animate-pulse-subtle"
-                  onClick={() => setIsInstallModalOpen(true)}
-                  title={language === 'te' ? 'శ్రీ వరలక్ష్మి చిట్స్ యాప్‌ను ఇన్‌స్టాల్ చేసుకోండి' : 'Install Sri Varalaxmi Chits App'}
-                >
-                  <Download size={13} className="text-amber-400" />
-                  <span>{language === 'te' ? 'యాప్ ఇన్‌స్టాల్' : 'Install App'}</span>
-                </button>
-              )}
-              <div className="landing-header-spacer"></div>
-              <LanguageToggle />
+              <div className="landing-brand-crest">
+                <div className="landing-crest-coin">
+                  <Sparkles size={16} className="text-amber-300" />
+                </div>
+                <div className="landing-crest-meta">
+                  <div className="landing-crest-title">
+                    <span>{language === 'te' ? 'శ్రీ వరలక్ష్మి చిట్స్' : 'Sri Varalaxmi Chits'}</span>
+                    <span className="landing-group-badge">{activeGroup?.name || 'Group A'}</span>
+                  </div>
+                  <div className="landing-crest-subtitle">
+                    {language === 'te' ? '20 నెలల పథకం • ₹2,00,000' : '20-Month Scheme • ₹2,00,000'}
+                  </div>
+                </div>
+              </div>
+
+              <div className="landing-header-right">
+                {!isStandalone && (
+                  <button
+                    type="button"
+                    className="landing-install-pill animate-pulse-subtle"
+                    onClick={() => setIsInstallModalOpen(true)}
+                    title={language === 'te' ? 'శ్రీ వరలక్ష్మి చిట్స్ యాప్‌ను ఇన్‌స్టాల్ చేసుకోండి' : 'Install Sri Varalaxmi Chits App'}
+                  >
+                    <Download size={13} className="text-amber-400" />
+                    <span>{language === 'te' ? 'ఇన్‌స్టాల్' : 'Install'}</span>
+                  </button>
+                )}
+                <LanguageToggle />
+              </div>
             </header>
+
+            {/* Upper Flowing Golden Ribbons in Background */}
+            <div className="landing-top-waves">
+              <img src="/gold-wave-ribbons.svg" alt="" className="waves-svg-top" />
+            </div>
 
             {/* Main Stage: Vertically balanced and elevated so content is never pushed to the bottom */}
             <div className="landing-main-stage">
-              {/* 3D Golden Kalash Artwork (Seamless Blended, No Box) */}
+              {/* 3D Golden Kalash Artwork (Seamless Transparent PNG, No Box) */}
               <div className="landing-art-container">
                 <div className="art-aura-glow"></div>
                 <img 
-                  src="/kalash-3d.jpg" 
+                  src="/kalash-3d.png" 
                   alt="Sri Varalaxmi 3D Kalash, Lotus & Gold Coins" 
                   className="landing-kalash-3d-img"
                 />
