@@ -45,7 +45,6 @@
 }
 
 html {
-  overflow-x: hidden;
   max-width: 100vw;
   width: 100%;
 }
@@ -71,6 +70,9 @@ body {
 .app-layout {
   max-width: 100vw;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 /* Typography Utilities */
@@ -114,19 +116,22 @@ body {
   width: 100%;
   margin: 0 auto;
   padding: 1.5rem 1rem 3rem 1rem;
+  overflow-x: hidden;
 }
 
 /* ==========================================================================
    NAVBAR
    ========================================================================== */
 .app-navbar {
+  position: -webkit-sticky;
   position: sticky;
   top: 0;
   z-index: 1000;
   background: #070D1F;
   border-bottom: 1.5px solid var(--navy-border-gold);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.65);
-  padding-top: max(calc(env(safe-area-inset-top, 0px) + 8px), 14px);
+  padding-top: 0.5rem;
+  padding-bottom: 0.35rem;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -3278,6 +3283,7 @@ body {
 }
 
 .login-frame-top-bar {
+  position: -webkit-sticky;
   position: sticky;
   top: 0;
   z-index: 60;
@@ -3286,7 +3292,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: max(calc(env(safe-area-inset-top, 0px) + 12px), 48px) 1.15rem 0.75rem 1.15rem;
+  padding: 0.85rem 1.15rem 0.75rem 1.15rem;
   width: 100%;
 }
 
@@ -4216,7 +4222,12 @@ body {
    ========================================================================== */
 @media (max-width: 768px) {
   .app-navbar {
-    padding-top: max(calc(env(safe-area-inset-top, 0px) + 12px), 48px);
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding-top: 0.5rem;
+    padding-bottom: 0.35rem;
   }
 
   .navbar-container {
@@ -4764,6 +4775,21 @@ body {
     flex: 1;
     justify-content: center;
     font-size: 0.75rem;
+  }
+}
+
+/* ==========================================================================
+   APPLE iOS (iPhone / iPad) SAFE AREA & NOTCH OVERRIDE
+   Targets ONLY Apple iOS devices via -webkit-touch-callout.
+   Android browsers (Chrome, Edge, Samsung Internet) ignore this entirely.
+   ========================================================================== */
+@supports (-webkit-touch-callout: none) {
+  .app-navbar {
+    padding-top: max(env(safe-area-inset-top, 0px), 44px) !important;
+  }
+
+  .login-frame-top-bar {
+    padding-top: max(env(safe-area-inset-top, 0px), 44px) !important;
   }
 }
 
