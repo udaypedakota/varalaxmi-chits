@@ -940,15 +940,21 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                   <span>{language === 'te' ? 'చిట్ గ్రూప్ ఎంచుకోండి' : 'Select Chit Group'}</span>
                 </label>
                 <select
-                  className="form-input"
+                  className="form-input font-bold"
                   value={selectedEnrollGroupId}
                   onChange={e => setSelectedEnrollGroupId(e.target.value)}
                 >
-                  {groups.map(g => (
-                    <option key={g.id} value={g.id}>
-                      {language === 'te' ? g.nameTe : g.name} (₹{g.totalValue.toLocaleString('en-IN')})
-                    </option>
-                  ))}
+                  {groups.map(g => {
+                    const isGroupB = g.id === 'grp-2' || g.name.includes('Group B') || g.nameTe?.includes('గ్రూప్ B');
+                    const label = isGroupB 
+                      ? (language === 'te' ? 'గ్రూప్ B' : 'Group B')
+                      : (language === 'te' ? 'గ్రూప్ A' : 'Group A');
+                    return (
+                      <option key={g.id} value={g.id}>
+                        {label}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
 
@@ -1018,11 +1024,11 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                   <Gavel size={22} />
                 </span>
                 <div>
-                  <h3 className="text-base font-bold text-white m-0">
-                    {language === 'te' ? 'నెలసరి వేలం పాట / చిట్ ఎత్తిన వివరాలు నమోదు' : 'Record Monthly Chit Auction / Lift'}
+                  <h3 className="text-sm sm:text-base font-bold text-white m-0">
+                    {language === 'te' ? 'నెలసరి వేలం పాట / చిట్ ఎత్తిన వివరాలు' : 'Record Monthly Auction / Lift'}
                   </h3>
-                  <p className="text-xs text-amber-400 m-0 font-medium">
-                    {language === 'te' ? `${currentGroup.nameTe} (మొత్తం విలువ: ₹2,00,000)` : `${currentGroup.name} (Value: ₹2,00,000)`}
+                  <p className="text-xs text-amber-400 m-0 font-semibold">
+                    {currentGroup.id === 'grp-2' || currentGroup.name.includes('Group B') ? (language === 'te' ? 'గ్రూప్ B • ₹2,00,000 పథకం' : 'Group B • ₹2,00,000 Scheme') : (language === 'te' ? 'గ్రూప్ A • ₹2,00,000 పథకం' : 'Group A • ₹2,00,000 Scheme')}
                   </p>
                 </div>
               </div>

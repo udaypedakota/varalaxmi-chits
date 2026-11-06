@@ -29,15 +29,22 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenLogin, onOpenInstall, isSt
             <div className="brand-text">
               <h1 className="brand-title">
                 <span>{language === 'te' ? 'శ్రీ వరలక్ష్మి చిట్స్' : 'Sri Varalaxmi Chits'}</span>
-                <span 
-                  className="brand-group-pill"
-                  title={dbStatus?.isMongoConnected 
-                    ? (language === 'te' ? 'క్లౌడ్ డేటాబేస్ కనెక్ట్ అయింది (🟢 Live Atlas Cloud)' : 'Cloud Database Connected (🟢 Live Atlas Cloud)') 
-                    : (language === 'te' ? 'డేటాబేస్ ఆఫ్‌లైన్ (🟡 Local Storage Sync)' : 'Database Offline (🟡 Local Storage Sync)')}
-                >
-                  <span className={`db-live-dot ${dbStatus?.isMongoConnected ? 'online' : 'offline'}`} />
-                  <span>{currentGroup.id === 'grp-2' ? (language === 'te' ? 'గ్రూప్ B' : 'Group B') : (language === 'te' ? 'గ్రూప్ A' : 'Group A')}</span>
-                </span>
+                {currentUser ? (
+                  <span 
+                    className="brand-group-pill"
+                    title={dbStatus?.isMongoConnected 
+                      ? (language === 'te' ? 'క్లౌడ్ డేటాబేస్ కనెక్ట్ అయింది (🟢 Live Atlas Cloud)' : 'Cloud Database Connected (🟢 Live Atlas Cloud)') 
+                      : (language === 'te' ? 'డేటాబేస్ ఆఫ్‌లైన్ (🟡 Local Storage Sync)' : 'Database Offline (🟡 Local Storage Sync)')}
+                  >
+                    <span className={`db-live-dot ${dbStatus?.isMongoConnected ? 'online' : 'offline'}`} />
+                    <span>{currentGroup.id === 'grp-2' ? (language === 'te' ? 'గ్రూప్ B' : 'Group B') : (language === 'te' ? 'గ్రూప్ A' : 'Group A')}</span>
+                  </span>
+                ) : (
+                  <span 
+                    className={`db-live-dot standalone ${dbStatus?.isMongoConnected ? 'online' : 'offline'}`}
+                    title={dbStatus?.isMongoConnected ? 'Live Atlas Cloud' : 'Offline'}
+                  />
+                )}
               </h1>
               <span className="brand-subtitle">
                 {language === 'te' 

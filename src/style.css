@@ -1227,6 +1227,19 @@ body {
   border-color: var(--gold-bright);
 }
 
+select.form-input,
+.form-input select {
+  cursor: pointer;
+}
+
+select.form-input option,
+.form-input option {
+  background-color: #0A1128 !important;
+  color: #FFFFFF !important;
+  font-weight: 600;
+  padding: 8px 12px;
+}
+
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -2065,15 +2078,18 @@ body {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 1000;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 1rem;
+  padding: max(calc(env(safe-area-inset-top, 0px) + 1.25rem), 54px) 1rem max(calc(env(safe-area-inset-bottom, 0px) + 2.5rem), 50px) 1rem;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
 
 .btn-modal-close {
@@ -2110,11 +2126,14 @@ body {
   border-radius: var(--radius-xl);
   max-width: 440px;
   width: 100%;
+  margin: 0 auto 2.5rem auto;
+  box-sizing: border-box;
   padding: 2.25rem 2rem;
   box-shadow: 
     0 25px 65px -12px rgba(0, 0, 0, 0.85),
     inset 0 1px 1px 0 rgba(254, 240, 138, 0.3),
     0 0 35px -5px rgba(245, 158, 11, 0.18);
+  touch-action: pan-y;
 }
 
 .login-modal-card.luxury-card {
@@ -2452,10 +2471,13 @@ body {
   border-radius: var(--radius-xl);
   max-width: 580px;
   width: 100%;
+  margin: 0 auto 2.5rem auto;
+  box-sizing: border-box;
   padding: 2rem 1.75rem;
   box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8), var(--gold-glow);
   max-height: 90vh;
   overflow-y: auto;
+  touch-action: pan-y;
 }
 
 .lottery-modal-header {
@@ -2726,6 +2748,9 @@ body {
   position: relative;
   max-width: 520px;
   width: 100%;
+  margin: 0 auto 2.5rem auto;
+  box-sizing: border-box;
+  touch-action: pan-y;
 }
 
 .receipt-top-controls {
@@ -4094,6 +4119,9 @@ body {
   max-width: 1000px;
   width: 95%;
   height: 85vh;
+  margin: 0 auto 2.5rem auto;
+  box-sizing: border-box;
+  touch-action: pan-y;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -4489,8 +4517,17 @@ body {
     padding: 1.25rem 0.5rem 6.5rem 0.5rem;
   }
 
-  .lottery-modal-card, .login-modal-card {
-    padding: 1.5rem 1rem;
+  .modal-backdrop {
+    padding: max(calc(env(safe-area-inset-top, 0px) + 0.85rem), 54px) 0.65rem max(calc(env(safe-area-inset-bottom, 0px) + 2.5rem), 50px) 0.65rem !important;
+    align-items: flex-start !important;
+  }
+
+  .lottery-modal-card, .login-modal-card, .lifting-modal-card {
+    padding: 1.15rem 0.95rem !important;
+    border-radius: 18px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto 2.5rem auto !important;
   }
 
   /* Master Schedule Table 100% Mobile Fit (Zero Horizontal Scroll, No Cutoff) */
@@ -5122,12 +5159,15 @@ body {
    ========================================================================== */
 .lifting-modal-card {
   max-width: 520px;
-  width: 95vw;
+  width: 100%;
+  margin: 0 auto 2.5rem auto;
+  box-sizing: border-box;
   background: linear-gradient(180deg, #0D1636 0%, #070B19 100%) !important;
   border: 1.5px solid rgba(245, 158, 11, 0.45) !important;
   border-radius: 22px !important;
-  padding: 1.5rem !important;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(245, 158, 11, 0.2) !important;
+  padding: 1.35rem 1.25rem !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(245, 158, 11, 0.25) !important;
+  touch-action: pan-y;
 }
 
 .method-segmented-group {
@@ -5490,21 +5530,26 @@ body {
 .modal-backdrop-luxury {
   position: fixed;
   inset: 0;
-  z-index: 1100;
+  z-index: 10100;
   background: rgba(4, 7, 18, 0.92);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 1rem;
+  padding: max(calc(env(safe-area-inset-top, 0px) + 1.25rem), 54px) 1rem max(calc(env(safe-area-inset-bottom, 0px) + 2.5rem), 50px) 1rem;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
 
 .install-pwa-modal {
   width: 100%;
   max-width: 460px;
+  margin: 0 auto 2.5rem auto;
+  box-sizing: border-box;
+  touch-action: pan-y;
   background: linear-gradient(180deg, #0A1128 0%, #070D1C 50%, #050814 100%);
   border: 1.8px solid rgba(245, 158, 11, 0.45);
   border-radius: 28px;
