@@ -59,8 +59,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
     deleteMember,
     groups,
     dbStatus,
-    truncateAllData,
-    seedAllData,
     language,
     showToast
   } = useChit();
@@ -71,7 +69,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
   const [filterStatus, setFilterStatus] = useState<'all' | 'lifted' | 'eligible'>('all');
   const [isReportsOpen, setIsReportsOpen] = useState(false);
   const [previewProofUrl, setPreviewProofUrl] = useState<string | null>(null);
-  const [isTruncating, setIsTruncating] = useState(false);
   const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
   const [newMemberName, setNewMemberName] = useState('');
@@ -239,27 +236,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
       `UPI ID: ${currentGroup.organizerUpiId} (${currentGroup.organizerName})\nధన్యవాదాలు!`
     );
     window.open(`https://wa.me/91${member.phone}?text=${message}`, '_blank');
-  };
-
-  const handleTruncateConfirm = async () => {
-    const confirmed = window.confirm(
-      language === 'te'
-        ? '⚠️ హెచ్చరిక: మీరు మొత్తం డేటాబేస్ ను ఖాళీ (Truncate) చేయాలనుకుంటున్నారా? సభ్యులు, పేమెంట్లు అన్నీ క్లియర్ అవుతాయి. కొత్త క్లీన్ ఫ్లో టెస్ట్ చేయడానికి ఇది ఉపయోగపడుతుంది.'
-        : '⚠️ Warning: Are you sure you want to TRUNCATE / Clear the entire database? All members & payments will be cleared for testing clean flow.'
-    );
-    if (confirmed) {
-      setIsTruncating(true);
-      await truncateAllData();
-      setIsTruncating(false);
-      alert(language === 'te' ? 'డేటాబేస్ విజయవంతంగా క్లియర్ చేయబడింది!' : 'Database cleared successfully! Fresh testing mode ready.');
-    }
-  };
-
-  const handleSeedConfirm = async () => {
-    setIsTruncating(true);
-    await seedAllData();
-    setIsTruncating(false);
-    alert(language === 'te' ? 'టెస్ట్ డేటా విజయవంతంగా లోడ్ అయింది!' : 'Default test data restored successfully!');
   };
 
   return (
@@ -707,8 +683,15 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
           </div>
         </div>
 
+        {/* Mobile Horizontal Scroll Hint */}
+        <div className="table-scroll-hint-bar">
+          <span className="scroll-hint-text">
+            {language === 'te' ? '👉 పూర్తి 9 కాలమ్స్ వివరాల కోసం పట్టికను పక్కకు జరపండి' : '👉 Swipe horizontally to view all 9 columns'}
+          </span>
+        </div>
+
         {/* Ledger Table */}
-        <div className="table-responsive-container">
+        <div className="table-responsive-container ledger-table-wrap">
           {filteredMembers.length === 0 ? (
             <div className="text-center py-10 border border-dashed border-gray-800 rounded-xl bg-gray-950/40 my-3">
               <Users size={36} className="mx-auto text-gray-500 mb-2" />
@@ -1255,44 +1238,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
         </div>
       )}
 
-      {/* 6. CLOUD DATABASE CONTROLS & SYSTEM STATUS (Admin Footer) */}
-      <section className="db-control-banner animate-fade mt-8 pt-4 border-t border-gray-800">
-        <div className="db-status-pill">
-          <Database size={15} className="text-emerald-400" />
-          <span>
-            {language === 'te' ? 'డేటాబేస్ స్థితి:' : 'Database Status:'} 
-            <strong className="text-emerald-400 ml-1">
-              {dbStatus.isMongoConnected ? '🟢 MongoDB Atlas (Live Cloud)' : '🟡 MongoDB Hybrid Mode'}
-            </strong>
-          </span>
-        </div>
-
-        <div className="db-actions-row">
-          <button
-            type="button"
-            className="btn-seed-data"
-            onClick={handleSeedConfirm}
-            disabled={isTruncating}
-            title="Restore Default Test Data"
-          >
-            <RefreshCw size={14} className={isTruncating ? 'animate-spin' : ''} />
-            <span>{language === 'te' ? 'టెస్ట్ డేటా నింపు' : 'Seed Test Data'}</span>
-          </button>
-
-          <button
-            type="button"
-            className="btn-truncate-db"
-            onClick={handleTruncateConfirm}
-            disabled={isTruncating}
-            title="Clear all data for clean testing"
-          >
-            <Trash2 size={14} />
-            <span>{language === 'te' ? 'డేటాబేస్ ఖాళీ చేయి (Truncate)' : 'Truncate DB'}</span>
-          </button>
-        </div>
-      </section>
-
-      {/* 7. FINANCIAL REPORTS MODAL (Section 11) */}
+      {/* FINANCIAL REPORTS MODAL */}
       <FinancialReportsModal
         isOpen={isReportsOpen}
         onClose={() => setIsReportsOpen(false)}

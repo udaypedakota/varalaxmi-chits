@@ -227,11 +227,33 @@ body {
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.15) 100%);
   color: #FDE68A;
   border: 1px solid rgba(245, 158, 11, 0.5);
-  padding: 1px 6px;
+  padding: 1px 7px;
   border-radius: 9999px;
   letter-spacing: 0.03em;
   box-shadow: 0 0 6px rgba(245, 158, 11, 0.2);
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.db-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.db-live-dot.online {
+  background: #10B981;
+  box-shadow: 0 0 8px #10B981;
+}
+
+.db-live-dot.offline {
+  background: #F59E0B;
+  box-shadow: 0 0 8px #F59E0B;
 }
 
 .group-name-short {
@@ -4384,11 +4406,44 @@ body {
     border-radius: 16px !important;
   }
 
-  .table-responsive-container {
+  .schedule-section .table-responsive-container {
     overflow-x: hidden !important;
     width: 100% !important;
     border-radius: 12px !important;
     border: 1px solid rgba(245, 158, 11, 0.25) !important;
+  }
+
+  /* Member Directory Ledger Table: Allow smooth touch horizontal scroll so all 9 columns are accessible */
+  .table-responsive-container,
+  .ledger-table-wrap {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(245, 158, 11, 0.25) !important;
+  }
+
+  .ledger-table {
+    min-width: 760px !important;
+  }
+
+  .ledger-table th,
+  .ledger-table td {
+    white-space: nowrap !important;
+    padding: 0.65rem 0.6rem !important;
+  }
+
+  .table-scroll-hint-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: 0.72rem;
+    color: var(--gold-light);
+    margin-bottom: 0.45rem;
+    padding: 0.25rem 0.5rem;
+    background: rgba(245, 158, 11, 0.1);
+    border-radius: 8px;
+    border: 1px dashed rgba(245, 158, 11, 0.35);
   }
 
   .master-table {

@@ -13,7 +13,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenLogin, onOpenInstall, isStandalone }) => {
-  const { activeGroup, scheme, currentUser, language, logout } = useChit();
+  const { activeGroup, scheme, currentUser, language, logout, dbStatus } = useChit();
 
   const currentGroup = activeGroup || scheme;
 
@@ -29,8 +29,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenLogin, onOpenInstall, isSt
             <div className="brand-text">
               <h1 className="brand-title">
                 <span>{language === 'te' ? 'శ్రీ వరలక్ష్మి చిట్స్' : 'Sri Varalaxmi Chits'}</span>
-                <span className="brand-group-pill">
-                  {currentGroup.id === 'grp-2' ? (language === 'te' ? 'గ్రూప్ B' : 'Group B') : (language === 'te' ? 'గ్రూప్ A' : 'Group A')}
+                <span 
+                  className="brand-group-pill"
+                  title={dbStatus?.isMongoConnected 
+                    ? (language === 'te' ? 'క్లౌడ్ డేటాబేస్ కనెక్ట్ అయింది (🟢 Live Atlas Cloud)' : 'Cloud Database Connected (🟢 Live Atlas Cloud)') 
+                    : (language === 'te' ? 'డేటాబేస్ ఆఫ్‌లైన్ (🟡 Local Storage Sync)' : 'Database Offline (🟡 Local Storage Sync)')}
+                >
+                  <span className={`db-live-dot ${dbStatus?.isMongoConnected ? 'online' : 'offline'}`} />
+                  <span>{currentGroup.id === 'grp-2' ? (language === 'te' ? 'గ్రూప్ B' : 'Group B') : (language === 'te' ? 'గ్రూప్ A' : 'Group A')}</span>
                 </span>
               </h1>
               <span className="brand-subtitle">
