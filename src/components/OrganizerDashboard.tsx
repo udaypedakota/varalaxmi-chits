@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useChit } from '../context/ChitContext';
 import { MASTER_SCHEDULE, getInstallmentForMember, getMonthDisplayName } from '../data/scheduleData';
 import { PaymentRecord, Member } from '../types/chit';
-import { FinancialReportsModal } from './FinancialReportsModal';
 import { 
   Users, 
   CheckCircle2, 
@@ -18,7 +17,6 @@ import {
   CreditCard,
   FileCheck,
   Send,
-  FileSpreadsheet,
   Trash2,
   RefreshCw,
   Database,
@@ -67,7 +65,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'lifted' | 'eligible'>('all');
-  const [isReportsOpen, setIsReportsOpen] = useState(false);
   const [previewProofUrl, setPreviewProofUrl] = useState<string | null>(null);
   const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
@@ -339,15 +336,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                 ? `🎰 నెల ${currentGroup.currentMonth} లక్కీ డ్రా నిర్వహించండి` 
                 : `🎰 Launch Month ${currentGroup.currentMonth} Lucky Draw`}
             </span>
-          </button>
-
-          <button 
-            type="button" 
-            className="btn-tool-reports"
-            onClick={() => setIsReportsOpen(true)}
-          >
-            <FileSpreadsheet size={18} />
-            <span>{language === 'te' ? 'ఆర్థిక నివేదికలు & ఎక్సెల్ (9 Reports)' : '9 Financial Reports & Excel'}</span>
           </button>
 
           <button 
@@ -1222,12 +1210,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
           </div>
         </div>
       )}
-
-      {/* FINANCIAL REPORTS MODAL */}
-      <FinancialReportsModal
-        isOpen={isReportsOpen}
-        onClose={() => setIsReportsOpen(false)}
-      />
     </div>
   );
 };
