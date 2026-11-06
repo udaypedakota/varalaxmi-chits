@@ -4,7 +4,6 @@ import { LogIn, LogOut, Download } from 'lucide-react';
 import { LanguageToggle } from './LanguageToggle';
 import { NotificationDropdown } from './NotificationDropdown';
 import { GroupSwitcher } from './GroupSwitcher';
-import { getMonthDisplayName } from '../data/scheduleData';
 
 interface NavbarProps {
   onOpenLogin: () => void;
@@ -92,19 +91,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenLogin, onOpenInstall, isSt
           </div>
         </div>
 
-        {/* Sub Row: Scheme Month, Language, Notifications, & Group Switcher */}
+        {/* Sub Row: Group Switcher (Organizer) on Left, Language & Notifications on Right */}
         <div className="navbar-sub-row">
           <div className="navbar-sub-left">
             {currentUser?.role === 'organizer' && (
               <GroupSwitcher />
             )}
-
-            <div className="current-month-badge">
-              <span className="month-dot"></span>
-              <span className="month-text font-bold">
-                {getMonthDisplayName(currentGroup.currentMonth, language)}
-              </span>
-            </div>
           </div>
 
           <div className="navbar-sub-right">
