@@ -123,11 +123,9 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(10, 17, 40, 0.92);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--navy-border-gold);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  background: #070D1F;
+  border-bottom: 1.5px solid var(--navy-border-gold);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
   padding-top: env(safe-area-inset-top, 0px);
 }
 
@@ -3225,9 +3223,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 60;
-  background: rgba(7, 13, 28, 0.98);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: #070D1C;
   border-bottom: 1px solid rgba(245, 158, 11, 0.22);
   display: flex;
   align-items: center;
