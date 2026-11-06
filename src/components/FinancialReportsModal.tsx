@@ -233,7 +233,7 @@ export const FinancialReportsModal: React.FC<FinancialReportsModalProps> = ({ is
                         <tr key={m.id}>
                           <td>#{m.memberNo}</td>
                           <td><strong>{language === 'te' ? m.nameTe : m.name}</strong></td>
-                          <td>₹{m.hasLiftedChit ? activeGroup.fixedTakenInstallment.toLocaleString('en-IN') : '10,350'}</td>
+                          <td>₹{m.hasLiftedChit ? activeGroup.fixedTakenInstallment.toLocaleString('en-IN') : activeGroup.monthlyInstallment.toLocaleString('en-IN')}</td>
                           <td>{cur?.status === 'approved' ? <span className="status-badge-paid">Paid</span> : <span className="status-badge-due">Pending</span>}</td>
                         </tr>
                       );

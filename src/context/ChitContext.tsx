@@ -124,7 +124,7 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
       totalValue: 200000,
       totalMonths: 20,
       totalMembers: 20,
-      monthlyInstallment: 11350,
+      monthlyInstallment: 10000,
       fixedTakenInstallment: 11500,
       organizerName: 'Siva (Organizer)',
       organizerPhone: '8790859546',
@@ -409,7 +409,7 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     totalValue: 200000,
                     totalMonths: 20,
                     totalMembers: 20,
-                    monthlyInstallment: 11350,
+                    monthlyInstallment: 10000,
                     name: 'Sri Varalaxmi Chits (Group B)',
                     nameTe: 'శ్రీ వరలక్ష్మి చిట్స్ (గ్రూప్ B)'
                   };
@@ -419,7 +419,7 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
                   totalValue: 200000,
                   totalMonths: 20,
                   totalMembers: 20,
-                  monthlyInstallment: 11350,
+                  monthlyInstallment: 10000,
                   name: 'Sri Varalaxmi Chits (Group A)',
                   nameTe: 'శ్రీ వరలక్ష్మి చిట్స్ (గ్రూప్ A)'
                 };

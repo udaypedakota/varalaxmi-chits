@@ -189,7 +189,7 @@ const INITIAL_GROUPS = [
     totalValue: 200000,
     totalMonths: 20,
     totalMembers: 20,
-    monthlyInstallment: 11350,
+    monthlyInstallment: 10000,
     fixedTakenInstallment: 11500,
     commissionPercent: 5,
     currentMonth: 1, // Fresh Start: Month 1
@@ -206,7 +206,7 @@ const INITIAL_GROUPS = [
     totalValue: 200000,
     totalMonths: 20,
     totalMembers: 20,
-    monthlyInstallment: 11350,
+    monthlyInstallment: 10000,
     fixedTakenInstallment: 11500,
     commissionPercent: 5,
     currentMonth: 1, // Fresh Start: Month 1
@@ -270,7 +270,7 @@ async function connectDB() {
           totalValue: 200000,
           totalMonths: 20,
           totalMembers: 20,
-          monthlyInstallment: 11350,
+          monthlyInstallment: 10000,
           fixedTakenInstallment: 11500
         } 
       }
@@ -284,7 +284,7 @@ async function connectDB() {
           totalValue: 200000, 
           totalMonths: 20, 
           totalMembers: 20, 
-          monthlyInstallment: 11350 
+          monthlyInstallment: 10000 
         } 
       }
     );

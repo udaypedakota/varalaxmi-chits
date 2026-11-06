@@ -42,7 +42,7 @@ export const GroupSwitcher: React.FC = () => {
       totalValue: Number(totalValue),
       totalMonths: Number(totalMonths),
       totalMembers: Number(totalMonths),
-      monthlyInstallment: 11350,
+      monthlyInstallment: 10000,
       commissionPercent: Number(commissionPercent),
       fixedTakenInstallment: Number(fixedTakenInstallment)
     });

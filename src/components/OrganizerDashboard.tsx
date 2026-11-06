@@ -229,7 +229,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
   });
 
   const handleSendReminder = (member: Member) => {
-    const dueAmount = getInstallmentForMember(currentGroup.currentMonth, member);
+    const dueAmount = getInstallmentForMember(currentGroup.currentMonth, member, language);
     const message = encodeURIComponent(
       `నమస్కారం ${member.nameTe} గారు,\n` +
       `శ్రీ వరలక్ష్మి చిట్స్ (${currentGroup.nameTe}) నెల ${currentGroup.currentMonth} వాయిదా సొమ్ము ₹${dueAmount.toLocaleString('en-IN')} తేదీ ${currentGroup.paymentDueDay} లోపు చెల్లించవలసిందిగా కోరుతున్నాము.\n` +
@@ -731,7 +731,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               </thead>
               <tbody>
                 {filteredMembers.map(m => {
-                  const monthDue = getInstallmentForMember(currentGroup.currentMonth, m);
+                  const monthDue = getInstallmentForMember(currentGroup.currentMonth, m, language);
                   const curPay = groupPayments.find(p => p.memberId === m.id && p.month === currentGroup.currentMonth);
                   const isPaid = curPay?.status === 'approved';
                   const isPending = curPay?.status === 'pending';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useChit } from '../context/ChitContext';
-import { MASTER_SCHEDULE, getInstallmentForMember, getMonthDisplayName, MONTH_CALENDAR_NAMES } from '../data/scheduleData';
+import { MASTER_SCHEDULE, getInstallmentForMember, getScheduleNotTakenAmount, getMonthDisplayName, MONTH_CALENDAR_NAMES } from '../data/scheduleData';
 import { PaymentRecord } from '../types/chit';
 
 // Compact Short Month Names for 100% Mobile Table Fit
@@ -66,7 +66,7 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
   const currentGroup = activeGroup || scheme;
 
   // Calculate stats for current member
-  const currentMonthDue = getInstallmentForMember(currentGroup.currentMonth, currentUser);
+  const currentMonthDue = getInstallmentForMember(currentGroup.currentMonth, currentUser, language);
   const currentMonthPayment = groupPayments.find(
     p => p.memberId === currentUser.id && p.month === currentGroup.currentMonth
   );
@@ -399,14 +399,14 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
                 <th className="th-val">{language === 'te' ? 'చిట్ విలువ' : 'Chit Value'}</th>
                 <th className="th-nottaken">
                   <div className="th-stacked-header">
-                    <span>{language === 'te' ? 'వాయిదా' : 'Installment'}</span>
-                    <span className="th-sub-note">{language === 'te' ? '(తీసుకోని వారు)' : '(Less Price)'}</span>
+                    <span>{language === 'te' ? 'చిట్ తీసుకోని వారి వాయిదా' : 'Chit Not Taken'}</span>
+                    <span className="th-sub-note">{language === 'te' ? '(తగ్గింపు వాయిదా)' : '(Discounted)'}</span>
                   </div>
                 </th>
                 <th className="th-taken">
                   <div className="th-stacked-header">
-                    <span>{language === 'te' ? 'స్థిర వాయిదా' : 'Fixed Rate'}</span>
-                    <span className="th-sub-note">{language === 'te' ? '(ఎత్తిన వారు)' : '(Chit Taken)'}</span>
+                    <span>{language === 'te' ? 'చిట్ తీసుకున్న వారి వాయిదా' : 'Chit Taken Rate'}</span>
+                    <span className="th-sub-note">{language === 'te' ? '(స్థిర వాయిదా)' : '(Fixed Post-Lift)'}</span>
                   </div>
                 </th>
               </tr>
@@ -415,6 +415,7 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
               {MASTER_SCHEDULE.map(item => {
                 const isCurrent = item.month === scheme.currentMonth;
                 const isPast = item.month < scheme.currentMonth;
+                const notTaken = getScheduleNotTakenAmount(item, language);
                 return (
                   <tr key={item.month} className={`schedule-row ${isCurrent ? 'current-active-row' : ''} ${isPast ? 'past-row' : ''}`}>
                     <td className="td-month">
@@ -438,7 +439,7 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
                       ₹{item.chitValue.toLocaleString('en-IN')}
                     </td>
                     <td className="td-nottaken font-mono font-bold text-amber-400">
-                      {item.notTakenAmount === 0 ? '₹0' : `₹${item.notTakenAmount.toLocaleString('en-IN')}`}
+                      {notTaken === 0 ? '₹0' : `₹${notTaken.toLocaleString('en-IN')}`}
                     </td>
                     <td className="td-taken font-mono font-bold text-emerald-400">
                       ₹{item.takenAmount.toLocaleString('en-IN')}

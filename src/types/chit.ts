@@ -22,6 +22,7 @@ export interface ScheduleItem {
   month: number;
   chitValue: number;
   notTakenAmount: number;
+  notTakenAmountTe?: number;
   takenAmount: number;
 }
 
