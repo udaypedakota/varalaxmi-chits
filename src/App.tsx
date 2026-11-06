@@ -103,26 +103,8 @@ const AppContent: React.FC = () => {
             {/* Ambient Gold Aura */}
             <div className="landing-ambient-glow center"></div>
 
-            {/* Top Branded Bar (Row 1): Auspicious Crest & Scheme Specs */}
-            <div className="landing-top-bar">
-              <div className="landing-brand-crest">
-                <div className="landing-crest-coin">
-                  <Sparkles size={16} className="text-amber-300" />
-                </div>
-                <div className="landing-crest-meta">
-                  <div className="landing-crest-title">
-                    <span>{language === 'te' ? 'శ్రీ వరలక్ష్మి చిట్స్' : 'Sri Varalaxmi Chits'}</span>
-                    <span className="landing-group-badge">{activeGroup?.name || 'Group A'}</span>
-                  </div>
-                  <div className="landing-crest-subtitle">
-                    {language === 'te' ? '20 నెలల పథకం • ₹2,00,000' : '20-Month Scheme • ₹2,00,000'}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Sub Bar (Row 2): Language Selector & Install Button (Cleanly stacked to prevent any overlap) */}
-            <div className="landing-sub-bar">
+            {/* Top Language Bar & Optional Install Pill (No Group Name before login) */}
+            <header className="landing-header-row">
               {!isStandalone && (
                 <button
                   type="button"
@@ -130,12 +112,13 @@ const AppContent: React.FC = () => {
                   onClick={() => setIsInstallModalOpen(true)}
                   title={language === 'te' ? 'శ్రీ వరలక్ష్మి చిట్స్ యాప్‌ను ఇన్‌స్టాల్ చేసుకోండి' : 'Install Sri Varalaxmi Chits App'}
                 >
-                  <Download size={12} className="text-amber-400" />
+                  <Download size={13} className="text-amber-400" />
                   <span>{language === 'te' ? 'యాప్ ఇన్‌స్టాల్' : 'Install App'}</span>
                 </button>
               )}
-              <LanguageToggle showIcon={false} />
-            </div>
+              <div className="landing-header-spacer"></div>
+              <LanguageToggle />
+            </header>
 
             {/* Upper Flowing Golden Ribbons in Background */}
             <div className="landing-top-waves">

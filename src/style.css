@@ -3009,94 +3009,30 @@ body {
   z-index: 1;
 }
 
-.landing-top-bar {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: calc(env(safe-area-inset-top, 0px) + 0.85rem) 1.25rem 0.2rem 1.25rem;
-  position: relative;
-  z-index: 25;
-  width: 100%;
-}
-
-.landing-sub-bar {
+.landing-header-row {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.5rem;
-  padding: 0.15rem 1.25rem 0.35rem 1.25rem;
+  padding: 0.85rem 1.25rem 0.25rem 1.25rem;
   position: relative;
   z-index: 25;
   width: 100%;
-}
-
-.landing-brand-crest {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  min-width: 0;
-}
-
-.landing-crest-coin {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #FDE68A 0%, #F59E0B 50%, #B45309 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 14px rgba(245, 158, 11, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(254, 240, 138, 0.6);
   flex-shrink: 0;
 }
 
-.landing-crest-meta {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.landing-crest-title {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.88rem;
-  font-weight: 800;
-  color: #FFFFFF;
-  line-height: 1.2;
-  white-space: nowrap;
-  letter-spacing: -0.01em;
-}
-
-.landing-group-badge {
-  font-size: 0.62rem;
-  font-weight: 700;
-  color: #FDE68A;
-  background: rgba(245, 158, 11, 0.18);
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  border-radius: 9999px;
-  padding: 0.05rem 0.35rem;
-  letter-spacing: 0.3px;
-}
-
-.landing-crest-subtitle {
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: #F59E0B;
-  letter-spacing: 0.2px;
-  line-height: 1.2;
-  white-space: nowrap;
+.landing-header-spacer {
+  flex: 1;
 }
 
 .landing-top-waves {
   position: absolute;
-  top: clamp(75px, 12vh, 110px);
+  top: clamp(65px, 10vh, 100px);
   left: 0;
   width: 100%;
   height: 130px;
   pointer-events: none;
   z-index: 2;
-  opacity: 0.42;
+  opacity: 0.35;
   overflow: hidden;
 }
 
@@ -4871,11 +4807,15 @@ body {
    ========================================================================== */
 @supports (-webkit-touch-callout: none) {
   .app-navbar {
-    padding-top: max(env(safe-area-inset-top, 0px), 44px) !important;
+    padding-top: max(calc(env(safe-area-inset-top, 0px) + 0.65rem), 58px) !important;
   }
 
   .login-frame-top-bar {
-    padding-top: max(env(safe-area-inset-top, 0px), 44px) !important;
+    padding-top: max(calc(env(safe-area-inset-top, 0px) + 0.65rem), 58px) !important;
+  }
+
+  .landing-header-row {
+    padding-top: max(calc(env(safe-area-inset-top, 0px) + 0.65rem), 58px) !important;
   }
 }
 
