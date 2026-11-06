@@ -173,8 +173,9 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return (parsed || []).filter((n: ChitNotification) =>
       !n.title?.includes('Month 3 installment') &&
       !n.message?.includes('Uday (#2) won a chit') &&
-      !n.message?.includes('SVC-2026-02-002')
-    );
+      !n.message?.includes('SVC-2026-02-002') &&
+      !n.id?.startsWith('toast-')
+    ).map((n: ChitNotification) => ({ ...n, isRead: true }));
   });
 
   // 7. Current User (Persisted so page refresh maintains login across localStorage & sessionStorage)
@@ -343,7 +344,7 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
       messageTe: message,
       type: notifType,
       date: new Date().toISOString().split('T')[0],
-      isRead: false
+      isRead: true
     };
     triggerToast(notif);
   };
@@ -357,10 +358,12 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const incomingNotif: ChitNotification = event.data.notif;
         setActiveToast(incomingNotif);
         playChimeAudio();
-        setNotifications(prev => {
-          if (prev.some(n => n.id === incomingNotif.id)) return prev;
-          return [incomingNotif, ...prev];
-        });
+        if (incomingNotif.id && !incomingNotif.id.startsWith('toast-')) {
+          setNotifications(prev => {
+            if (prev.some(n => n.id === incomingNotif.id)) return prev;
+            return [incomingNotif, ...prev];
+          });
+        }
       }
     };
     return () => {

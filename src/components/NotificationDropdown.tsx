@@ -52,14 +52,17 @@ export const NotificationDropdown: React.FC = () => {
       <button
         type="button"
         className={`btn-notification-trigger ${isOpen ? 'active' : ''}`}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          const nextState = !isOpen;
+          setIsOpen(nextState);
+          if (nextState) {
+            markAllNotificationsAsRead();
+          }
+        }}
         aria-label="Notifications"
         title={language === 'te' ? 'సమాచారాలు (నోటిఫికేషన్లు)' : 'Notifications'}
       >
         <Bell size={18} />
-        {unreadCount > 0 && (
-          <span className="notif-badge-count">{unreadCount}</span>
-        )}
       </button>
 
       {/* Popover Dropdown */}
