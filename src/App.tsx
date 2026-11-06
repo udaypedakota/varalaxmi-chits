@@ -103,8 +103,8 @@ const AppContent: React.FC = () => {
             {/* Ambient Gold Aura */}
             <div className="landing-ambient-glow center"></div>
 
-            {/* Top Branded Header Row: Auspicious Crest & Language Bar */}
-            <header className="landing-header-row">
+            {/* Top Branded Bar (Row 1): Auspicious Crest & Scheme Specs */}
+            <div className="landing-top-bar">
               <div className="landing-brand-crest">
                 <div className="landing-crest-coin">
                   <Sparkles size={16} className="text-amber-300" />
@@ -119,22 +119,23 @@ const AppContent: React.FC = () => {
                   </div>
                 </div>
               </div>
+            </div>
 
-              <div className="landing-header-right">
-                {!isStandalone && (
-                  <button
-                    type="button"
-                    className="landing-install-pill animate-pulse-subtle"
-                    onClick={() => setIsInstallModalOpen(true)}
-                    title={language === 'te' ? 'శ్రీ వరలక్ష్మి చిట్స్ యాప్‌ను ఇన్‌స్టాల్ చేసుకోండి' : 'Install Sri Varalaxmi Chits App'}
-                  >
-                    <Download size={13} className="text-amber-400" />
-                    <span>{language === 'te' ? 'ఇన్‌స్టాల్' : 'Install'}</span>
-                  </button>
-                )}
-                <LanguageToggle />
-              </div>
-            </header>
+            {/* Sub Bar (Row 2): Language Selector & Install Button (Cleanly stacked to prevent any overlap) */}
+            <div className="landing-sub-bar">
+              {!isStandalone && (
+                <button
+                  type="button"
+                  className="landing-install-pill animate-pulse-subtle"
+                  onClick={() => setIsInstallModalOpen(true)}
+                  title={language === 'te' ? 'శ్రీ వరలక్ష్మి చిట్స్ యాప్‌ను ఇన్‌స్టాల్ చేసుకోండి' : 'Install Sri Varalaxmi Chits App'}
+                >
+                  <Download size={12} className="text-amber-400" />
+                  <span>{language === 'te' ? 'యాప్ ఇన్‌స్టాల్' : 'Install App'}</span>
+                </button>
+              )}
+              <LanguageToggle showIcon={false} />
+            </div>
 
             {/* Upper Flowing Golden Ribbons in Background */}
             <div className="landing-top-waves">
