@@ -262,27 +262,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                 ))}
               </select>
             </div>
-
-            {currentGroup.currentMonth < currentGroup.totalMonths && (
-              <button
-                type="button"
-                className="btn-seed-data py-1.5 px-3 text-xs flex items-center gap-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-lg transition-colors font-semibold"
-                onClick={() => {
-                  const nextM = currentGroup.currentMonth + 1;
-                  const confirmAdv = window.confirm(
-                    language === 'te'
-                      ? `నెల ${currentGroup.currentMonth} కలెక్షన్స్ & వేలం పూర్తయిన తర్వాత, చిట్ ను తదుపరి నెలకు (${getMonthDisplayName(nextM, 'te')}) మార్చాలనుకుంటున్నారా?`
-                      : `Advance chit fund to next month: ${getMonthDisplayName(nextM, 'en')}?`
-                  );
-                  if (confirmAdv) {
-                    setCurrentMonth(nextM);
-                  }
-                }}
-                title={language === 'te' ? 'తదుపరి నెలకు మార్చండి' : 'Advance to Next Month'}
-              >
-                <span>{language === 'te' ? `➡️ తదుపరి నెల (${getMonthDisplayName(currentGroup.currentMonth + 1, language)})` : `➡️ Next Month (${currentGroup.currentMonth + 1})`}</span>
-              </button>
-            )}
           </div>
         </div>
 
