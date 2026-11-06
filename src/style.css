@@ -112,6 +112,7 @@ body {
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--navy-border-gold);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 .navbar-container {
@@ -2874,10 +2875,12 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  min-height: 100dvh;
   padding: 1.5rem 1rem;
   background: radial-gradient(circle at 50% 25%, #0F1A34 0%, #060A16 70%, #03060C 100%);
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .landing-mobile-frame {
@@ -2895,18 +2898,19 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 }
 
 @media (max-width: 480px) {
   .landing-viewport-wrap {
     padding: 0;
     min-height: 100vh;
+    min-height: 100dvh;
     background: #070D1C;
   }
   .landing-mobile-frame {
     max-width: 100%;
     min-height: 100vh;
+    min-height: 100dvh;
     border: none;
     border-radius: 0;
     box-shadow: none;
@@ -2930,27 +2934,52 @@ body {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: 1rem 1.25rem 0.25rem 1.25rem;
+  padding: calc(env(safe-area-inset-top, 0px) + 0.85rem) 1.25rem 0.25rem 1.25rem;
   position: relative;
-  z-index: 10;
+  z-index: 25;
+  width: 100%;
+  flex-shrink: 0;
 }
 
 .landing-header-spacer {
   flex: 1;
 }
 
+/* Center Hero Stage: Vertically balanced so Title & Buttons sit at eye level, not crammed at bottom */
+.landing-main-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  position: relative;
+  z-index: 10;
+  padding: 0.25rem 1.35rem max(2rem, calc(1.25rem + env(safe-area-inset-bottom))) 1.35rem;
+  margin-top: -1.25rem; /* Elevates content upward into prime eye/thumb level */
+}
+
+@media (max-height: 700px) {
+  .landing-main-stage {
+    margin-top: 0;
+    padding-bottom: 1.5rem;
+    justify-content: flex-start;
+  }
+}
+
 .landing-art-container {
   position: relative;
   z-index: 5;
   text-align: center;
-  margin: 0.5rem auto 0.25rem auto;
+  margin: 0 auto;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  max-width: 290px;
-  height: 250px;
+  max-width: 280px;
+  height: clamp(175px, 25vh, 235px);
   overflow: visible;
+  flex-shrink: 0;
 }
 
 .art-aura-glow {
@@ -2958,8 +2987,8 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 240px;
-  height: 240px;
+  width: clamp(180px, 24vh, 230px);
+  height: clamp(180px, 24vh, 230px);
   background: radial-gradient(circle, rgba(245, 158, 11, 0.45) 0%, rgba(217, 119, 6, 0.2) 45%, transparent 72%);
   border-radius: 50%;
   pointer-events: none;
@@ -2982,23 +3011,27 @@ body {
 .landing-content-box {
   position: relative;
   z-index: 10;
-  padding: 0 1.35rem 1.25rem 1.35rem;
+  padding: 0;
+  width: 100%;
+  max-width: 350px;
   text-align: center;
+  margin-top: -0.25rem;
 }
 
 .landing-hero-heading {
-  font-size: 1.55rem;
+  font-size: clamp(1.4rem, 4.3vw, 1.65rem);
   font-weight: 850;
   color: #FFFFFF;
-  margin: 0 0 0.4rem 0;
+  margin: 0 0 0.35rem 0;
   letter-spacing: -0.01em;
-  line-height: 1.25;
+  line-height: 1.22;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 .landing-hero-caption {
-  font-size: 0.84rem;
+  font-size: clamp(0.8rem, 2.5vw, 0.86rem);
   color: #94A3B8;
-  margin: 0 auto 1.4rem auto;
+  margin: 0 auto 1.15rem auto;
   max-width: 290px;
   line-height: 1.45;
 }
@@ -3017,7 +3050,7 @@ body {
   font-size: 0.98rem;
   border: 1px solid rgba(254, 240, 138, 0.5);
   border-radius: 16px;
-  padding: 14px 18px;
+  padding: 13px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -3048,7 +3081,7 @@ body {
   font-weight: 700;
   font-size: 0.98rem;
   border-radius: 16px;
-  padding: 14px 18px;
+  padding: 13px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -3072,7 +3105,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  margin: 1.15rem 0 0.85rem 0;
+  margin: 0.95rem 0 0.65rem 0;
 }
 
 .dot-active-pill {
@@ -3095,9 +3128,11 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  font-size: 0.72rem;
+  font-size: 0.73rem;
   color: #94A3B8;
   text-align: center;
+  line-height: 1.35;
+  padding: 0 0.5rem;
 }
 
 .landing-bottom-waves {
@@ -3150,7 +3185,7 @@ body {
   overflow: visible;
   display: flex;
   flex-direction: column;
-  padding-bottom: 1.25rem;
+  padding-bottom: max(1.75rem, calc(1rem + env(safe-area-inset-bottom)));
 }
 
 @media (max-width: 480px) {
@@ -3225,7 +3260,7 @@ body {
 .login-gold-sheet-card {
   position: relative;
   z-index: 10;
-  margin: 2.2rem 1.25rem 0 1.25rem;
+  margin: 1.5rem 1.25rem 1.5rem 1.25rem;
   background: linear-gradient(165deg, rgba(17, 26, 51, 0.97) 0%, rgba(9, 14, 28, 0.99) 100%);
   border: 1.5px solid rgba(245, 158, 11, 0.42);
   border-radius: 28px;

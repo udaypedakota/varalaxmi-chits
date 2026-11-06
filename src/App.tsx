@@ -120,75 +120,78 @@ const AppContent: React.FC = () => {
               <LanguageToggle />
             </header>
 
-            {/* 3D Golden Kalash Artwork (Seamless Blended, No Box) */}
-            <div className="landing-art-container">
-              <div className="art-aura-glow"></div>
-              <img 
-                src="/kalash-3d.jpg" 
-                alt="Sri Varalaxmi 3D Kalash, Lotus & Gold Coins" 
-                className="landing-kalash-3d-img"
-              />
-            </div>
-
-            {/* Center Typography & CTA Section */}
-            <div className="landing-content-box">
-              <h1 className="landing-hero-heading">
-                {language === 'te' ? (
-                  <>శ్రీ వరలక్ష్మి చిట్స్ కు<br />స్వాగతం</>
-                ) : (
-                  <>Welcome to<br />Sri Varalaxmi Chits</>
-                )}
-              </h1>
-              <p className="landing-hero-caption">
-                {language === 'te' ? (
-                  <>20 నెలల పరస్పర ప్రయోజన<br />చిట్ ఫండ్ పథకం (₹2,00,000)</>
-                ) : (
-                  <>20-Month Mutual Benefit<br />Chit Fund Scheme (₹2,00,000)</>
-                )}
-              </p>
-
-              {/* 2 Primary CTA Buttons */}
-              <div className="landing-actions-col">
-                <button 
-                  type="button" 
-                  className="btn-landing-member"
-                  onClick={openMemberLogin}
-                >
-                  <div className="btn-inner-left">
-                    <UserCheck size={20} className="btn-icon" />
-                    <span className="btn-label">{language === 'te' ? 'సభ్యుల లాగిన్' : 'Member Login'}</span>
-                  </div>
-                  <ChevronRight size={20} className="btn-chevron" />
-                </button>
-
-                <button 
-                  type="button" 
-                  className="btn-landing-organizer"
-                  onClick={openOrganizerLogin}
-                >
-                  <div className="btn-inner-left">
-                    <ShieldCheck size={20} className="btn-icon" />
-                    <span className="btn-label">{language === 'te' ? 'ఆర్గనైజర్ లాగిన్' : 'Organizer Login'}</span>
-                  </div>
-                  <ChevronRight size={20} className="btn-chevron text-amber-400" />
-                </button>
+            {/* Main Stage: Vertically balanced and elevated so content is never pushed to the bottom */}
+            <div className="landing-main-stage">
+              {/* 3D Golden Kalash Artwork (Seamless Blended, No Box) */}
+              <div className="landing-art-container">
+                <div className="art-aura-glow"></div>
+                <img 
+                  src="/kalash-3d.jpg" 
+                  alt="Sri Varalaxmi 3D Kalash, Lotus & Gold Coins" 
+                  className="landing-kalash-3d-img"
+                />
               </div>
 
-              {/* Carousel Pagination Dots */}
-              <div className="landing-carousel-dots">
-                <span className="dot-active-pill"></span>
-                <span className="dot-inactive-circle"></span>
-                <span className="dot-inactive-circle"></span>
-              </div>
+              {/* Center Typography & CTA Section */}
+              <div className="landing-content-box">
+                <h1 className="landing-hero-heading">
+                  {language === 'te' ? (
+                    <>శ్రీ వరలక్ష్మి చిట్స్ కు<br />స్వాగతం</>
+                  ) : (
+                    <>Welcome to<br />Sri Varalaxmi Chits</>
+                  )}
+                </h1>
+                <p className="landing-hero-caption">
+                  {language === 'te' ? (
+                    <>20 నెలల పరస్పర ప్రయోజన<br />చిట్ ఫండ్ పథకం (₹2,00,000)</>
+                  ) : (
+                    <>20-Month Mutual Benefit<br />Chit Fund Scheme (₹2,00,000)</>
+                  )}
+                </p>
 
-              {/* Footer Phone Notice */}
-              <div className="landing-footer-note">
-                <Phone size={13} className="text-amber-400 shrink-0" />
-                <span>
-                  {language === 'te' 
-                    ? 'వివరాలకు సంప్రదించండి: చిట్ నిర్వాహకుడు శివ (8790859546)' 
-                    : 'For inquiries, contact Chit Organizer Siva at 8790859546.'}
-                </span>
+                {/* 2 Primary CTA Buttons */}
+                <div className="landing-actions-col">
+                  <button 
+                    type="button" 
+                    className="btn-landing-member"
+                    onClick={openMemberLogin}
+                  >
+                    <div className="btn-inner-left">
+                      <UserCheck size={20} className="btn-icon" />
+                      <span className="btn-label">{language === 'te' ? 'సభ్యుల లాగిన్' : 'Member Login'}</span>
+                    </div>
+                    <ChevronRight size={20} className="btn-chevron" />
+                  </button>
+
+                  <button 
+                    type="button" 
+                    className="btn-landing-organizer"
+                    onClick={openOrganizerLogin}
+                  >
+                    <div className="btn-inner-left">
+                      <ShieldCheck size={20} className="btn-icon" />
+                      <span className="btn-label">{language === 'te' ? 'ఆర్గనైజర్ లాగిన్' : 'Organizer Login'}</span>
+                    </div>
+                    <ChevronRight size={20} className="btn-chevron text-amber-400" />
+                  </button>
+                </div>
+
+                {/* Carousel Pagination Dots */}
+                <div className="landing-carousel-dots">
+                  <span className="dot-active-pill"></span>
+                  <span className="dot-inactive-circle"></span>
+                  <span className="dot-inactive-circle"></span>
+                </div>
+
+                {/* Footer Phone Notice */}
+                <div className="landing-footer-note">
+                  <Phone size={13} className="text-amber-400 shrink-0" />
+                  <span>
+                    {language === 'te' 
+                      ? 'వివరాలకు సంప్రదించండి: చిట్ నిర్వాహకుడు శివ (8790859546)' 
+                      : 'For inquiries, contact Chit Organizer Siva at 8790859546.'}
+                  </span>
+                </div>
               </div>
             </div>
 
