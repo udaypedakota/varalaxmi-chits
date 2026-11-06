@@ -1,78 +1,129 @@
 import React, { useState } from 'react';
 import { useChit } from '../context/ChitContext';
-import { MASTER_SCHEDULE, getInstallmentForMember } from '../data/scheduleData';
+import { MASTER_SCHEDULE, getInstallmentForMember, getMonthDisplayName, MONTH_CALENDAR_NAMES } from '../data/scheduleData';
 import { PaymentRecord } from '../types/chit';
+
+// Compact Short Month Names for 100% Mobile Table Fit
+const MONTH_SHORT_NAMES: { [key: number]: { en: string; te: string } } = {
+  1: { en: "Dec '26", te: "డిసెం '26" },
+  2: { en: "Jan '27", te: "జన '27" },
+  3: { en: "Feb '27", te: "ఫిబ్ర '27" },
+  4: { en: "Mar '27", te: "మార్చి '27" },
+  5: { en: "Apr '27", te: "ఏప్రి '27" },
+  6: { en: "May '27", te: "మే '27" },
+  7: { en: "Jun '27", te: "జూన్ '27" },
+  8: { en: "Jul '27", te: "జూలై '27" },
+  9: { en: "Aug '27", te: "ఆగ '27" },
+  10: { en: "Sep '27", te: "సెప్టెం '27" },
+  11: { en: "Oct '27", te: "అక్టో '27" },
+  12: { en: "Nov '27", te: "నవం '27" },
+  13: { en: "Dec '27", te: "డిసెం '27" },
+  14: { en: "Jan '28", te: "జన '28" },
+  15: { en: "Feb '28", te: "ఫిబ్ర '28" },
+  16: { en: "Mar '28", te: "మార్చి '28" },
+  17: { en: "Apr '28", te: "ఏప్రి '28" },
+  18: { en: "May '28", te: "మే '28" },
+  19: { en: "Jun '28", te: "జూన్ '28" },
+  20: { en: "Jul '28", te: "జూలై '28" }
+};
 import { 
   Wallet, 
   Calendar, 
   CheckCircle, 
+  CheckCircle2,
   Clock, 
-  ArrowUpRight, 
   FileText, 
   AlertCircle,
-  Copy,
   Sparkles,
   Award,
   ChevronRight,
   TrendingUp,
-  Receipt
+  Receipt,
+  Upload,
+  Image as ImageIcon,
+  Gavel,
+  Trophy,
+  Banknote,
+  Smartphone,
+  CreditCard
 } from 'lucide-react';
 
 interface MemberDashboardProps {
   onOpenReceipt: (payment: PaymentRecord) => void;
-  onOpenLottery: () => void;
 }
 
-export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt, onOpenLottery }) => {
-  const { scheme, currentUser, payments, submitPayment, language } = useChit();
+export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt }) => {
+  const { scheme, activeGroup, currentUser, groupPayments, groupLotteryHistory, groupLiftings, submitPayment, language, showToast } = useChit();
 
+  const [paymentMode, setPaymentMode] = useState<'Cash' | 'PhonePe' | 'UPI'>('Cash');
   const [utrInput, setUtrInput] = useState('');
-  const [copiedUpi, setCopiedUpi] = useState(false);
+  const [amountInput, setAmountInput] = useState<string>('');
+  const [proofImage, setProofImage] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   if (!currentUser) return null;
 
+  const currentGroup = activeGroup || scheme;
+
   // Calculate stats for current member
-  const currentMonthDue = getInstallmentForMember(scheme.currentMonth, currentUser);
-  const currentMonthPayment = payments.find(
-    p => p.memberId === currentUser.id && p.month === scheme.currentMonth
+  const currentMonthDue = getInstallmentForMember(currentGroup.currentMonth, currentUser);
+  const currentMonthPayment = groupPayments.find(
+    p => p.memberId === currentUser.id && p.month === currentGroup.currentMonth
   );
 
   const isCurrentMonthPaid = currentMonthPayment?.status === 'approved';
   const isCurrentMonthPending = currentMonthPayment?.status === 'pending';
 
   // Total paid calculation
-  const approvedPayments = payments.filter(
+  const approvedPayments = groupPayments.filter(
     p => p.memberId === currentUser.id && p.status === 'approved'
   );
   const totalPaidAmount = approvedPayments.reduce((sum, p) => sum + p.amount, 0);
   const totalMonthsPaidCount = approvedPayments.length;
-  const progressPercent = Math.min(100, Math.round((totalMonthsPaidCount / scheme.totalMonths) * 100));
+  const progressPercent = Math.min(100, Math.round((totalMonthsPaidCount / currentGroup.totalMonths) * 100));
+  const remainingMonthsCount = Math.max(0, currentGroup.totalMonths - totalMonthsPaidCount);
+  const remainingEstimatedBalance = Math.max(0, currentGroup.totalValue - totalPaidAmount);
 
-  const handleCopyUpi = () => {
-    navigator.clipboard.writeText(scheme.organizerUpiId);
-    setCopiedUpi(true);
-    setTimeout(() => setCopiedUpi(false), 2500);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProofImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handlePaymentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!utrInput.trim()) return;
 
-    submitPayment(scheme.currentMonth, currentMonthDue, utrInput, 'UPI');
+    const finalAmount = amountInput !== '' ? Number(amountInput) : currentMonthDue;
+    if (!finalAmount || finalAmount <= 0) return;
+
+    const refString = utrInput.trim() || (paymentMode === 'Cash' ? 'Cash' : paymentMode);
+    submitPayment(currentGroup.currentMonth, finalAmount, refString, paymentMode, proofImage || undefined);
     setUtrInput('');
+    setProofImage(null);
     setSubmitSuccess(true);
+    showToast(
+      language === 'te' ? '✅ పేమెంట్ సమర్పించబడింది!' : '✅ Payment Submitted!',
+      language === 'te'
+        ? `నెల ${currentGroup.currentMonth} వాయిదా ₹${finalAmount.toLocaleString('en-IN')} వివరాలు ఆర్గనైజర్ శివ గారికి పంపబడ్డాయి.`
+        : `Month ${currentGroup.currentMonth} installment ₹${finalAmount.toLocaleString('en-IN')} sent to Organizer Siva for approval.`,
+      'payment'
+    );
     setTimeout(() => setSubmitSuccess(false), 4000);
   };
 
   return (
     <div className="dashboard-content">
-      {/* 1. HERO CARD: TOTAL PAID AMOUNT SO FAR (High Priority as requested) */}
+      {/* 1. UNIFIED LUXURY MEMBER PASSBOOK HERO */}
       <section className="hero-total-card animate-fade">
         <div className="hero-top-row">
           <div className="hero-chip">
-            <Sparkles size={16} className="text-yellow-300" />
-            <span>{language === 'te' ? 'సభ్యుని ఖాతా సారాంశం' : 'Member Passbook Overview'}</span>
+            <Sparkles size={15} className="text-yellow-300" />
+            <span>{language === 'te' ? 'సభ్యుని ఖాతా పుస్తకం' : 'Member Passbook'}</span>
           </div>
           <div className="hero-member-id">
             #{currentUser.memberNo} {language === 'te' ? currentUser.nameTe : currentUser.name}
@@ -82,12 +133,28 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt,
         <div className="hero-counter-wrap">
           <span className="hero-label">
             {language === 'te' 
-              ? 'ఇప్పటివరకు మీరు చెల్లించిన మొత్తం (Total Paid So Far)' 
+              ? 'ఇప్పటివరకు మీరు చెల్లించిన మొత్తం' 
               : 'Total Amount You Paid So Far'}
           </span>
           <div className="hero-amount-display">
             <span className="currency-symbol">₹</span>
             <span className="amount-number">{totalPaidAmount.toLocaleString('en-IN')}</span>
+          </div>
+        </div>
+
+        {/* 3 Compact Inline Stats */}
+        <div className="hero-stats-row-mini">
+          <div className="hero-mini-stat">
+            <span className="mini-stat-label">{language === 'te' ? 'మొత్తం పథకం' : 'Chit Scheme'}</span>
+            <span className="mini-stat-val font-mono">₹{currentGroup.totalValue.toLocaleString('en-IN')}</span>
+          </div>
+          <div className="hero-mini-stat">
+            <span className="mini-stat-label">{language === 'te' ? 'చెల్లించినవి' : 'Installments'}</span>
+            <span className="mini-stat-val font-mono text-emerald-400">{totalMonthsPaidCount} / 20</span>
+          </div>
+          <div className="hero-mini-stat">
+            <span className="mini-stat-label">{language === 'te' ? 'మిగిలినవి' : 'Remaining'}</span>
+            <span className="mini-stat-val font-mono text-amber-300">{remainingMonthsCount} {language === 'te' ? 'నెలలు' : 'Mos'}</span>
           </div>
         </div>
 
@@ -110,7 +177,7 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt,
         <div className="hero-chit-status-pill">
           {currentUser.hasLiftedChit ? (
             <div className="status-lifted">
-              <Award size={18} className="text-yellow-400" />
+              <Award size={16} className="text-yellow-400 shrink-0" />
               <span>
                 {language === 'te' 
                   ? `చిట్ గ్రహీత: నెల ${currentUser.liftedMonth} లో ₹2,00,000 తీసుకున్నారు (స్థిర వాయిదా: ₹11,500)` 
@@ -119,7 +186,7 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt,
             </div>
           ) : (
             <div className="status-waiting">
-              <Clock size={18} className="text-emerald-400" />
+              <Clock size={16} className="text-emerald-400 shrink-0" />
               <span>
                 {language === 'te' 
                   ? 'చిట్ ఇంకా తీసుకోలేదు: ₹2,00,000 పొందడానికి మరియు లక్కీ డ్రాకు మీరు అర్హులు' 
@@ -134,8 +201,8 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt,
       <section className="current-month-card">
         <div className="month-card-header">
           <div>
-            <span className="section-tag">
-              {language === 'te' ? `నెల ${scheme.currentMonth} వాయిదా` : `Month ${scheme.currentMonth} Installment`}
+            <span className="section-tag font-bold text-amber-400">
+              {getMonthDisplayName(currentGroup.currentMonth, language)}
             </span>
             <h3 className="section-heading">
               {language === 'te' ? 'ఈ నెల చెల్లించవలసిన సొమ్ము' : 'Current Month Due'}
@@ -149,14 +216,14 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt,
 
         <div className="due-amount-hero">
           <div className="due-figure-col">
-            <span className="due-label">
-              {currentUser.hasLiftedChit 
-                ? (language === 'te' ? 'చిట్ తీసుకున్న వారి స్థిర వాయిదా' : 'Chit Taken Fixed Rate')
-                : (language === 'te' ? 'చిట్ తీసుకోని వారి వాయిదా (Less Price)' : 'Chit Not Taken Rate')}
-            </span>
             <div className="due-amount-number">
               ₹{currentMonthDue.toLocaleString('en-IN')}
             </div>
+            <span className="due-label">
+              {currentUser.hasLiftedChit && currentUser.liftedMonth !== undefined && currentGroup.currentMonth > currentUser.liftedMonth
+                ? (language === 'te' ? 'స్థిర వాయిదా (Fixed Rate)' : 'Fixed Installment Rate')
+                : (language === 'te' ? 'ఈ నెల వాయిదా మొత్తం' : 'Monthly Due Installment')}
+            </span>
           </div>
 
           <div className="due-status-col">
@@ -179,65 +246,114 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt,
           </div>
         </div>
 
-        {/* UPI Payment Box & UTR Submission Form */}
+        {/* Simple & Clean Payment Submission as requested by user */}
         {!isCurrentMonthPaid && (
-          <div className="payment-submission-box">
-            <h4 className="payment-box-title">
-              {language === 'te' ? 'ఫోన్‌పే / గూగుల్‌పే ద్వారా చెల్లించండి:' : 'Pay via PhonePe / Google Pay / Paytm:'}
+          <div className="payment-submission-box luxury-card border border-amber-500/20 bg-gray-950/70 p-4 rounded-xl mt-4">
+            <h4 className="payment-box-title font-bold text-white text-sm mb-3 flex items-center gap-2">
+              <CreditCard size={17} className="text-amber-400" />
+              <span>{language === 'te' ? 'వాయిదా చెల్లింపు నమోదు (Record Payment)' : 'Record Monthly Payment'}</span>
             </h4>
 
-            {/* UPI ID Row */}
-            <div className="upi-detail-card">
-              <div className="upi-meta">
-                <span className="upi-label">ఆర్గనైజర్ UPI ID:</span>
-                <span className="upi-address font-mono">{scheme.organizerUpiId}</span>
-                <span className="upi-holder">({scheme.organizerName})</span>
+            <form onSubmit={handlePaymentSubmit} className="space-y-3">
+              {/* 1. Payment Method Pills: Cash / PhonePe & GPay / Other UPI */}
+              <div>
+                <label className="text-xs text-gray-300 font-semibold mb-1.5 block">
+                  {language === 'te' ? 'చెల్లింపు విధానం (Payment Mode):' : 'Select Payment Mode:'}
+                </label>
+                <div className="payment-mode-selector-grid">
+                  <button
+                    type="button"
+                    className={`payment-mode-card-btn cash ${paymentMode === 'Cash' ? 'active' : ''}`}
+                    onClick={() => setPaymentMode('Cash')}
+                  >
+                    <div className="mode-icon-circle">
+                      <Banknote size={18} className="text-amber-400" />
+                    </div>
+                    <span>{language === 'te' ? 'నగదు (Cash)' : 'Cash'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`payment-mode-card-btn phonepe ${paymentMode === 'PhonePe' ? 'active' : ''}`}
+                    onClick={() => setPaymentMode('PhonePe')}
+                  >
+                    <div className="mode-icon-circle">
+                      <Smartphone size={18} className="text-purple-400" />
+                    </div>
+                    <span>PhonePe / GPay</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`payment-mode-card-btn upi ${paymentMode === 'UPI' ? 'active' : ''}`}
+                    onClick={() => setPaymentMode('UPI')}
+                  >
+                    <div className="mode-icon-circle">
+                      <CreditCard size={18} className="text-emerald-400" />
+                    </div>
+                    <span>{language === 'te' ? 'ఇతర UPI' : 'Other UPI'}</span>
+                  </button>
+                </div>
               </div>
-              <button 
-                type="button" 
-                className="btn-copy-upi" 
-                onClick={handleCopyUpi}
-              >
-                <Copy size={16} />
-                <span>{copiedUpi ? (language === 'te' ? 'కాపీ చేయబడింది!' : 'Copied!') : (language === 'te' ? 'కాపీ చేయి' : 'Copy UPI')}</span>
-              </button>
-            </div>
 
-            {/* 1-Click UPI Pay Link */}
-            <div className="upi-quick-actions">
-              <a 
-                href={`upi://pay?pa=${scheme.organizerUpiId}&pn=${encodeURIComponent(scheme.name)}&am=${currentMonthDue}&cu=INR&tn=${encodeURIComponent(`Sri Varalaxmi Chits Month ${scheme.currentMonth} - ${currentUser.name}`)}`}
-                className="btn-upi-instant"
-              >
-                <ArrowUpRight size={18} />
-                <span>{language === 'te' ? 'UPI యాప్‌లో చెల్లించండి (Direct Pay ₹' + currentMonthDue.toLocaleString('en-IN') + ')' : 'Open UPI App to Pay'}</span>
-              </a>
-            </div>
+              {/* 2. Amount Input */}
+              <div>
+                <label className="text-xs text-gray-300 font-semibold mb-1 block">
+                  {language === 'te' ? 'చెల్లిస్తున్న మొత్తం (Amount in ₹):' : 'Amount Being Paid (₹):'}
+                </label>
+                <div className="input-group relative flex items-center">
+                  <span className="input-prefix px-3 py-2 bg-gray-900 text-amber-400 font-bold border border-r-0 border-gray-800 rounded-l-lg">₹</span>
+                  <input
+                    type="number"
+                    className="form-input text-lg font-bold text-amber-300 font-mono w-full px-3 py-2 bg-gray-950 border border-gray-800 rounded-r-lg focus:outline-none focus:border-amber-500"
+                    value={amountInput !== '' ? amountInput : currentMonthDue}
+                    onChange={e => setAmountInput(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
 
-            {/* UTR Submission Form */}
-            <form onSubmit={handlePaymentSubmit} className="utr-submit-form">
-              <label className="utr-label">
-                {language === 'te' 
-                  ? 'చెల్లించిన తర్వాత 12 అంకెల UTR / ట్రాన్సాక్షన్ ID ఇక్కడ నమోదు చేయండి:' 
-                  : 'Enter 12-digit UTR / Transaction ID after payment:'}
-              </label>
-              <div className="utr-input-group">
+              {/* 3. Optional Reference / Note (NOT strictly required for Cash) */}
+              <div>
+                <label className="text-xs text-gray-400 mb-1 block">
+                  {paymentMode === 'Cash'
+                    ? (language === 'te' ? 'నోట్ / రిఫరెన్స్ (ఐచ్ఛికం):' : 'Notes / Remarks (Optional):')
+                    : (language === 'te' ? 'ట్రాన్సాక్షన్ ID / UTR నంబర్ (ఐచ్ఛికం):' : 'Transaction ID / UTR Ref (Optional):')}
+                </label>
                 <input
                   type="text"
-                  placeholder="e.g. 523412349876 or UPI Ref"
-                  className="form-input"
+                  placeholder={
+                    paymentMode === 'Cash'
+                      ? (language === 'te' ? 'ఉదా: శివ గారికి నేరుగా ఇచ్చాను' : 'e.g. Paid in cash directly to Siva')
+                      : (language === 'te' ? 'ఉదా: UPI ట్రాన్సాక్షన్ నంబర్ లేదా రిఫరెన్స్' : 'e.g. UPI Ref / Transaction ID')
+                  }
+                  className="form-input text-xs w-full px-3 py-2 bg-gray-950 border border-gray-800 rounded-lg text-gray-200"
                   value={utrInput}
                   onChange={e => setUtrInput(e.target.value)}
-                  required
                 />
-                <button type="submit" className="btn-primary">
-                  {language === 'te' ? 'సమర్పించండి' : 'Submit UTR'}
-                </button>
               </div>
+
+              {/* 4. Single Big Submit Button */}
+              <button
+                type="submit"
+                className="btn-primary w-full luxury-btn py-3 px-4 font-bold text-sm flex items-center justify-center gap-2 mt-2"
+              >
+                <CheckCircle2 size={18} />
+                <span>
+                  {language === 'te'
+                    ? 'చెల్లింపు సమర్పించండి (Submit Payment)'
+                    : 'Submit Payment for Approval'}
+                </span>
+              </button>
+
               {submitSuccess && (
-                <div className="success-toast">
+                <div className="success-toast mt-2 text-xs text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 p-2.5 rounded-lg flex items-center gap-2">
                   <CheckCircle size={16} />
-                  <span>{language === 'te' ? 'మీ చెల్లింపు వివరాలు నిర్వాహకునికి పంపబడ్డాయి!' : 'Payment submitted successfully for verification!'}</span>
+                  <span>
+                    {language === 'te'
+                      ? '✅ పేమెంట్ వివరాలు ఆర్గనైజర్ శివ గారికి పంపబడ్డాయి! పరిశీలించి ఆమోదించబడుతుంది.'
+                      : '✅ Payment details sent to Organizer Siva! Awaiting approval.'}
+                  </span>
                 </div>
               )}
             </form>
@@ -253,34 +369,13 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt,
               onClick={() => onOpenReceipt(currentMonthPayment)}
             >
               <Receipt size={18} />
-              <span>{language === 'te' ? 'ఈ నెల అధికారిక రసీదును చూడండి (View Receipt)' : 'View Month 3 Official Receipt'}</span>
+              <span>{language === 'te' ? `నెల ${scheme.currentMonth} అధికారిక రసీదును చూడండి` : `View Month ${scheme.currentMonth} Official Receipt`}</span>
             </button>
           </div>
         )}
       </section>
 
-      {/* 3. LUCKY DRAW BANNER FOR MEMBERS */}
-      <section className="lottery-feature-banner">
-        <div className="lottery-banner-text">
-          <span className="lottery-tag">🎲 లక్కీ డ్రా ఫీచర్</span>
-          <h4>
-            {language === 'te' 
-              ? 'ఈ నెల ఎవరూ చిట్టీ ఎత్తలేదా? లక్కీ డ్రా అందుబాటులో ఉంది!' 
-              : 'No bids this month? Digital Lucky Draw is available!'}
-          </h4>
-          <p>
-            {language === 'te'
-              ? 'గతంలో చిట్ ఎత్తినవారు మినహాయించబడతారు. మిగిలిన సభ్యుల పేర్లతో పారదర్శక లక్కీ డ్రా జరుగుతుంది.'
-              : 'Members who lifted previously are excluded. Remaining members get fair digital lottery draw.'}
-          </p>
-        </div>
-        <button type="button" className="btn-open-lottery" onClick={onOpenLottery}>
-          <span>{language === 'te' ? 'లక్కీ డ్రా తెరవండి' : 'Open Lucky Draw'}</span>
-          <ChevronRight size={18} />
-        </button>
-      </section>
-
-      {/* 4. MASTER 20-MONTH SCHEDULE (Strictly 4 Columns as requested by user) */}
+      {/* 3. MASTER 20-MONTH SCHEDULE (Official 4-Column Schedule) */}
       <section className="schedule-section">
         <div className="section-header-row">
           <div>
@@ -300,10 +395,20 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt,
           <table className="master-table">
             <thead>
               <tr>
-                <th className="th-month">{language === 'te' ? 'నెల (నెం)' : 'Month'}</th>
+                <th className="th-month">{language === 'te' ? 'నెల' : 'Month'}</th>
                 <th className="th-val">{language === 'te' ? 'చిట్ విలువ' : 'Chit Value'}</th>
-                <th className="th-nottaken">{language === 'te' ? 'చిట్ తీసుకోని వారి వాయిదా (Less Price)' : 'Chit Not Taken (Less Price)'}</th>
-                <th className="th-taken">{language === 'te' ? 'చిట్ తీసుకున్న వారి స్థిర వాయిదా (Fixed Rate)' : 'Chit Taken (Fixed Rate)'}</th>
+                <th className="th-nottaken">
+                  <div className="th-stacked-header">
+                    <span>{language === 'te' ? 'వాయిదా' : 'Installment'}</span>
+                    <span className="th-sub-note">{language === 'te' ? '(తీసుకోని వారు)' : '(Less Price)'}</span>
+                  </div>
+                </th>
+                <th className="th-taken">
+                  <div className="th-stacked-header">
+                    <span>{language === 'te' ? 'స్థిర వాయిదా' : 'Fixed Rate'}</span>
+                    <span className="th-sub-note">{language === 'te' ? '(ఎత్తిన వారు)' : '(Chit Taken)'}</span>
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -313,18 +418,29 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt,
                 return (
                   <tr key={item.month} className={`schedule-row ${isCurrent ? 'current-active-row' : ''} ${isPast ? 'past-row' : ''}`}>
                     <td className="td-month">
-                      <span className="month-badge">
-                        {item.month}
-                        {isCurrent && <span className="active-dot-indicator" title="ప్రస్తుత నెల"></span>}
-                      </span>
+                      <div className="sched-cell-stack">
+                        <div className="sched-month-top">
+                          <span className="sched-pill-no">#{item.month}</span>
+                          {isCurrent && (
+                            <span className="sched-current-dot-pill" title={language === 'te' ? 'ప్రస్తుత నెల' : 'Current Month'}>
+                              {language === 'te' ? 'ప్రస్తుతం' : 'Active'}
+                            </span>
+                          )}
+                        </div>
+                        <span className="sched-month-subtext">
+                          {MONTH_SHORT_NAMES[item.month]
+                            ? (language === 'te' ? MONTH_SHORT_NAMES[item.month].te : MONTH_SHORT_NAMES[item.month].en)
+                            : `M${item.month}`}
+                        </span>
+                      </div>
                     </td>
-                    <td className="td-val font-semibold">
+                    <td className="td-val font-mono font-bold text-gray-200">
                       ₹{item.chitValue.toLocaleString('en-IN')}
                     </td>
-                    <td className="td-nottaken font-bold text-amber-400">
+                    <td className="td-nottaken font-mono font-bold text-amber-400">
                       {item.notTakenAmount === 0 ? '₹0' : `₹${item.notTakenAmount.toLocaleString('en-IN')}`}
                     </td>
-                    <td className="td-taken font-bold text-emerald-400">
+                    <td className="td-taken font-mono font-bold text-emerald-400">
                       ₹{item.takenAmount.toLocaleString('en-IN')}
                     </td>
                   </tr>
@@ -351,7 +467,9 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt,
                     <FileText size={20} className="text-yellow-400" />
                   </div>
                   <div>
-                    <strong className="receipt-card-month">నెల {p.month} వాయిదా</strong>
+                    <strong className="receipt-card-month">
+                      {language === 'te' ? `నెల ${p.month} వాయిదా` : `Month ${p.month} Installment`}
+                    </strong>
                     <span className="receipt-card-date">{p.date} • {p.receiptNo}</span>
                   </div>
                 </div>
@@ -362,7 +480,7 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt,
                     className="btn-sm-receipt"
                     onClick={() => onOpenReceipt(p)}
                   >
-                    రసీదు చూడండి
+                    {language === 'te' ? 'రసీదు చూడండి' : 'View Receipt'}
                   </button>
                 </div>
               </div>

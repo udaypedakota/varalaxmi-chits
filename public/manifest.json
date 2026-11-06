@@ -1,0 +1,35 @@
+{
+  "name": "శ్రీ వరలక్ష్మి చిట్స్ | Sri Varalaxmi Chits",
+  "short_name": "Varalaxmi Chits",
+  "description": "Sri Varalaxmi Chits Official Member Passbook & Chit Fund Automation App",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#070B19",
+  "theme_color": "#F59E0B",
+  "icons": [
+    {
+      "src": "/chit-app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/chit-app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

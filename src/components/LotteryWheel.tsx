@@ -3,6 +3,7 @@ import { useChit } from '../context/ChitContext';
 import { Member } from '../types/chit';
 import confetti from 'canvas-confetti';
 import { X, Trophy, Dices, Users, CheckCircle, ShieldAlert, Award, Sparkles } from 'lucide-react';
+import { LanguageToggle } from './LanguageToggle';
 
 interface LotteryWheelProps {
   isOpen: boolean;
@@ -74,10 +75,13 @@ export const LotteryWheel: React.FC<LotteryWheelProps> = ({ isOpen, onClose }) =
   return (
     <div className="modal-backdrop animate-fade" onClick={onClose}>
       <div className="lottery-modal-card" onClick={e => e.stopPropagation()}>
-        {/* Close Button */}
-        <button type="button" className="btn-modal-close" onClick={onClose} aria-label="Close">
-          <X size={20} />
-        </button>
+        {/* Top Bar with Language Toggle & Close Button */}
+        <div className="login-modal-top-bar">
+          <LanguageToggle />
+          <button type="button" className="btn-modal-close static" onClick={onClose} aria-label="Close">
+            <X size={20} />
+          </button>
+        </div>
 
         {/* Modal Header */}
         <div className="lottery-modal-header text-center">
@@ -228,7 +232,7 @@ export const LotteryWheel: React.FC<LotteryWheelProps> = ({ isOpen, onClose }) =
                 {excludedMembers.map(m => (
                   <span key={m.id} className="member-chip excluded">
                     #{m.memberNo} {language === 'te' ? m.nameTe : m.name} 
-                    <small> (నెల {m.liftedMonth})</small>
+                    <small> ({language === 'te' ? `నెల ${m.liftedMonth}` : `Month ${m.liftedMonth}`})</small>
                   </span>
                 ))}
               </div>

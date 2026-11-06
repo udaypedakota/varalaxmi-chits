@@ -1,85 +1,114 @@
 import React from 'react';
 import { useChit } from '../context/ChitContext';
-import { LogIn, LogOut, Globe, Sparkles } from 'lucide-react';
+import { LogIn, LogOut, Download } from 'lucide-react';
+import { LanguageToggle } from './LanguageToggle';
+import { NotificationDropdown } from './NotificationDropdown';
+import { GroupSwitcher } from './GroupSwitcher';
+import { getMonthDisplayName } from '../data/scheduleData';
 
-export const Navbar: React.FC<{ onOpenLogin: () => void }> = ({ onOpenLogin }) => {
-  const { scheme, currentUser, language, setLanguage, logout } = useChit();
+interface NavbarProps {
+  onOpenLogin: () => void;
+  onOpenInstall?: () => void;
+  isStandalone?: boolean;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({ onOpenLogin, onOpenInstall, isStandalone }) => {
+  const { activeGroup, scheme, currentUser, language, logout } = useChit();
+
+  const currentGroup = activeGroup || scheme;
 
   return (
     <header className="app-navbar">
       <div className="navbar-container">
-        {/* Brand Logo & Name */}
-        <div className="navbar-brand">
-          <div className="brand-logo-coin">
-            <Sparkles size={22} className="coin-icon" />
+        {/* Main Row: Brand on Left, User on Right */}
+        <div className="navbar-main-row">
+          <div className="navbar-brand">
+            <div className="brand-logo-coin">
+              <img src="/app-icon.svg" alt="Varalaxmi Chits App Icon" className="brand-app-icon-img" />
+            </div>
+            <div className="brand-text">
+              <h1 className="brand-title">
+                <span>{language === 'te' ? 'శ్రీ వరలక్ష్మి చిట్స్' : 'Sri Varalaxmi Chits'}</span>
+                <span className="brand-group-pill">
+                  {currentGroup.id === 'grp-2' ? (language === 'te' ? 'గ్రూప్ B' : 'Group B') : (language === 'te' ? 'గ్రూప్ A' : 'Group A')}
+                </span>
+              </h1>
+              <span className="brand-subtitle">
+                {language === 'te' 
+                  ? `${currentGroup.totalMonths} నెలల పథకం • ₹${currentGroup.totalValue.toLocaleString('en-IN')}` 
+                  : `${currentGroup.totalMonths}-Month Scheme • ₹${currentGroup.totalValue.toLocaleString('en-IN')}`}
+              </span>
+            </div>
           </div>
-          <div className="brand-text">
-            <h1 className="brand-title">
-              {language === 'te' ? 'శ్రీ వరలక్ష్మి చిట్స్' : 'Sri Varalaxmi Chits'}
-            </h1>
-            <span className="brand-subtitle">
-              {language === 'te' 
-                ? '20 నెలల పథకం • ₹2,00,000' 
-                : '20-Month Mutual Scheme • ₹2,00,000'}
-            </span>
+
+          {/* User Info / Login Action */}
+          <div className="navbar-user-corner">
+            {currentUser ? (
+              <div className="user-profile-widget">
+                <div className="user-info-text">
+                  <span className="user-name">
+                    {language === 'te' 
+                      ? (currentUser.role === 'organizer' ? 'శివ' : currentUser.nameTe) 
+                      : (currentUser.role === 'organizer' ? 'Siva' : currentUser.name)}
+                  </span>
+                  <span className={`user-role-pill role-${currentUser.role}`}>
+                    {currentUser.role === 'organizer' 
+                      ? (language === 'te' ? 'ఆర్గనైజర్' : 'Admin')
+                      : (language === 'te' ? `#${currentUser.memberNo}` : `#${currentUser.memberNo}`)}
+                  </span>
+                </div>
+                <button 
+                  type="button" 
+                  className="btn-icon-logout" 
+                  onClick={logout} 
+                  title={language === 'te' ? 'లాగ్ అవుట్' : 'Logout'}
+                >
+                  <LogOut size={15} />
+                </button>
+              </div>
+            ) : (
+              <button 
+                type="button" 
+                className="btn-login-trigger"
+                onClick={onOpenLogin}
+              >
+                <LogIn size={15} />
+                <span>{language === 'te' ? 'లాగిన్' : 'Login'}</span>
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Right Controls */}
-        <div className="navbar-actions">
-          {/* Current Scheme Month Pill */}
-          <div className="current-month-badge">
-            <span className="month-dot"></span>
-            <span className="month-text">
-              {language === 'te' 
-                ? `నెల ${scheme.currentMonth} / 20` 
-                : `Month ${scheme.currentMonth} of 20`}
-            </span>
+        {/* Sub Row: Scheme Month, Language, Notifications, & Group Switcher */}
+        <div className="navbar-sub-row">
+          <div className="navbar-sub-left">
+            {currentUser?.role === 'organizer' && (
+              <GroupSwitcher />
+            )}
+
+            <div className="current-month-badge">
+              <span className="month-dot"></span>
+              <span className="month-text font-bold">
+                {getMonthDisplayName(currentGroup.currentMonth, language)}
+              </span>
+            </div>
           </div>
 
-          {/* Language Switcher */}
-          <button 
-            type="button" 
-            className="lang-toggle-btn"
-            onClick={() => setLanguage(language === 'te' ? 'en' : 'te')}
-            title="భాష మార్చండి / Change Language"
-          >
-            <Globe size={16} />
-            <span>{language === 'te' ? 'English' : 'తెలుగు'}</span>
-          </button>
-
-          {/* User Info / Login Action */}
-          {currentUser ? (
-            <div className="user-profile-widget">
-              <div className="user-info-text">
-                <span className="user-name">
-                  {language === 'te' ? currentUser.nameTe : currentUser.name}
-                </span>
-                <span className={`user-role-pill role-${currentUser.role}`}>
-                  {currentUser.role === 'organizer' 
-                    ? (language === 'te' ? 'ఆర్గనైజర్' : 'Organizer')
-                    : (language === 'te' ? `సభ్యుడు #${currentUser.memberNo}` : `Member #${currentUser.memberNo}`)}
-                </span>
-              </div>
-              <button 
-                type="button" 
-                className="btn-icon-logout" 
-                onClick={logout} 
-                title={language === 'te' ? 'లాగ్ అవుట్' : 'Logout'}
+          <div className="navbar-sub-right">
+            {onOpenInstall && !isStandalone && (
+              <button
+                type="button"
+                className="navbar-install-pill animate-pulse-subtle"
+                onClick={onOpenInstall}
+                title={language === 'te' ? 'శ్రీ వరలక్ష్మి చిట్స్ యాప్‌ను ఇన్‌స్టాల్ చేసుకోండి' : 'Install Sri Varalaxmi Chits App'}
               >
-                <LogOut size={16} />
+                <Download size={13} className="text-amber-400" />
+                <span>{language === 'te' ? 'యాప్ ఇన్‌స్టాల్' : 'Install App'}</span>
               </button>
-            </div>
-          ) : (
-            <button 
-              type="button" 
-              className="btn-login-trigger"
-              onClick={onOpenLogin}
-            >
-              <LogIn size={16} />
-              <span>{language === 'te' ? 'లాగిన్' : 'Login'}</span>
-            </button>
-          )}
+            )}
+            <LanguageToggle />
+            <NotificationDropdown />
+          </div>
         </div>
       </div>
     </header>

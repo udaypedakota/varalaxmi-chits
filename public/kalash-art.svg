@@ -1,0 +1,181 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 320" width="400" height="320">
+  <defs>
+    <!-- Gold Metallic Gradients -->
+    <linearGradient id="potGrad" x1="20%" y1="10%" x2="80%" y2="90%">
+      <stop offset="0%" stop-color="#FFFBEB" />
+      <stop offset="25%" stop-color="#FDE68A" />
+      <stop offset="50%" stop-color="#F59E0B" />
+      <stop offset="75%" stop-color="#D97706" />
+      <stop offset="100%" stop-color="#78350F" />
+    </linearGradient>
+
+    <radialGradient id="potHighlight" cx="40%" cy="35%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.8" />
+      <stop offset="45%" stop-color="#FDE68A" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#D97706" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Green Leaves Gradient -->
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#86EFAC" />
+      <stop offset="40%" stop-color="#22C55E" />
+      <stop offset="80%" stop-color="#15803D" />
+      <stop offset="100%" stop-color="#14532D" />
+    </linearGradient>
+
+    <!-- Coconut Gradient -->
+    <linearGradient id="cocoGrad" x1="20%" y1="15%" x2="85%" y2="85%">
+      <stop offset="0%" stop-color="#D97706" />
+      <stop offset="50%" stop-color="#78350F" />
+      <stop offset="100%" stop-color="#451A03" />
+    </linearGradient>
+
+    <!-- Lotus Petal Gradient -->
+    <linearGradient id="lotusGrad" x1="20%" y1="10%" x2="80%" y2="90%">
+      <stop offset="0%" stop-color="#FEF08A" />
+      <stop offset="35%" stop-color="#FBBF24" />
+      <stop offset="70%" stop-color="#EA580C" />
+      <stop offset="100%" stop-color="#9A3412" />
+    </linearGradient>
+
+    <!-- Soft Glow Filter -->
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <radialGradient id="centerAura" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.45" />
+      <stop offset="60%" stop-color="#D97706" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#0A1128" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Ambient Golden Aura -->
+  <circle cx="200" cy="160" r="140" fill="url(#centerAura)" />
+
+  <!-- Flowing Golden Light Ribbons in background -->
+  <path d="M 10 220 C 100 260, 180 180, 260 230 C 320 270, 370 230, 400 240" 
+        fill="none" stroke="#FDE68A" stroke-opacity="0.3" stroke-width="3" />
+  <path d="M 0 240 C 90 280, 190 200, 280 250 C 330 280, 380 250, 400 260" 
+        fill="none" stroke="#F59E0B" stroke-opacity="0.2" stroke-width="2" />
+
+  <!-- Sparkle Stars -->
+  <g fill="#FDE68A">
+    <path d="M 110 90 Q 110 102 98 102 Q 110 102 110 114 Q 110 102 122 102 Q 110 102 110 90 Z" />
+    <path d="M 285 75 Q 285 85 275 85 Q 285 85 285 95 Q 285 85 295 85 Q 285 85 285 75 Z" opacity="0.85" />
+    <path d="M 330 140 Q 330 148 322 148 Q 330 148 330 156 Q 330 148 338 148 Q 330 148 330 140 Z" opacity="0.7" />
+    <path d="M 85 190 Q 85 196 79 196 Q 85 196 85 202 Q 85 196 91 196 Q 85 196 85 190 Z" opacity="0.8" />
+  </g>
+
+  <!-- STACK OF GOLD COINS (Left Side) -->
+  <g id="coinStack" transform="translate(105, 175)">
+    <!-- Base shadow -->
+    <ellipse cx="25" cy="52" rx="30" ry="10" fill="#050814" opacity="0.6" />
+
+    <!-- Coin 1 (Bottom) -->
+    <path d="M 0 40 C 0 46, 50 46, 50 40 L 50 48 C 50 54, 0 54, 0 48 Z" fill="#92400E" />
+    <ellipse cx="25" cy="40" rx="25" ry="8" fill="url(#potGrad)" stroke="#FEF08A" stroke-width="1" />
+
+    <!-- Coin 2 -->
+    <path d="M 0 30 C 0 36, 50 36, 50 30 L 50 38 C 50 44, 0 44, 0 38 Z" fill="#92400E" />
+    <ellipse cx="25" cy="30" rx="25" ry="8" fill="url(#potGrad)" stroke="#FEF08A" stroke-width="1" />
+
+    <!-- Coin 3 -->
+    <path d="M 2 20 C 2 26, 52 26, 52 20 L 52 28 C 52 34, 2 34, 2 28 Z" fill="#92400E" />
+    <ellipse cx="27" cy="20" rx="25" ry="8" fill="url(#potGrad)" stroke="#FEF08A" stroke-width="1" />
+
+    <!-- Coin 4 (Top tilted) -->
+    <path d="M 4 10 C 4 16, 54 16, 54 10 L 54 18 C 54 24, 4 24, 4 18 Z" fill="#78350F" />
+    <ellipse cx="29" cy="10" rx="25" ry="8" fill="url(#potGrad)" stroke="#FFFFFF" stroke-width="1.2" />
+    <!-- Embossed Rupee on top coin -->
+    <text x="29" y="13" font-size="9" font-weight="bold" fill="#78350F" text-anchor="middle" font-family="sans-serif">₹</text>
+  </g>
+
+  <!-- BLOOMING GOLDEN LOTUS FLOWER (Right Side) -->
+  <g id="lotusFlower" transform="translate(250, 185)">
+    <!-- Base shadow -->
+    <ellipse cx="45" cy="45" rx="35" ry="10" fill="#050814" opacity="0.6" />
+
+    <!-- Outer Back Petals -->
+    <path d="M 20 40 C 10 20, 20 5, 45 10 C 40 25, 35 35, 20 40 Z" fill="url(#lotusGrad)" opacity="0.85" />
+    <path d="M 70 40 C 80 20, 70 5, 45 10 C 50 25, 55 35, 70 40 Z" fill="url(#lotusGrad)" opacity="0.85" />
+
+    <!-- Side Petals -->
+    <path d="M 12 36 C 5 22, 18 12, 38 22 C 30 30, 22 34, 12 36 Z" fill="url(#lotusGrad)" />
+    <path d="M 78 36 C 85 22, 72 12, 52 22 C 60 30, 68 34, 78 36 Z" fill="url(#lotusGrad)" />
+
+    <!-- Front Petals -->
+    <path d="M 28 42 C 22 25, 38 12, 45 18 C 42 28, 38 38, 28 42 Z" fill="url(#potGrad)" stroke="#FFFBEB" stroke-width="0.8" />
+    <path d="M 62 42 C 68 25, 52 12, 45 18 C 48 28, 52 38, 62 42 Z" fill="url(#potGrad)" stroke="#FFFBEB" stroke-width="0.8" />
+    <path d="M 36 44 C 36 28, 54 28, 54 44 C 45 46, 45 46, 36 44 Z" fill="url(#potGrad)" stroke="#FFFBEB" stroke-width="1" />
+  </g>
+
+  <!-- MAIN GOLDEN KALASH (Center) -->
+  <g id="mainKalash" transform="translate(140, 60)">
+    <!-- Base Shadow -->
+    <ellipse cx="60" cy="168" rx="48" ry="12" fill="#050814" opacity="0.75" />
+
+    <!-- 1. MANGO LEAVES (Behind Pot, Spreading outward) -->
+    <!-- Far Left Leaf -->
+    <path d="M 30 52 C 5 35, -5 10, 15 2 C 30 18, 42 38, 48 50 Z" fill="url(#leafGrad)" stroke="#86EFAC" stroke-width="0.8" />
+    <path d="M 15 2 C 25 24, 38 38, 48 50" fill="none" stroke="#BBF7D0" stroke-width="0.8" opacity="0.6" />
+
+    <!-- Left Center Leaf -->
+    <path d="M 44 48 C 28 25, 25 -5, 45 -12 C 55 12, 58 32, 58 46 Z" fill="url(#leafGrad)" stroke="#86EFAC" stroke-width="0.8" />
+    <path d="M 45 -12 C 48 10, 52 30, 58 46" fill="none" stroke="#BBF7D0" stroke-width="0.8" opacity="0.6" />
+
+    <!-- Center Top Leaf -->
+    <path d="M 52 45 C 50 18, 55 -18, 60 -24 C 65 -18, 70 18, 68 45 Z" fill="url(#leafGrad)" stroke="#86EFAC" stroke-width="0.8" />
+    <path d="M 60 -24 L 60 45" fill="none" stroke="#BBF7D0" stroke-width="0.8" opacity="0.6" />
+
+    <!-- Right Center Leaf -->
+    <path d="M 76 48 C 92 25, 95 -5, 75 -12 C 65 12, 62 32, 62 46 Z" fill="url(#leafGrad)" stroke="#86EFAC" stroke-width="0.8" />
+    <path d="M 75 -12 C 72 10, 68 30, 62 46" fill="none" stroke="#BBF7D0" stroke-width="0.8" opacity="0.6" />
+
+    <!-- Far Right Leaf -->
+    <path d="M 90 52 C 115 35, 125 10, 105 2 C 90 18, 78 38, 72 50 Z" fill="url(#leafGrad)" stroke="#86EFAC" stroke-width="0.8" />
+    <path d="M 105 2 C 95 24, 82 38, 72 50" fill="none" stroke="#BBF7D0" stroke-width="0.8" opacity="0.6" />
+
+    <!-- 2. COCONUT (Nestled in the neck) -->
+    <ellipse cx="60" cy="38" rx="24" ry="26" fill="url(#cocoGrad)" />
+    <!-- Coconut Fiber Texture -->
+    <path d="M 44 26 Q 60 48 76 26" fill="none" stroke="#FDE68A" stroke-width="1.2" opacity="0.5" />
+    <path d="M 48 40 Q 60 52 72 40" fill="none" stroke="#FDE68A" stroke-width="1" opacity="0.5" />
+    <!-- Sacred Tilak / Red Dot on Coconut -->
+    <ellipse cx="60" cy="32" rx="4" ry="7" fill="#DC2626" />
+    <circle cx="60" cy="32" r="2" fill="#FEF08A" />
+
+    <!-- 3. KALASH BODY (The Sacred Brass/Gold Pot) -->
+    <!-- Pot Neck Rim -->
+    <ellipse cx="60" cy="54" rx="34" ry="9" fill="url(#potGrad)" stroke="#FEF08A" stroke-width="1.5" />
+    <ellipse cx="60" cy="54" rx="28" ry="6" fill="#78350F" />
+
+    <!-- Main Spherical Belly -->
+    <path d="M 32 58 C 15 75, 5 110, 20 142 C 32 165, 88 165, 100 142 C 115 110, 105 75, 88 58 Z" 
+          fill="url(#potGrad)" stroke="#FFFBEB" stroke-width="1.2" />
+
+    <!-- Pot 3D Surface Highlight -->
+    <ellipse cx="48" cy="100" rx="38" ry="46" fill="url(#potHighlight)" />
+
+    <!-- Neck Rosette Belt -->
+    <path d="M 30 70 Q 60 84 90 70" fill="none" stroke="#FFFBEB" stroke-width="3" opacity="0.8" />
+    <path d="M 30 70 Q 60 84 90 70" fill="none" stroke="#78350F" stroke-width="1.5" stroke-dasharray="2 4" />
+
+    <!-- Embossed Indian Rupee (₹) Symbol on Kalash Belly -->
+    <g transform="translate(60, 118)">
+      <!-- 3D Shadow -->
+      <path d="M -15 -20 L 15 -20 M -15 -10 L 15 -10 M -15 -20 L -15 4 Q 8 4 8 -10 Q 8 -20 -15 -20 M -2 4 L 15 26"
+            fill="none" stroke="#78350F" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" transform="translate(1, 2)" />
+      <!-- Radiant Gold Stroke -->
+      <path d="M -15 -20 L 15 -20 M -15 -10 L 15 -10 M -15 -20 L -15 4 Q 8 4 8 -10 Q 8 -20 -15 -20 M -2 4 L 15 26"
+            fill="none" stroke="#FFFBEB" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M -15 -20 L 15 -20 M -15 -10 L 15 -10 M -15 -20 L -15 4 Q 8 4 8 -10 Q 8 -20 -15 -20 M -2 4 L 15 26"
+            fill="none" stroke="#F59E0B" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+
+    <!-- Base Ring of the Pot -->
+    <ellipse cx="60" cy="158" rx="28" ry="7" fill="url(#potGrad)" stroke="#FFFBEB" stroke-width="1" />
+  </g>
+</svg>
+
