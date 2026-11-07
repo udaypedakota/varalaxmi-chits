@@ -754,6 +754,41 @@ app.get('/api/groups/:groupId/payments', async (req, res) => {
 
 app.post('/api/groups/:groupId/payments', async (req, res) => {
   const { groupId } = req.params;
+  const { memberId, month } = req.body;
+
+  // Strict anti-duplicate check: One member cannot submit multiple times for the same month while pending/approved
+  if (isMongoConnected) {
+    const existing = await PaymentModel.findOne({
+      groupId,
+      memberId,
+      month: Number(month),
+      status: { $in: ['pending', 'approved'] }
+    });
+    if (existing) {
+      return res.status(400).json({
+        success: false,
+        error: existing.status === 'pending'
+          ? 'ఈ నెలకు సంబంధించిన పేమెంట్ ఇప్పటికే పరిశీలనలో ఉంది. ఆర్గనైజర్ ఆమోదించే వరకు వేచి ఉండండి.'
+          : 'ఈ నెలకు సంబంధించిన పేమెంట్ ఇప్పటికే ఆమోదించబడింది.'
+      });
+    }
+  } else {
+    const existing = memoryStore.payments.find(p =>
+      p.groupId === groupId &&
+      p.memberId === memberId &&
+      p.month === Number(month) &&
+      (p.status === 'pending' || p.status === 'approved')
+    );
+    if (existing) {
+      return res.status(400).json({
+        success: false,
+        error: existing.status === 'pending'
+          ? 'A payment request for this month is already pending verification.'
+          : 'Payment for this month is already approved.'
+      });
+    }
+  }
+
   const newPayment = {
     id: `pay-${Date.now()}`,
     groupId,

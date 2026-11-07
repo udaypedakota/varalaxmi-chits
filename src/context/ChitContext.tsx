@@ -84,26 +84,26 @@ interface ChitContextType {
 const ChitContext = createContext<ChitContextType | undefined>(undefined);
 
 const STORAGE_KEYS = {
-  GROUPS: 'sv_chits_groups_v7',
-  ACTIVE_GROUP: 'sv_chits_active_group_v7',
-  MEMBERS: 'sv_chits_members_v7',
-  PAYMENTS: 'sv_chits_payments_v7',
-  LOTTERY: 'sv_chits_lottery_v7',
-  LIFTINGS: 'sv_chits_liftings_v7',
-  NOTIFICATIONS: 'sv_chits_notifs_v7',
-  CURRENT_USER: 'sv_chits_user_v7',
-  LANGUAGE: 'sv_chits_lang_v7'
+  GROUPS: 'sv_chits_groups_v8',
+  ACTIVE_GROUP: 'sv_chits_active_group_v8',
+  MEMBERS: 'sv_chits_members_v8',
+  PAYMENTS: 'sv_chits_payments_v8',
+  LOTTERY: 'sv_chits_lottery_v8',
+  LIFTINGS: 'sv_chits_liftings_v8',
+  NOTIFICATIONS: 'sv_chits_notifs_v8',
+  CURRENT_USER: 'sv_chits_user_v8',
+  LANGUAGE: 'sv_chits_lang_v8'
 };
 
 // Purge any stale legacy localStorage items so old cached data never corrupts state
 try {
   const legacyPrefixes = [
-    'sv_chits_groups_v1', 'sv_chits_groups_v2', 'sv_chits_groups_v3', 'sv_chits_groups_v4', 'sv_chits_groups_v5', 'sv_chits_groups_v6',
-    'sv_chits_notifs_v1', 'sv_chits_notifs_v2', 'sv_chits_notifs_v3', 'sv_chits_notifs_v4', 'sv_chits_notifs_v5', 'sv_chits_notifs_v6',
-    'sv_chits_members_v1', 'sv_chits_members_v2', 'sv_chits_members_v3', 'sv_chits_members_v4', 'sv_chits_members_v5', 'sv_chits_members_v6',
-    'sv_chits_payments_v5', 'sv_chits_payments_v6',
-    'sv_chits_lottery_v5', 'sv_chits_lottery_v6',
-    'sv_chits_liftings_v5', 'sv_chits_liftings_v6',
+    'sv_chits_groups_v1', 'sv_chits_groups_v2', 'sv_chits_groups_v3', 'sv_chits_groups_v4', 'sv_chits_groups_v5', 'sv_chits_groups_v6', 'sv_chits_groups_v7',
+    'sv_chits_notifs_v1', 'sv_chits_notifs_v2', 'sv_chits_notifs_v3', 'sv_chits_notifs_v4', 'sv_chits_notifs_v5', 'sv_chits_notifs_v6', 'sv_chits_notifs_v7',
+    'sv_chits_members_v1', 'sv_chits_members_v2', 'sv_chits_members_v3', 'sv_chits_members_v4', 'sv_chits_members_v5', 'sv_chits_members_v6', 'sv_chits_members_v7',
+    'sv_chits_payments_v5', 'sv_chits_payments_v6', 'sv_chits_payments_v7',
+    'sv_chits_lottery_v5', 'sv_chits_lottery_v6', 'sv_chits_lottery_v7',
+    'sv_chits_liftings_v5', 'sv_chits_liftings_v6', 'sv_chits_liftings_v7',
   ];
   legacyPrefixes.forEach(k => localStorage.removeItem(k));
 } catch {}
@@ -1075,6 +1075,14 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     proofUrl?: string
   ): PaymentRecord => {
     const member = currentUser || groupMembers[1] || members[0];
+
+    // Prevent duplicate submission if payment is already pending or approved for this month
+    const existing = payments.find(p => (!p.groupId || p.groupId === activeGroupId) && p.memberId === member.id && p.month === month && (p.status === 'pending' || p.status === 'approved'));
+    if (existing) {
+      console.warn('Payment for this month already pending/approved:', existing);
+      return existing;
+    }
+
     const receiptNo = `SVC-${new Date().getFullYear()}-${String(month).padStart(2, '0')}-${Math.floor(100 + Math.random() * 900)}`;
 
     const newPayment: PaymentRecord = {

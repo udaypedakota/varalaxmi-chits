@@ -77,6 +77,7 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
   const [amountInput, setAmountInput] = useState<string>('');
   const [proofImage, setProofImage] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isScheduleExpanded, setIsScheduleExpanded] = useState(false);
 
   if (!currentUser) return null;
@@ -115,23 +116,29 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
 
   const handlePaymentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting || isCurrentMonthPending || isCurrentMonthPaid) return;
 
     const finalAmount = amountInput !== '' ? Number(amountInput) : currentMonthDue;
     if (!finalAmount || finalAmount <= 0) return;
 
-    const refString = utrInput.trim() || (paymentMode === 'Cash' ? 'Cash' : paymentMode);
-    submitPayment(currentGroup.currentMonth, finalAmount, refString, paymentMode, proofImage || undefined);
-    setUtrInput('');
-    setProofImage(null);
-    setSubmitSuccess(true);
-    showToast(
-      language === 'te' ? '✅ పేమెంట్ సమర్పించబడింది!' : '✅ Payment Submitted!',
-      language === 'te'
-        ? `నెల ${currentGroup.currentMonth} వాయిదా ₹${finalAmount.toLocaleString('en-IN')} వివరాలు ఆర్గనైజర్ శివ గారికి పంపబడ్డాయి.`
-        : `Month ${currentGroup.currentMonth} installment ₹${finalAmount.toLocaleString('en-IN')} sent to Organizer Siva for approval.`,
-      'payment'
-    );
-    setTimeout(() => setSubmitSuccess(false), 4000);
+    setIsSubmitting(true);
+    try {
+      const refString = utrInput.trim() || (paymentMode === 'Cash' ? 'Cash' : paymentMode);
+      submitPayment(currentGroup.currentMonth, finalAmount, refString, paymentMode, proofImage || undefined);
+      setUtrInput('');
+      setProofImage(null);
+      setSubmitSuccess(true);
+      showToast(
+        language === 'te' ? '✅ పేమెంట్ సమర్పించబడింది!' : '✅ Payment Submitted!',
+        language === 'te'
+          ? `నెల ${currentGroup.currentMonth} వాయిదా ₹${finalAmount.toLocaleString('en-IN')} వివరాలు ఆర్గనైజర్ శివ గారికి పంపబడ్డాయి.`
+          : `Month ${currentGroup.currentMonth} installment ₹${finalAmount.toLocaleString('en-IN')} sent to Organizer Siva for approval.`,
+        'payment'
+      );
+      setTimeout(() => setSubmitSuccess(false), 4000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -322,8 +329,32 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
           </div>
         </div>
 
-        {/* Simple & Clean Payment Submission as requested by user */}
-        {!isCurrentMonthPaid && (
+        {/* If Pending Approval: Show Clear Pending State card (Prevents duplicate submissions!) */}
+        {isCurrentMonthPending && (
+          <div className="payment-pending-box luxury-card border border-amber-500/30 bg-amber-950/20 p-5 rounded-xl mt-4 text-center animate-fade">
+            <div className="inline-flex items-center justify-center p-3 rounded-full bg-amber-500/10 text-amber-400 mb-2">
+              <Clock size={28} />
+            </div>
+            <h4 className="font-bold text-white text-base mb-1">
+              {language === 'te'
+                ? `నెల ${currentGroup.currentMonth} వాయిదా పరిశీలనలో ఉంది`
+                : `Month ${currentGroup.currentMonth} Payment Verification Pending`}
+            </h4>
+            <p className="text-xs text-gray-300 max-w-md mx-auto mb-3">
+              {language === 'te'
+                ? `మీరు సమర్పించిన ₹${(currentMonthPayment?.amount || currentMonthDue).toLocaleString('en-IN')} వివరాలు ఆర్గనైజర్ శివ గారికి పంపబడ్డాయి. వారు పరిశీలించి ఆమోదించిన తర్వాత అధికారిక రసీదు ఇక్కడే కనిపిస్తుంది. మళ్ళీ సమర్పించవలసిన అవసరం లేదు.`
+                : `Your payment of ₹${(currentMonthPayment?.amount || currentMonthDue).toLocaleString('en-IN')} has been submitted to Organizer Siva for verification. Once approved, your official digital receipt will appear here. No need to submit again.`}
+            </p>
+            <div className="inline-flex items-center gap-2 text-xs font-mono text-amber-300 bg-amber-500/10 px-3 py-1.5 rounded-full border border-amber-500/20">
+              <span>{language === 'te' ? 'విధానం:' : 'Mode:'} {currentMonthPayment?.paymentMode || 'Cash'}</span>
+              <span>•</span>
+              <span>{currentMonthPayment?.receiptNo}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Simple & Clean Payment Submission: ONLY shown if NOT paid and NOT pending */}
+        {!isCurrentMonthPaid && !isCurrentMonthPending && (
           <div className="payment-submission-box luxury-card border border-amber-500/20 bg-gray-950/70 p-4 rounded-xl mt-4">
             <h4 className="payment-box-title font-bold text-white text-sm mb-3 flex items-center gap-2">
               <CreditCard size={17} className="text-amber-400" />
@@ -412,13 +443,14 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
               {/* 4. Single Big Submit Button */}
               <button
                 type="submit"
-                className="btn-primary w-full luxury-btn py-3 px-4 font-bold text-sm flex items-center justify-center gap-2 mt-2"
+                disabled={isSubmitting}
+                className="btn-primary w-full luxury-btn py-3 px-4 font-bold text-sm flex items-center justify-center gap-2 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <CheckCircle2 size={18} />
                 <span>
-                  {language === 'te'
-                    ? 'చెల్లింపు సమర్పించండి (Submit Payment)'
-                    : 'Submit Payment for Approval'}
+                  {isSubmitting
+                    ? (language === 'te' ? 'సమర్పిస్తోంది...' : 'Submitting...')
+                    : (language === 'te' ? 'చెల్లింపు సమర్పించండి (Submit Payment)' : 'Submit Payment for Approval')}
                 </span>
               </button>
 

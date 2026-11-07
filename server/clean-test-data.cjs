@@ -13,6 +13,8 @@ async function resetTestLifting() {
   const Member = mongoose.model('Member', new mongoose.Schema({}, { strict: false }));
   const Payment = mongoose.model('Payment', new mongoose.Schema({}, { strict: false }));
   const Lottery = mongoose.model('Lottery', new mongoose.Schema({}, { strict: false }));
+  const Notification = mongoose.model('Notification', new mongoose.Schema({}, { strict: false }));
+  const Group = mongoose.model('Group', new mongoose.Schema({}, { strict: false }));
 
   const delLift = await Lifting.deleteMany({});
   console.log('Deleted liftings records:', delLift.deletedCount);
@@ -22,6 +24,12 @@ async function resetTestLifting() {
 
   const delPay = await Payment.deleteMany({});
   console.log('Deleted payments records:', delPay.deletedCount);
+
+  const delNotif = await Notification.deleteMany({});
+  console.log('Deleted notifications records:', delNotif.deletedCount);
+
+  const updGroup = await Group.updateMany({}, { $set: { currentMonth: 1 } });
+  console.log('Reset groups currentMonth to 1:', updGroup.modifiedCount);
 
   const updMem = await Member.updateMany({}, { 
     $set: { 
@@ -38,7 +46,8 @@ async function resetTestLifting() {
     name: m.name, 
     phone: m.phone, 
     hasLiftedChit: m.hasLiftedChit, 
-    liftedMonth: m.liftedMonth 
+    liftedMonth: m.liftedMonth,
+    totalPaidSoFar: m.totalPaidSoFar
   })));
 
   await mongoose.disconnect();
