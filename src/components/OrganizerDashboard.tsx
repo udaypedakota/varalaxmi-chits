@@ -227,7 +227,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
   const [isLiftingModalOpen, setIsLiftingModalOpen] = useState(false);
   const [liftMonth, setLiftMonth] = useState(currentGroup.currentMonth);
   const [liftMemberId, setLiftMemberId] = useState('');
-  const [liftType, setLiftType] = useState<'auction' | 'lottery'>('auction');
   const [liftNotes, setLiftNotes] = useState('');
   const [liftError, setLiftError] = useState('');
 
@@ -254,7 +253,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
       memberName: selectedMember.name,
       memberNameTe: selectedMember.nameTe,
       memberNo: selectedMember.memberNo,
-      liftType,
+      liftType: 'auction',
       chitValue: calcChitVal,
       bidDiscount: 20000,
       organizerCommission: calcComm,
@@ -1740,33 +1739,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                 </select>
               </div>
 
-              {/* Method Selector: Luxury Segmented Switch */}
-              <div className="form-field">
-                <label className="field-label text-xs">
-                  <Award size={14} />
-                  <span>{language === 'te' ? 'తీసుకున్న పద్ధతి (Lifting Method)' : 'Lifting Method'}</span>
-                </label>
-                <div className="method-segmented-group">
-                  <button
-                    type="button"
-                    className={`method-segmented-btn ${liftType === 'auction' ? 'active' : ''}`}
-                    onClick={() => setLiftType('auction')}
-                  >
-                    <CheckCircle2 size={15} />
-                    <span>{language === 'te' ? 'చిట్ తీసుకున్నారు (Chit Lifted)' : 'Chit Lifted'}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className={`method-segmented-btn ${liftType === 'lottery' ? 'active' : ''}`}
-                    onClick={() => setLiftType('lottery')}
-                  >
-                    <Dices size={15} />
-                    <span>{language === 'te' ? 'లక్కీ డ్రా (Lucky Draw)' : 'Lucky Draw'}</span>
-                  </button>
-                </div>
-              </div>
-
               {/* Sri Varalaxmi Chits Fixed Schedule Summary Card */}
               <div className="auction-summary-card">
                 {/* 1. Chit Value */}
@@ -1781,22 +1753,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                   <span className="summary-metric-value text-white font-bold">{getMonthDisplayName(liftMonth, language)}</span>
                 </div>
 
-                {/* 3. Net Distributed to Winner */}
-                <div className="highlight-prize-box">
-                  <div>
-                    <span className="text-xs font-bold text-emerald-300 block">
-                      {language === 'te' ? 'విజేతకు చేతికి అందే నికర మొత్తం:' : 'Net Distributed to Winner:'}
-                    </span>
-                    <span className="text-[11px] text-emerald-200/70">
-                      {language === 'te' ? '(చేతికి ఇచ్చే నగదు)' : '(Final Prize Distributed)'}
-                    </span>
-                  </div>
-                  <span className="font-mono text-xl font-black text-emerald-400">
-                    ₹{calcNetDistributed.toLocaleString('en-IN')}
-                  </span>
-                </div>
-
-                {/* 4. Next Month Onwards Installment */}
+                {/* 3. Next Month Onwards Installment */}
                 <div className="highlight-taken-box">
                   <div>
                     <span className="text-xs font-bold text-amber-300 block">
