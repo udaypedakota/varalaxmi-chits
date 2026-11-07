@@ -44,7 +44,13 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, initial
     setError('');
     setSuccessMsg('');
 
-    const cleanPhone = phone.trim().replace(/\D/g, '');
+    let cleanPhone = phone.trim().replace(/\D/g, '');
+    if (cleanPhone.length === 12 && cleanPhone.startsWith('91')) {
+      cleanPhone = cleanPhone.slice(2);
+    } else if (cleanPhone.length === 11 && cleanPhone.startsWith('0')) {
+      cleanPhone = cleanPhone.slice(1);
+    }
+
     if (!cleanPhone || cleanPhone.length !== 10) {
       setError(language === 'te' ? 'దయచేసి సరైన 10 అంకెల మొబైల్ నంబర్ నమోదు చేయండి' : 'Please enter a valid 10-digit mobile number');
       return;
@@ -72,7 +78,13 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, initial
     setError('');
     setSuccessMsg('');
 
-    const cleanPhone = phone.trim().replace(/\D/g, '');
+    let cleanPhone = phone.trim().replace(/\D/g, '');
+    if (cleanPhone.length === 12 && cleanPhone.startsWith('91')) {
+      cleanPhone = cleanPhone.slice(2);
+    } else if (cleanPhone.length === 11 && cleanPhone.startsWith('0')) {
+      cleanPhone = cleanPhone.slice(1);
+    }
+
     if (!cleanPhone || cleanPhone.length !== 10) {
       setError(language === 'te' ? 'ఆర్గనైజర్ 10 అంకెల మొబైల్ నంబర్ నమోదు చేయండి' : 'Enter 10-digit organizer mobile');
       return;

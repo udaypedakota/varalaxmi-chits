@@ -776,7 +776,12 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const login = async (phone: string, pin: string): Promise<{ success: boolean; error?: string }> => {
-    const cleanPhone = phone.trim().replace(/\D/g, '');
+    let cleanPhone = phone.trim().replace(/\D/g, '');
+    if (cleanPhone.length === 12 && cleanPhone.startsWith('91')) {
+      cleanPhone = cleanPhone.slice(2);
+    } else if (cleanPhone.length === 11 && cleanPhone.startsWith('0')) {
+      cleanPhone = cleanPhone.slice(1);
+    }
     const cleanPin = pin.trim();
 
     // 1. Organizer Login Check (Siva)

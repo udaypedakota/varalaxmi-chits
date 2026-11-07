@@ -469,25 +469,21 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
                 </div>
               </div>
 
-              {/* 3. Optional Reference / Note (NOT strictly required for Cash) */}
-              <div>
-                <label className="text-xs text-gray-400 mb-1 block">
-                  {paymentMode === 'Cash'
-                    ? (language === 'te' ? 'నోట్ / రిఫరెన్స్ (ఐచ్ఛికం):' : 'Notes / Remarks (Optional):')
-                    : (language === 'te' ? 'ట్రాన్సాక్షన్ ID / UTR నంబర్ (ఐచ్ఛికం):' : 'Transaction ID / UTR Ref (Optional):')}
-                </label>
-                <input
-                  type="text"
-                  placeholder={
-                    paymentMode === 'Cash'
-                      ? (language === 'te' ? 'ఉదా: శివ గారికి నేరుగా ఇచ్చాను' : 'e.g. Paid in cash directly to Siva')
-                      : (language === 'te' ? 'ఉదా: UPI ట్రాన్సాక్షన్ నంబర్ లేదా రిఫరెన్స్' : 'e.g. UPI Ref / Transaction ID')
-                  }
-                  className="form-input text-xs w-full px-3 py-2 bg-gray-950 border border-gray-800 rounded-lg text-gray-200"
-                  value={utrInput}
-                  onChange={e => setUtrInput(e.target.value)}
-                />
-              </div>
+              {/* 3. Optional UTR / Reference for UPI / PhonePe (Hidden for Cash) */}
+              {paymentMode !== 'Cash' && (
+                <div>
+                  <label className="text-xs text-gray-400 mb-1 block">
+                    {language === 'te' ? 'ట్రాన్సాక్షన్ ID / UTR నంబర్ (ఐచ్ఛికం):' : 'Transaction ID / UTR Ref (Optional):'}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder={language === 'te' ? 'ఉదా: UPI ట్రాన్సాక్షన్ నంబర్ లేదా రిఫరెన్స్' : 'e.g. UPI Ref / Transaction ID'}
+                    className="form-input text-xs w-full px-3 py-2 bg-gray-950 border border-gray-800 rounded-lg text-gray-200"
+                    value={utrInput}
+                    onChange={e => setUtrInput(e.target.value)}
+                  />
+                </div>
+              )}
 
               {/* 4. Single Big Submit Button */}
               <button
