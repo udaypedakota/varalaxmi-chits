@@ -1,8 +1,9 @@
 import React from 'react';
 import { useChit } from '../context/ChitContext';
 import { PaymentRecord, Member } from '../types/chit';
-import { X, Printer, Share2, CheckCircle2, Sparkles } from 'lucide-react';
+import { X, Printer, Share2, CheckCircle2, Sparkles, MessageSquare } from 'lucide-react';
 import { LanguageToggle } from './LanguageToggle';
+import { openDeviceSms, getPaymentReceiptSmsText } from '../utils/smsHelper';
 
 interface ReceiptModalProps {
   payment: PaymentRecord | null;
@@ -49,6 +50,19 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ payment, member, isO
           `Organizer: ${scheme.organizerName} (${scheme.organizerPhone})`
         );
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+  };
+
+  const handleSendSms = () => {
+    const phone = member?.phone || '';
+    const text = getPaymentReceiptSmsText({
+      memberName: member?.name || payment.memberName,
+      month: payment.month,
+      amount: payment.amount,
+      receiptNo: payment.receiptNo,
+      organizerName: scheme.organizerName,
+      organizerPhone: scheme.organizerPhone
+    });
+    openDeviceSms(phone, text);
   };
 
   return (
@@ -156,11 +170,15 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ payment, member, isO
         <div className="receipt-action-bar no-print">
           <button type="button" className="btn-secondary" onClick={handlePrint}>
             <Printer size={18} />
-            <span>{language === 'te' ? 'ప్రింట్ / డౌన్‌లోడ్ (PDF)' : 'Print / Download (PDF)'}</span>
+            <span>{language === 'te' ? 'ప్రింట్ (PDF)' : 'Print (PDF)'}</span>
+          </button>
+          <button type="button" className="btn-sms-share" onClick={handleSendSms}>
+            <MessageSquare size={18} />
+            <span>{language === 'te' ? 'SMS రసీదు' : 'Send SMS'}</span>
           </button>
           <button type="button" className="btn-whatsapp-share" onClick={handleShareWhatsApp}>
             <Share2 size={18} />
-            <span>{language === 'te' ? 'WhatsApp లో పంపండి' : 'Share on WhatsApp'}</span>
+            <span>WhatsApp</span>
           </button>
         </div>
       </div>

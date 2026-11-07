@@ -32,8 +32,15 @@ import {
   Copy,
   Eye,
   EyeOff,
-  Layers
+  Layers,
+  MessageSquare
 } from 'lucide-react';
+import { 
+  openDeviceSms, 
+  openWhatsApp, 
+  getEnrollmentSmsText, 
+  getPaymentReceiptSmsText 
+} from '../utils/smsHelper';
 
 interface OrganizerDashboardProps {
   onOpenReceipt: (payment: PaymentRecord, member?: Member) => void;
@@ -74,6 +81,16 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
   const [selectedEnrollGroupId, setSelectedEnrollGroupId] = useState(currentGroup.id);
   const [showMemberPins, setShowMemberPins] = useState<{ [id: string]: boolean }>({});
   const [addMemberError, setAddMemberError] = useState('');
+  const [enrolledSuccessMember, setEnrolledSuccessMember] = useState<{
+    name: string;
+    phone: string;
+    pin: string;
+    groupName: string;
+  } | null>(null);
+  const [approvedPaymentSuccess, setApprovedPaymentSuccess] = useState<{
+    payment: PaymentRecord;
+    member: Member | null;
+  } | null>(null);
 
   const handleAddMemberSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,6 +112,9 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
       return;
     }
 
+    const targetGroup = groups.find(g => g.id === (selectedEnrollGroupId || currentGroup.id)) || currentGroup;
+    const groupName = targetGroup.id === 'grp-2' || targetGroup.name.includes('Group B') ? 'Group B' : 'Group A';
+
     addMember({
       name: newMemberName.trim(),
       nameTe: newMemberName.trim(),
@@ -103,10 +123,43 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
       groupId: selectedEnrollGroupId || currentGroup.id
     });
 
+    setEnrolledSuccessMember({
+      name: newMemberName.trim(),
+      phone: cleanPhone,
+      pin: newMemberPin.trim() || '1234',
+      groupName
+    });
+
     setNewMemberName('');
     setNewMemberPhone('');
     setNewMemberPin('1234');
-    setIsAddMemberOpen(false);
+  };
+
+  const handleShareLoginSms = (m: Member) => {
+    const targetGroup = groups.find(g => g.id === (m.groupId || currentGroup.id)) || currentGroup;
+    const groupName = targetGroup.id === 'grp-2' || targetGroup.name.includes('Group B') ? 'Group B' : 'Group A';
+    const text = getEnrollmentSmsText({
+      memberName: m.name,
+      phone: m.phone,
+      pin: m.pin,
+      groupName,
+      organizerName: currentGroup.organizerName,
+      organizerPhone: currentGroup.organizerPhone,
+    });
+    openDeviceSms(m.phone, text);
+  };
+
+  const handleSendPaymentReceiptSms = (p: PaymentRecord, mem?: Member | null) => {
+    const phone = mem?.phone || '';
+    const text = getPaymentReceiptSmsText({
+      memberName: mem?.name || p.memberName,
+      month: p.month,
+      amount: p.amount,
+      receiptNo: p.receiptNo,
+      organizerName: currentGroup.organizerName,
+      organizerPhone: currentGroup.organizerPhone
+    });
+    openDeviceSms(phone, text);
   };
 
   const handleShareLoginWhatsApp = (m: Member) => {
@@ -423,11 +476,9 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                       className="btn-approve"
                       onClick={() => {
                         approvePayment(p.id);
-                        alert(language === 'te' 
-                          ? `✅ ${mem?.name || p.memberName} చెల్లించిన ₹${p.amount.toLocaleString('en-IN')} స్వీకరించబడిందిగా ఆమోదించబడింది!` 
-                          : `✅ Marked as Received: ₹${p.amount.toLocaleString('en-IN')} from ${mem?.name || p.memberName}`);
+                        setApprovedPaymentSuccess({ payment: p, member: mem || null });
                       }}
-                      title="Mark as Received"
+                      title="Mark as Received & Send Receipt"
                     >
                       <CheckCircle2 size={16} />
                       <span>{language === 'te' ? '✓ స్వీకరించబడింది (Received)' : '✓ Mark Received'}</span>
@@ -642,7 +693,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             <button
               type="button"
               className="btn-seed-data py-2 px-3 text-xs flex items-center gap-1.5 ml-auto"
-              onClick={() => { setIsAddMemberOpen(true); setAddMemberError(''); }}
+              onClick={() => { setIsAddMemberOpen(true); setAddMemberError(''); setEnrolledSuccessMember(null); }}
             >
               <UserPlus size={14} className="text-amber-400" />
               <span>{language === 'te' ? '+ సభ్యుని చేర్చండి' : '+ Add Member'}</span>
@@ -675,7 +726,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               <button
                 type="button"
                 className="btn-primary mt-3 text-xs py-2 px-4 inline-flex items-center gap-1.5"
-                onClick={() => { setIsAddMemberOpen(true); setAddMemberError(''); }}
+                onClick={() => { setIsAddMemberOpen(true); setAddMemberError(''); setEnrolledSuccessMember(null); }}
               >
                 <UserPlus size={14} />
                 <span>{language === 'te' ? '+ సభ్యుని నమోదు చేయండి' : '+ Add Member'}</span>
@@ -758,7 +809,18 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                         ₹{m.totalPaidSoFar.toLocaleString('en-IN')}
                       </td>
                       <td>
-                        <div className="action-buttons-cell flex items-center gap-1.5">
+                        <div className="action-buttons-cell flex items-center gap-1.5 flex-wrap">
+                          {/* 1-Click English SMS Login Credentials */}
+                          <button
+                            type="button"
+                            className="btn-cell-sms text-xs py-1 px-2 flex items-center gap-1"
+                            onClick={() => handleShareLoginSms(m)}
+                            title="Send Login Password/PIN via SMS (English)"
+                          >
+                            <MessageSquare size={13} />
+                            <span className="text-[11px]">SMS PIN</span>
+                          </button>
+
                           {/* 1-Click WhatsApp Login Credentials Share */}
                           <button
                             type="button"
@@ -767,18 +829,29 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                             title={language === 'te' ? 'లాగిన్ వివరాలు వాట్సాప్‌లో పంపండి' : 'Share Login Details on WhatsApp'}
                           >
                             <Send size={13} />
-                            <span className="text-[11px]">{language === 'te' ? 'లాగిన్ పంపు' : 'Share Login'}</span>
+                            <span className="text-[11px]">{language === 'te' ? 'వాట్సాప్' : 'WhatsApp'}</span>
                           </button>
 
                           {isPaid && curPay ? (
-                            <button 
-                              type="button" 
-                              className="btn-cell-receipt"
-                              onClick={() => onOpenReceipt(curPay, m)}
-                              title={language === 'te' ? 'రసీదు వీక్షించండి' : 'View Receipt'}
-                            >
-                              <FileCheck size={15} />
-                            </button>
+                            <>
+                              <button 
+                                type="button" 
+                                className="btn-cell-receipt"
+                                onClick={() => onOpenReceipt(curPay, m)}
+                                title={language === 'te' ? 'రసీదు వీక్షించండి' : 'View Receipt'}
+                              >
+                                <FileCheck size={15} />
+                              </button>
+                              <button
+                                type="button"
+                                className="btn-cell-sms text-xs py-1 px-2 flex items-center gap-1"
+                                onClick={() => handleSendPaymentReceiptSms(curPay, m)}
+                                title="Send SMS Receipt to Member (English)"
+                              >
+                                <MessageSquare size={13} />
+                                <span className="text-[11px]">SMS</span>
+                              </button>
+                            </>
                           ) : (
                             <button 
                               type="button" 
@@ -921,83 +994,176 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               </div>
             )}
 
-            <form onSubmit={handleAddMemberSubmit} className="login-form mt-3">
-              <div className="form-field">
-                <label className="field-label text-xs">
-                  <Layers size={14} />
-                  <span>{language === 'te' ? 'చిట్ గ్రూప్ ఎంచుకోండి' : 'Select Chit Group'}</span>
-                </label>
-                <select
-                  className="form-input font-bold"
-                  value={selectedEnrollGroupId}
-                  onChange={e => setSelectedEnrollGroupId(e.target.value)}
-                >
-                  {groups.map(g => {
-                    const isGroupB = g.id === 'grp-2' || g.name.includes('Group B') || g.nameTe?.includes('గ్రూప్ B');
-                    const label = isGroupB 
-                      ? (language === 'te' ? 'గ్రూప్ B' : 'Group B')
-                      : (language === 'te' ? 'గ్రూప్ A' : 'Group A');
-                    return (
-                      <option key={g.id} value={g.id}>
-                        {label}
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
+            {enrolledSuccessMember ? (
+              <div className="enroll-success-stage py-2 text-center animate-fade">
+                <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                  <CheckCircle2 size={28} />
+                </div>
+                <h4 className="text-base font-bold text-white mb-0.5">
+                  {language === 'te' ? 'సభ్యుడు విజయవంతంగా చేర్చబడ్డాడు!' : 'Member Enrolled Successfully!'}
+                </h4>
+                <p className="text-xs text-amber-300 mb-3">
+                  {language === 'te' ? 'పాస్‌వర్డ్ / లాగిన్ వివరాలను SMS ద్వారా పంపండి:' : 'Send login credentials to the member via SMS:'}
+                </p>
 
-              <div className="form-field">
-                <label className="field-label text-xs">
-                  <span>{language === 'te' ? 'సభ్యుని పేరు (Member Name)' : 'Member Name'}</span>
-                </label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="e.g. Ramesh Kumar"
-                  value={newMemberName}
-                  onChange={e => setNewMemberName(e.target.value)}
-                  autoFocus
-                  required
-                />
-              </div>
+                <div className="bg-slate-900/80 border border-slate-700/60 rounded-xl p-3 text-left mb-3.5 space-y-1.5 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">{language === 'te' ? 'సభ్యుని పేరు:' : 'Member Name:'}</span>
+                    <strong className="text-white">{enrolledSuccessMember.name}</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">{language === 'te' ? 'మొబైల్ నంబర్:' : 'Mobile Number:'}</span>
+                    <strong className="text-amber-400 font-mono">+91 {enrolledSuccessMember.phone}</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">{language === 'te' ? 'సెక్యూరిటీ PIN (పాస్‌వర్డ్):' : 'Security PIN (Password):'}</span>
+                    <strong className="text-emerald-400 font-mono tracking-widest font-bold">{enrolledSuccessMember.pin}</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">{language === 'te' ? 'చిట్ గ్రూప్:' : 'Chit Group:'}</span>
+                    <strong className="text-yellow-400">{enrolledSuccessMember.groupName}</strong>
+                  </div>
+                </div>
 
-              <div className="form-field">
-                <label className="field-label text-xs">
-                  <span>{language === 'te' ? 'మొబైల్ నంబర్ (10-Digit Mobile)' : 'Mobile Number'}</span>
-                </label>
-                <div className="input-group">
-                  <span className="input-prefix">+91</span>
+                <div className="space-y-2">
+                  <button
+                    type="button"
+                    className="btn-sms-share w-full py-2.5 flex items-center justify-center gap-2"
+                    onClick={() => {
+                      const text = getEnrollmentSmsText({
+                        memberName: enrolledSuccessMember.name,
+                        phone: enrolledSuccessMember.phone,
+                        pin: enrolledSuccessMember.pin,
+                        groupName: enrolledSuccessMember.groupName,
+                        organizerName: currentGroup.organizerName,
+                        organizerPhone: currentGroup.organizerPhone,
+                      });
+                      openDeviceSms(enrolledSuccessMember.phone, text);
+                    }}
+                  >
+                    <MessageSquare size={16} />
+                    <span>{language === 'te' ? '📱 SMS ద్వారా పిన్ పంపండి (English SMS)' : '📱 Send Credentials via SMS'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn-whatsapp-share w-full py-2.5 flex items-center justify-center gap-2"
+                    onClick={() => {
+                      const text = getEnrollmentSmsText({
+                        memberName: enrolledSuccessMember.name,
+                        phone: enrolledSuccessMember.phone,
+                        pin: enrolledSuccessMember.pin,
+                        groupName: enrolledSuccessMember.groupName,
+                        organizerName: currentGroup.organizerName,
+                        organizerPhone: currentGroup.organizerPhone,
+                      });
+                      openWhatsApp(enrolledSuccessMember.phone, text);
+                    }}
+                  >
+                    <Send size={16} />
+                    <span>{language === 'te' ? '💬 WhatsApp లో పంపండి' : '💬 Send via WhatsApp'}</span>
+                  </button>
+
+                  <div className="flex gap-2 pt-1">
+                    <button
+                      type="button"
+                      className="btn-secondary flex-1 py-2 text-xs"
+                      onClick={() => setEnrolledSuccessMember(null)}
+                    >
+                      <span>{language === 'te' ? '+ మరొకరిని చేర్చండి' : '+ Enroll Another'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-secondary flex-1 py-2 text-xs"
+                      onClick={() => {
+                        setEnrolledSuccessMember(null);
+                        setIsAddMemberOpen(false);
+                      }}
+                    >
+                      <span>{language === 'te' ? 'ముగించు (Close)' : 'Done / Close'}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleAddMemberSubmit} className="login-form mt-3">
+                <div className="form-field">
+                  <label className="field-label text-xs">
+                    <Layers size={14} />
+                    <span>{language === 'te' ? 'చిట్ గ్రూప్ ఎంచుకోండి' : 'Select Chit Group'}</span>
+                  </label>
+                  <select
+                    className="form-input font-bold"
+                    value={selectedEnrollGroupId}
+                    onChange={e => setSelectedEnrollGroupId(e.target.value)}
+                  >
+                    {groups.map(g => {
+                      const isGroupB = g.id === 'grp-2' || g.name.includes('Group B') || g.nameTe?.includes('గ్రూప్ B');
+                      const label = isGroupB 
+                        ? (language === 'te' ? 'గ్రూప్ B' : 'Group B')
+                        : (language === 'te' ? 'గ్రూప్ A' : 'Group A');
+                      return (
+                        <option key={g.id} value={g.id}>
+                          {label}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+
+                <div className="form-field">
+                  <label className="field-label text-xs">
+                    <span>{language === 'te' ? 'సభ్యుని పేరు (Member Name)' : 'Member Name'}</span>
+                  </label>
                   <input
-                    type="tel"
-                    maxLength={10}
+                    type="text"
                     className="form-input"
-                    placeholder="10-digit mobile"
-                    value={newMemberPhone}
-                    onChange={e => setNewMemberPhone(e.target.value.replace(/\D/g, ''))}
+                    placeholder="e.g. Ramesh Kumar"
+                    value={newMemberName}
+                    onChange={e => setNewMemberName(e.target.value)}
+                    autoFocus
                     required
                   />
                 </div>
-              </div>
 
-              <div className="form-field">
-                <label className="field-label text-xs">
-                  <span>{language === 'te' ? 'సెక్యూరిటీ PIN (4-Digits, Default: 1234)' : 'Security PIN (4-Digits)'}</span>
-                </label>
-                <input
-                  type="text"
-                  maxLength={4}
-                  className="form-input text-center tracking-widest font-bold"
-                  placeholder="1234"
-                  value={newMemberPin}
-                  onChange={e => setNewMemberPin(e.target.value.replace(/\D/g, ''))}
-                  required
-                />
-              </div>
+                <div className="form-field">
+                  <label className="field-label text-xs">
+                    <span>{language === 'te' ? 'మొబైల్ నంబర్ (10-Digit Mobile)' : 'Mobile Number'}</span>
+                  </label>
+                  <div className="input-group">
+                    <span className="input-prefix">+91</span>
+                    <input
+                      type="tel"
+                      maxLength={10}
+                      className="form-input"
+                      placeholder="10-digit mobile"
+                      value={newMemberPhone}
+                      onChange={e => setNewMemberPhone(e.target.value.replace(/\D/g, ''))}
+                      required
+                    />
+                  </div>
+                </div>
 
-              <button type="submit" className="btn-primary w-full mt-2">
-                <span>{language === 'te' ? 'సభ్యుని గ్రూప్‌లో చేర్చండి' : 'Enroll Member in Group'}</span>
-              </button>
-            </form>
+                <div className="form-field">
+                  <label className="field-label text-xs">
+                    <span>{language === 'te' ? 'సెక్యూరిటీ PIN (4-Digits, Default: 1234)' : 'Security PIN (4-Digits)'}</span>
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={4}
+                    className="form-input text-center tracking-widest font-bold"
+                    placeholder="1234"
+                    value={newMemberPin}
+                    onChange={e => setNewMemberPin(e.target.value.replace(/\D/g, ''))}
+                    required
+                  />
+                </div>
+
+                <button type="submit" className="btn-primary w-full mt-2">
+                  <span>{language === 'te' ? 'సభ్యుని గ్రూప్‌లో చేర్చండి' : 'Enroll Member in Group'}</span>
+                </button>
+              </form>
+            )}
           </div>
         </div>
       )}
@@ -1207,6 +1373,104 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* 7. PAYMENT APPROVED SUCCESS MODAL (Send SMS / WhatsApp Receipt in English) */}
+      {approvedPaymentSuccess && (
+        <div className="modal-backdrop animate-fade" onClick={() => setApprovedPaymentSuccess(null)}>
+          <div className="login-modal-card luxury-card animate-fade max-w-md" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-3">
+              <div className="flex items-center gap-2">
+                <span className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                  <CheckCircle2 size={20} />
+                </span>
+                <div>
+                  <h3 className="text-sm sm:text-base font-bold text-white m-0">
+                    {language === 'te' ? 'చెల్లింపు ఆమోదించబడింది!' : 'Payment Approved & Received!'}
+                  </h3>
+                  <p className="text-xs text-amber-400 m-0">
+                    {language === 'te' ? 'సభ్యునికి SMS రసీదు పంపండి' : 'Send payment receipt SMS to member'}
+                  </p>
+                </div>
+              </div>
+              <button type="button" className="btn-modal-close static" onClick={() => setApprovedPaymentSuccess(null)}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="bg-slate-900/80 border border-slate-700/60 rounded-xl p-3 mb-4 text-xs space-y-1.5">
+              <div className="flex justify-between">
+                <span className="text-gray-400">{language === 'te' ? 'సభ్యుని పేరు:' : 'Member Name:'}</span>
+                <strong className="text-white text-sm">
+                  {approvedPaymentSuccess.member?.name || approvedPaymentSuccess.payment.memberName}
+                </strong>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">{language === 'te' ? 'వాయిదా నెల:' : 'Installment Month:'}</span>
+                <strong className="text-yellow-400 font-bold">Month {approvedPaymentSuccess.payment.month}</strong>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">{language === 'te' ? 'స్వీకరించిన మొత్తం:' : 'Amount Received:'}</span>
+                <strong className="text-emerald-400 font-mono text-base font-bold">
+                  ₹{approvedPaymentSuccess.payment.amount.toLocaleString('en-IN')}
+                </strong>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">{language === 'te' ? 'రసీదు సంఖ్య:' : 'Receipt No:'}</span>
+                <strong className="text-amber-400 font-mono">{approvedPaymentSuccess.payment.receiptNo}</strong>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <button
+                type="button"
+                className="btn-sms-share w-full py-2.5 flex items-center justify-center gap-2"
+                onClick={() => {
+                  const phone = approvedPaymentSuccess.member?.phone || '';
+                  const text = getPaymentReceiptSmsText({
+                    memberName: approvedPaymentSuccess.member?.name || approvedPaymentSuccess.payment.memberName,
+                    month: approvedPaymentSuccess.payment.month,
+                    amount: approvedPaymentSuccess.payment.amount,
+                    receiptNo: approvedPaymentSuccess.payment.receiptNo,
+                    organizerName: currentGroup.organizerName,
+                    organizerPhone: currentGroup.organizerPhone
+                  });
+                  openDeviceSms(phone, text);
+                }}
+              >
+                <MessageSquare size={16} />
+                <span>{language === 'te' ? '📱 SMS రసీదు పంపండి (English SMS)' : '📱 Send SMS Receipt'}</span>
+              </button>
+
+              <button
+                type="button"
+                className="btn-whatsapp-share w-full py-2.5 flex items-center justify-center gap-2"
+                onClick={() => {
+                  const phone = approvedPaymentSuccess.member?.phone || '';
+                  const text = getPaymentReceiptSmsText({
+                    memberName: approvedPaymentSuccess.member?.name || approvedPaymentSuccess.payment.memberName,
+                    month: approvedPaymentSuccess.payment.month,
+                    amount: approvedPaymentSuccess.payment.amount,
+                    receiptNo: approvedPaymentSuccess.payment.receiptNo,
+                    organizerName: currentGroup.organizerName,
+                    organizerPhone: currentGroup.organizerPhone
+                  });
+                  openWhatsApp(phone, text);
+                }}
+              >
+                <Send size={16} />
+                <span>{language === 'te' ? '💬 WhatsApp లో రసీదు పంపండి' : '💬 Send via WhatsApp'}</span>
+              </button>
+
+              <button
+                type="button"
+                className="btn-secondary w-full py-2 text-xs mt-1"
+                onClick={() => setApprovedPaymentSuccess(null)}
+              >
+                <span>{language === 'te' ? 'ముగించు (Done)' : 'Done / Close'}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

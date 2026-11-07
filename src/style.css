@@ -2056,6 +2056,34 @@ select.form-input option,
   padding: 0.35rem 0.5rem;
   border-radius: 6px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.btn-cell-whatsapp:hover {
+  background: rgba(37, 211, 102, 0.3);
+  color: #86EFAC;
+}
+
+.btn-cell-sms {
+  background: rgba(2, 132, 199, 0.18);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  color: #38BDF8;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s ease;
+  font-weight: 600;
+}
+
+.btn-cell-sms:hover {
+  background: rgba(2, 132, 199, 0.35);
+  color: #BAE6FD;
 }
 
 .btn-cell-switch {
@@ -2967,10 +2995,38 @@ select.form-input option,
   background: #25D366;
   border: none;
   color: #FFFFFF;
-  padding: 0.75rem;
+  padding: 0.75rem 0.6rem;
   border-radius: var(--radius-md);
   font-weight: 800;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-whatsapp-share:hover {
+  background: #22c35e;
+  transform: translateY(-1px);
+}
+
+.btn-sms-share {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #0284C7, #0369A1);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  color: #FFFFFF;
+  padding: 0.75rem 0.6rem;
+  border-radius: var(--radius-md);
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
+}
+
+.btn-sms-share:hover {
+  background: linear-gradient(135deg, #0369A1, #075985);
+  transform: translateY(-1px);
 }
 
 /* ==========================================================================
