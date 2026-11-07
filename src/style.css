@@ -4663,6 +4663,7 @@ select.form-input option,
   }
 
   .lottery-modal-card, .login-modal-card, .lifting-modal-card {
+    position: relative !important;
     padding: 1.15rem 0.95rem !important;
     border-radius: 18px !important;
     width: 100% !important;
@@ -5370,6 +5371,7 @@ select.form-input option,
    AUCTION / LIFT MODAL LUXURY STYLING (పాట పాడుకున్నవారి వివరాలు)
    ========================================================================== */
 .lifting-modal-card {
+  position: relative !important;
   max-width: 520px;
   width: 100%;
   margin: 0 auto 2.5rem auto;
@@ -5380,6 +5382,30 @@ select.form-input option,
   padding: 1.35rem 1.25rem !important;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(245, 158, 11, 0.25) !important;
   touch-action: pan-y;
+}
+
+.lifting-modal-card .btn-modal-close {
+  position: absolute !important;
+  top: 14px !important;
+  right: 14px !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #CBD5E1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  z-index: 20 !important;
+  transition: all 0.2s ease !important;
+}
+
+.lifting-modal-card .btn-modal-close:hover {
+  background: rgba(239, 68, 68, 0.3) !important;
+  color: #FFFFFF !important;
+  border-color: rgba(239, 68, 68, 0.5) !important;
 }
 
 .method-segmented-group {
@@ -5458,6 +5484,17 @@ select.form-input option,
   border-radius: 12px !important;
   padding: 0.85rem 1rem !important;
   margin-top: 0.75rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.highlight-taken-box {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(217, 119, 6, 0.08)) !important;
+  border: 1.5px solid rgba(245, 158, 11, 0.45) !important;
+  border-radius: 12px !important;
+  padding: 0.85rem 1rem !important;
+  margin-top: 0.65rem !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;

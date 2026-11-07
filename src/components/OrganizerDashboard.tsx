@@ -228,16 +228,13 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
   const [liftMonth, setLiftMonth] = useState(currentGroup.currentMonth);
   const [liftMemberId, setLiftMemberId] = useState('');
   const [liftType, setLiftType] = useState<'auction' | 'lottery'>('auction');
-  const [liftBidDiscount, setLiftBidDiscount] = useState<number>(20000);
   const [liftNotes, setLiftNotes] = useState('');
   const [liftError, setLiftError] = useState('');
 
-  const calcChitVal = currentGroup.totalValue;
-  const calcDiscount = liftType === 'auction' ? Math.max(0, Number(liftBidDiscount) || 0) : 0;
+  const calcChitVal = currentGroup.totalValue || 200000;
   const calcComm = (calcChitVal * (currentGroup.commissionPercent || 5)) / 100;
-  const calcNetDistributed = calcChitVal - calcDiscount;
-  const remCount = Math.max(1, (currentGroup.totalMembers || 20) - 1);
-  const calcDivPerMember = Math.max(0, Math.round((calcDiscount - calcComm) / remCount));
+  const calcNetDistributed = 180000;
+  const fixedTakenInstallment = currentGroup.fixedTakenInstallment || 11500;
 
   const handleSaveLiftingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -259,10 +256,10 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
       memberNo: selectedMember.memberNo,
       liftType,
       chitValue: calcChitVal,
-      bidDiscount: calcDiscount,
+      bidDiscount: 20000,
       organizerCommission: calcComm,
       netDistributedAmount: calcNetDistributed,
-      dividendPerMember: calcDivPerMember,
+      dividendPerMember: 0,
       notes: liftNotes
     });
 
@@ -618,9 +615,9 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                     <th>{language === 'te' ? 'నెల' : 'Month'}</th>
                     <th>{language === 'te' ? 'పాట పాడుకున్న సభ్యుడు' : 'Winner Member'}</th>
                     <th>{language === 'te' ? 'విధానం' : 'Method'}</th>
-                    <th>{language === 'te' ? 'వేలం పాట తగ్గింపు' : 'Bid Discount'}</th>
+                    <th>{language === 'te' ? 'మొత్తం చిట్ విలువ' : 'Chit Value'}</th>
                     <th>{language === 'te' ? 'చేతికి అందిన మొత్తం' : 'Net Prize Distributed'}</th>
-                    <th>{language === 'te' ? 'సభ్యునికి తగ్గింపు (డివిడెండ్)' : 'Dividend / Member'}</th>
+                    <th>{language === 'te' ? 'వచ్చే నెల వాయిదా' : 'Next Month Installment'}</th>
                     <th>{language === 'te' ? 'తేదీ' : 'Date'}</th>
                     <th>{language === 'te' ? 'స్థితి' : 'Status'}</th>
                   </tr>
@@ -650,14 +647,14 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                             : (language === 'te' ? 'లక్కీ డ్రా' : 'Lucky Draw')}
                         </span>
                       </td>
-                      <td className="font-mono text-red-400 text-xs">
-                        {lift.bidDiscount > 0 ? `-₹${lift.bidDiscount.toLocaleString('en-IN')}` : '₹0 (Full Chit)'}
+                      <td className="font-mono text-white text-xs">
+                        ₹{(lift.chitValue || currentGroup.totalValue || 200000).toLocaleString('en-IN')}
                       </td>
                       <td className="font-mono font-bold text-emerald-400 text-sm">
-                        ₹{lift.netDistributedAmount.toLocaleString('en-IN')}
+                        ₹{(lift.netDistributedAmount || 180000).toLocaleString('en-IN')}
                       </td>
-                      <td className="font-mono text-amber-400 text-xs">
-                        {lift.dividendPerMember && lift.dividendPerMember > 0 ? `+₹${lift.dividendPerMember.toLocaleString('en-IN')}` : '₹0'}
+                      <td className="font-mono font-bold text-amber-400 text-xs">
+                        ₹{(currentGroup.fixedTakenInstallment || 11500).toLocaleString('en-IN')}
                       </td>
                       <td className="text-xs text-gray-400 font-mono">
                         {lift.date}
@@ -1660,28 +1657,31 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
       {/* 6. RECORD MONTHLY CHIT AUCTION / LIFTING MODAL (పాట పాడుకున్నవారి వివరాలు) */}
       {isLiftingModalOpen && (
         <div className="modal-backdrop animate-fade" onClick={() => setIsLiftingModalOpen(false)}>
-          <div className="lifting-modal-card luxury-card animate-fade" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-800">
-              <div className="flex items-center gap-2">
-                <span className="p-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40">
+          <div className="lifting-modal-card luxury-card animate-fade relative" onClick={e => e.stopPropagation()}>
+            {/* Top-Right Absolute Close Cross Mark */}
+            <button 
+              type="button" 
+              className="btn-modal-close" 
+              onClick={() => setIsLiftingModalOpen(false)}
+              aria-label="Close modal"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="mb-4 pb-2 border-b border-gray-800 pr-10">
+              <div className="flex items-center gap-2.5">
+                <span className="p-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0">
                   <Gavel size={22} />
                 </span>
-                <div>
-                  <h3 className="text-sm sm:text-base font-bold text-white m-0">
+                <div className="min-w-0">
+                  <h3 className="text-sm sm:text-base font-bold text-white m-0 truncate">
                     {language === 'te' ? 'నెలసరి వేలం పాట / చిట్ ఎత్తిన వివరాలు' : 'Record Monthly Auction / Lift'}
                   </h3>
-                  <p className="text-xs text-amber-400 m-0 font-semibold">
+                  <p className="text-xs text-amber-400 m-0 font-semibold truncate">
                     {currentGroup.id === 'grp-2' || currentGroup.name.includes('Group B') ? (language === 'te' ? 'గ్రూప్ B • ₹2,00,000 పథకం' : 'Group B • ₹2,00,000 Scheme') : (language === 'te' ? 'గ్రూప్ A • ₹2,00,000 పథకం' : 'Group A • ₹2,00,000 Scheme')}
                   </p>
                 </div>
               </div>
-              <button 
-                type="button" 
-                className="btn-modal-close static" 
-                onClick={() => setIsLiftingModalOpen(false)}
-              >
-                <X size={16} />
-              </button>
             </div>
 
             {liftError && (
@@ -1770,65 +1770,49 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                 </div>
               </div>
 
-              {/* If Auction: Bid Discount Input */}
-              {liftType === 'auction' && (
-                <div className="form-field">
-                  <label className="field-label text-xs">
-                    <TrendingUp size={14} />
-                    <span>{language === 'te' ? 'వేలం పాట తగ్గింపు మొత్తం (₹ Auction Discount)' : 'Auction Bid Discount (₹)'}</span>
-                  </label>
-                  <div className="input-group">
-                    <span className="input-prefix">₹</span>
-                    <input
-                      type="number"
-                      step={500}
-                      min={0}
-                      max={calcChitVal}
-                      className="form-input font-bold text-amber-400 font-mono text-base"
-                      value={liftBidDiscount}
-                      onChange={e => setLiftBidDiscount(Number(e.target.value))}
-                      required
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Dynamic Calculation Breakdown: Luxury Ledger Card */}
+              {/* Sri Varalaxmi Chits Fixed Schedule Summary Card */}
               <div className="auction-summary-card">
+                {/* 1. Chit Value */}
                 <div className="summary-metric-row">
                   <span className="summary-metric-label">{language === 'te' ? 'మొత్తం చిట్ విలువ:' : 'Total Chit Value:'}</span>
-                  <span className="summary-metric-value">₹{calcChitVal.toLocaleString('en-IN')}</span>
-                </div>
-                {liftType === 'auction' && (
-                  <div className="summary-metric-row text-red-400">
-                    <span className="summary-metric-label text-red-400">{language === 'te' ? 'వేలం పాట తగ్గింపు (Discount):' : 'Bid Discount:'}</span>
-                    <span className="summary-metric-value text-red-400">- ₹{calcDiscount.toLocaleString('en-IN')}</span>
-                  </div>
-                )}
-                <div className="summary-metric-row">
-                  <span className="summary-metric-label">{language === 'te' ? 'ఆర్గనైజర్ కమీషన్ (5%):' : 'Organizer Commission (5%):'}</span>
-                  <span className="summary-metric-value">₹{calcComm.toLocaleString('en-IN')}</span>
+                  <span className="summary-metric-value text-amber-300">₹{calcChitVal.toLocaleString('en-IN')}</span>
                 </div>
 
+                {/* 2. Chit Taken Month */}
+                <div className="summary-metric-row">
+                  <span className="summary-metric-label">{language === 'te' ? 'చిట్ తీసుకున్న నెల:' : 'Chit Taken Month:'}</span>
+                  <span className="summary-metric-value text-white font-bold">{getMonthDisplayName(liftMonth, language)}</span>
+                </div>
+
+                {/* 3. Net Distributed to Winner */}
                 <div className="highlight-prize-box">
-                  <span className="text-xs font-bold text-emerald-300">
-                    {language === 'te' ? 'విజేతకు చేతికి ఇచ్చే నికర మొత్తం:' : 'Net Distributed to Winner:'}
-                  </span>
-                  <span className="font-mono text-lg font-bold text-emerald-400">
+                  <div>
+                    <span className="text-xs font-bold text-emerald-300 block">
+                      {language === 'te' ? 'విజేతకు చేతికి అందే నికర మొత్తం:' : 'Net Distributed to Winner:'}
+                    </span>
+                    <span className="text-[11px] text-emerald-200/70">
+                      {language === 'te' ? '(చేతికి ఇచ్చే నగదు)' : '(Final Prize Distributed)'}
+                    </span>
+                  </div>
+                  <span className="font-mono text-xl font-black text-emerald-400">
                     ₹{calcNetDistributed.toLocaleString('en-IN')}
                   </span>
                 </div>
 
-                {liftType === 'auction' && (
-                  <div className="highlight-dividend-box">
-                    <span className="text-amber-300 font-semibold">
-                      {language === 'te' ? 'మిగిలిన 19 మంది సభ్యుల డివిడెండ్:' : 'Dividend to other members:'}
+                {/* 4. Next Month Onwards Installment */}
+                <div className="highlight-taken-box">
+                  <div>
+                    <span className="text-xs font-bold text-amber-300 block">
+                      {language === 'te' ? 'వచ్చే నెల నుండి విజేత కట్టాల్సిన వాయిదా:' : 'Next Month Onwards Installment:'}
                     </span>
-                    <span className="font-mono font-bold text-amber-400">
-                      ~₹{calcDivPerMember.toLocaleString('en-IN')} / member
+                    <span className="text-[11px] text-amber-200/70">
+                      {language === 'te' ? '(నెల 20 వరకు స్థిర వాయిదా)' : '(Fixed Post-Lift Rate till Month 20)'}
                     </span>
                   </div>
-                )}
+                  <span className="font-mono text-lg font-black text-amber-400">
+                    ₹{fixedTakenInstallment.toLocaleString('en-IN')}
+                  </span>
+                </div>
               </div>
 
               {/* Notes */}
@@ -1858,13 +1842,14 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                   className="btn-primary flex-1 luxury-btn text-xs py-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5"
                 >
                   <CheckCircle2 size={16} />
-                  <span>{language === 'te' ? '✓ నిర్ధారించండి & సేవ్ చేయండి' : '✓ Confirm & Save'}</span>
+                  <span>{language === 'te' ? 'పాట నమోదు చేయి' : 'Save & Record Lift'}</span>
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
       {/* 7. PAYMENT APPROVED SUCCESS MODAL (Send SMS / WhatsApp Receipt in English) */}
       {approvedPaymentSuccess && (
         <div className="modal-backdrop animate-fade" onClick={() => setApprovedPaymentSuccess(null)}>
