@@ -47,7 +47,9 @@ import {
   Smartphone,
   CreditCard,
   Ticket,
-  Check
+  Check,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 interface MemberDashboardProps {
@@ -75,6 +77,7 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
   const [amountInput, setAmountInput] = useState<string>('');
   const [proofImage, setProofImage] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [isScheduleExpanded, setIsScheduleExpanded] = useState(false);
 
   if (!currentUser) return null;
 
@@ -449,89 +452,138 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
       </section>
 
       {/* 3. MASTER 20-MONTH SCHEDULE (Official 4-Column Schedule) */}
-      <section className="schedule-section">
-        <div className="section-header-row">
-          <div>
-            <h3 className="section-title">
-              {language === 'te' ? 'ప్రధాన 20 నెలల పట్టిక (Master Schedule)' : 'Master 20-Month Schedule'}
-            </h3>
-            <p className="section-subtitle">
-              {language === 'te' 
-                ? 'మొత్తం చిట్ విలువ: ₹2,00,000 • 20 నెలలు • ప్రతి నెల 10వ తేదీ లోపు చెల్లించవలెను' 
-                : 'Total Chit Value: ₹2,00,000 • 20 Months • Pay before 10th of every month'}
-            </p>
+      <section className="schedule-section luxury-card mb-6">
+        <div className="section-header-row flex justify-between items-center flex-wrap gap-3 pb-3 border-b border-gray-800">
+          <div
+            className="cursor-pointer select-none flex-1 min-w-[240px]"
+            onClick={() => setIsScheduleExpanded(!isScheduleExpanded)}
+            title={isScheduleExpanded ? (language === 'te' ? 'టేబుల్ మడవడానికి క్లిక్ చేయండి' : 'Click to collapse table') : (language === 'te' ? 'టేబుల్ తెరవడానికి క్లిక్ చేయండి' : 'Click to expand table')}
+          >
+            <div className="flex items-center gap-2">
+              <span className="p-2 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                <Calendar size={20} />
+              </span>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="section-title m-0 text-base font-bold text-white flex items-center gap-1.5">
+                    <span>{language === 'te' ? 'ప్రధాన 20 నెలల పట్టిక (Master Schedule)' : 'Master 20-Month Schedule'}</span>
+                    {isScheduleExpanded ? <ChevronUp size={16} className="text-amber-400" /> : <ChevronDown size={16} className="text-gray-400" />}
+                  </h3>
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30 whitespace-nowrap">
+                    {groupLiftings.length} / {currentGroup.totalMonths} {language === 'te' ? 'నెలలు లిఫ్ట్ అయ్యాయి' : 'Lifted'}
+                  </span>
+                </div>
+                <p className="section-subtitle m-0 text-xs text-gray-400 mt-0.5">
+                  {language === 'te' 
+                    ? 'మొత్తం చిట్ విలువ: ₹2,00,000 • 20 నెలలు • ప్రతి నెల 10వ తేదీ లోపు చెల్లించవలెను' 
+                    : 'Total Chit Value: ₹2,00,000 • 20 Months • Pay before 10th of every month'}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
+        {/* Collapsed Compact Preview Bar */}
+        {!isScheduleExpanded && (
+          <div
+            className="collapsed-preview-strip"
+            onClick={() => setIsScheduleExpanded(true)}
+            role="button"
+            tabIndex={0}
+            title={language === 'te' ? '20 నెలల పూర్తి పట్టిక తెరవడానికి క్లిక్ చేయండి' : 'Click to open 20-Month Table'}
+          >
+            <div className="flex items-center gap-3 text-xs flex-wrap">
+              <span className="font-semibold text-amber-400">
+                {language === 'te' ? `ప్రస్తుతం: నెల #${currentGroup.currentMonth}` : `Current: Month #${currentGroup.currentMonth}`}
+              </span>
+              <span className="text-gray-500">|</span>
+              <span className="text-gray-300">
+                {language === 'te' ? 'తీసుకోని వారి వాయిదా: ' : 'Chit Not Taken: '}
+                <strong className="text-amber-300">
+                  ₹{getScheduleNotTakenAmount(MASTER_SCHEDULE.find(m => m.month === currentGroup.currentMonth) || MASTER_SCHEDULE[0], language).toLocaleString('en-IN')}
+                </strong>
+              </span>
+              <span className="text-gray-500">|</span>
+              <span className="text-gray-300">
+                {language === 'te' ? 'తీసుకున్న వారి వాయిదా: ' : 'Chit Taken Rate: '}
+                <strong className="text-emerald-400">₹{MASTER_SCHEDULE[0].takenAmount.toLocaleString('en-IN')}</strong>
+              </span>
+            </div>
+            <ChevronDown size={16} className="text-amber-400" />
+          </div>
+        )}
+
         {/* 4-COLUMN TABLE ONLY */}
-        <div className="table-responsive-container">
-          <table className="master-table">
-            <thead>
-              <tr>
-                <th className="th-month">{language === 'te' ? 'నెల & విజేత' : 'Month & Winner'}</th>
-                <th className="th-val">{language === 'te' ? 'చిట్ విలువ' : 'Chit Value'}</th>
-                <th className="th-nottaken">
-                  <div className="th-stacked-header">
-                    <span>{language === 'te' ? 'చిట్ తీసుకోని వారి వాయిదా' : 'Chit Not Taken'}</span>
-                    <span className="th-sub-note">{language === 'te' ? '(తగ్గింపు వాయిదా)' : '(Discounted)'}</span>
-                  </div>
-                </th>
-                <th className="th-taken">
-                  <div className="th-stacked-header">
-                    <span>{language === 'te' ? 'చిట్ తీసుకున్న వారి వాయిదా' : 'Chit Taken Rate'}</span>
-                    <span className="th-sub-note">{language === 'te' ? '(స్థిర వాయిదా)' : '(Fixed Post-Lift)'}</span>
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {MASTER_SCHEDULE.map(item => {
-                const isCurrent = item.month === scheme.currentMonth;
-                const isPast = item.month < scheme.currentMonth;
-                const notTaken = getScheduleNotTakenAmount(item, language);
-                const monthLifting = groupLiftings.find(l => l.month === item.month);
-                const winnerName = monthLifting 
-                  ? (language === 'te' ? (monthLifting.memberNameTe || monthLifting.memberName) : monthLifting.memberName)
-                  : null;
-                return (
-                  <tr key={item.month} className={`schedule-row ${isCurrent ? 'current-active-row' : ''} ${isPast ? 'past-row' : ''}`}>
-                    <td className="td-month">
-                      <div className="sched-cell-stack">
-                        <div className="sched-month-top">
-                          <span className="sched-pill-no">#{item.month}</span>
-                          {isCurrent && (
-                            <span className="sched-current-dot-pill" title={language === 'te' ? 'ప్రస్తుత నెల' : 'Current Month'}>
-                              {language === 'te' ? 'ప్రస్తుతం' : 'Active'}
+        {isScheduleExpanded && (
+          <div className="table-responsive-container mt-3 animate-fade">
+            <table className="master-table">
+              <thead>
+                <tr>
+                  <th className="th-month">{language === 'te' ? 'నెల & విజేత' : 'Month & Winner'}</th>
+                  <th className="th-val">{language === 'te' ? 'చిట్ విలువ' : 'Chit Value'}</th>
+                  <th className="th-nottaken">
+                    <div className="th-stacked-header">
+                      <span>{language === 'te' ? 'చిట్ తీసుకోని వారి వాయిదా' : 'Chit Not Taken'}</span>
+                      <span className="th-sub-note">{language === 'te' ? '(తగ్గింపు వాయిదా)' : '(Discounted)'}</span>
+                    </div>
+                  </th>
+                  <th className="th-taken">
+                    <div className="th-stacked-header">
+                      <span>{language === 'te' ? 'చిట్ తీసుకున్న వారి వాయిదా' : 'Chit Taken Rate'}</span>
+                      <span className="th-sub-note">{language === 'te' ? '(స్థిర వాయిదా)' : '(Fixed Post-Lift)'}</span>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {MASTER_SCHEDULE.map(item => {
+                  const isCurrent = item.month === currentGroup.currentMonth;
+                  const isPast = item.month < currentGroup.currentMonth;
+                  const notTaken = getScheduleNotTakenAmount(item, language);
+                  const monthLifting = groupLiftings.find(l => l.month === item.month);
+                  const winnerName = monthLifting 
+                    ? (language === 'te' ? (monthLifting.memberNameTe || monthLifting.memberName) : monthLifting.memberName)
+                    : null;
+                  return (
+                    <tr key={item.month} className={`schedule-row ${isCurrent ? 'current-active-row' : ''} ${isPast ? 'past-row' : ''}`}>
+                      <td className="td-month">
+                        <div className="sched-cell-stack">
+                          <div className="sched-month-top">
+                            <span className="sched-pill-no">#{item.month}</span>
+                            {isCurrent && (
+                              <span className="sched-current-dot-pill" title={language === 'te' ? 'ప్రస్తుత నెల' : 'Current Month'}>
+                                {language === 'te' ? 'ప్రస్తుతం' : 'Active'}
+                              </span>
+                            )}
+                          </div>
+                          <span className="sched-month-subtext">
+                            {MONTH_SHORT_NAMES[item.month]
+                              ? (language === 'te' ? MONTH_SHORT_NAMES[item.month].te : MONTH_SHORT_NAMES[item.month].en)
+                              : `M${item.month}`}
+                          </span>
+                          {winnerName && (
+                            <span className="sched-winner-pill" title={language === 'te' ? `చిట్ తీసుకున్నవారు: ${winnerName}` : `Lifted by: ${winnerName}`}>
+                              👑 {winnerName} {monthLifting?.memberNo ? `(#${monthLifting.memberNo})` : ''}
                             </span>
                           )}
                         </div>
-                        <span className="sched-month-subtext">
-                          {MONTH_SHORT_NAMES[item.month]
-                            ? (language === 'te' ? MONTH_SHORT_NAMES[item.month].te : MONTH_SHORT_NAMES[item.month].en)
-                            : `M${item.month}`}
-                        </span>
-                        {winnerName && (
-                          <span className="sched-winner-pill" title={language === 'te' ? `చిట్ తీసుకున్నవారు: ${winnerName}` : `Lifted by: ${winnerName}`}>
-                            👑 {winnerName} {monthLifting?.memberNo ? `(#${monthLifting.memberNo})` : ''}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="td-val font-mono font-bold text-gray-200">
-                      ₹{item.chitValue.toLocaleString('en-IN')}
-                    </td>
-                    <td className="td-nottaken font-mono font-bold text-amber-400">
-                      {notTaken === 0 ? '₹0' : `₹${notTaken.toLocaleString('en-IN')}`}
-                    </td>
-                    <td className="td-taken font-mono font-bold text-emerald-400">
-                      ₹{item.takenAmount.toLocaleString('en-IN')}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                      </td>
+                      <td className="td-val font-mono font-bold text-gray-200">
+                        ₹{item.chitValue.toLocaleString('en-IN')}
+                      </td>
+                      <td className="td-nottaken font-mono font-bold text-amber-400">
+                        {notTaken === 0 ? '₹0' : `₹${notTaken.toLocaleString('en-IN')}`}
+                      </td>
+                      <td className="td-taken font-mono font-bold text-emerald-400">
+                        ₹{item.takenAmount.toLocaleString('en-IN')}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
       {/* 5. MY PAST RECEIPTS & PASSBOOK */}
