@@ -468,7 +468,7 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
           <table className="master-table">
             <thead>
               <tr>
-                <th className="th-month">{language === 'te' ? 'నెల' : 'Month'}</th>
+                <th className="th-month">{language === 'te' ? 'నెల & విజేత' : 'Month & Winner'}</th>
                 <th className="th-val">{language === 'te' ? 'చిట్ విలువ' : 'Chit Value'}</th>
                 <th className="th-nottaken">
                   <div className="th-stacked-header">
@@ -489,6 +489,10 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
                 const isCurrent = item.month === scheme.currentMonth;
                 const isPast = item.month < scheme.currentMonth;
                 const notTaken = getScheduleNotTakenAmount(item, language);
+                const monthLifting = groupLiftings.find(l => l.month === item.month);
+                const winnerName = monthLifting 
+                  ? (language === 'te' ? (monthLifting.memberNameTe || monthLifting.memberName) : monthLifting.memberName)
+                  : null;
                 return (
                   <tr key={item.month} className={`schedule-row ${isCurrent ? 'current-active-row' : ''} ${isPast ? 'past-row' : ''}`}>
                     <td className="td-month">
@@ -506,6 +510,11 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
                             ? (language === 'te' ? MONTH_SHORT_NAMES[item.month].te : MONTH_SHORT_NAMES[item.month].en)
                             : `M${item.month}`}
                         </span>
+                        {winnerName && (
+                          <span className="sched-winner-pill" title={language === 'te' ? `చిట్ తీసుకున్నవారు: ${winnerName}` : `Lifted by: ${winnerName}`}>
+                            👑 {winnerName} {monthLifting?.memberNo ? `(#${monthLifting.memberNo})` : ''}
+                          </span>
+                        )}
                       </div>
                     </td>
                     <td className="td-val font-mono font-bold text-gray-200">

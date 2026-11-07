@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useChit } from '../context/ChitContext';
-import { MASTER_SCHEDULE, getInstallmentForMember, getMonthDisplayName } from '../data/scheduleData';
+import { MASTER_SCHEDULE, getInstallmentForMember, getMonthDisplayName, MONTH_SHORT_NAMES, getScheduleNotTakenAmount } from '../data/scheduleData';
 import { PaymentRecord, Member } from '../types/chit';
 import { 
   Users, 
@@ -539,27 +539,27 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
         </section>
       )}
 
-      {/* 3.5 MONTHLY CHIT LIFTING & AUCTION REGISTER (పాట పాడుకున్నవారి వివరాలు - Section 3, 4, 5) */}
-      <section className="auction-register-section luxury-card mb-6">
+      {/* 3.5 MASTER 20-MONTH SCHEDULE (Official Schedule with Option A Winner Tracking) */}
+      <section className="schedule-section luxury-card mb-6">
         <div className="section-header-row flex justify-between items-center flex-wrap gap-3 pb-3 border-b border-gray-800">
           <div>
             <div className="flex items-center gap-2">
               <span className="p-2 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                <Gavel size={20} />
+                <Calendar size={20} />
               </span>
               <div>
-                <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="section-title m-0 text-base font-bold text-white">
-                    {language === 'te' ? 'నెలసరి చిట్ తీసుకున్నవారి వివరాలు' : 'Monthly Chit Lift Register'}
+                    {language === 'te' ? 'ప్రధాన 20 నెలల పట్టిక (Master Schedule)' : 'Master 20-Month Schedule'}
                   </h3>
                   <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30 whitespace-nowrap">
-                    {groupLiftings.length} / {currentGroup.totalMonths} {language === 'te' ? 'నెలలు' : 'Months'}
+                    {groupLiftings.length} / {currentGroup.totalMonths} {language === 'te' ? 'నెలలు లిఫ్ట్ అయ్యాయి' : 'Lifted'}
                   </span>
                 </div>
-                <p className="section-subtitle m-0 text-xs text-gray-400">
+                <p className="section-subtitle m-0 text-xs text-gray-400 mt-0.5">
                   {language === 'te'
-                    ? 'ప్రతి నెల చిట్ తీసుకున్న సభ్యుడు మరియు చేతికి అందిన నికర మొత్తం వివరాలు'
-                    : 'Month-by-month winner tracking and net prize money paid'}
+                    ? 'మొత్తం చిట్ విలువ: ₹2,00,000 • 20 నెలలు • ప్రతి నెల 10వ తేదీ లోపు చెల్లించవలెను'
+                    : 'Total Chit Value: ₹2,00,000 • 20 Months • Pay before 10th of every month'}
                 </p>
               </div>
             </div>
@@ -590,86 +590,75 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
           </div>
         </div>
 
-        {/* Liftings Cards / Table */}
-        <div className="mt-3">
-          {groupLiftings.length === 0 ? (
-            <div className="text-center py-6 border border-dashed border-gray-800 rounded-xl bg-gray-950/30">
-              <Trophy size={32} className="mx-auto text-amber-500/60 mb-2" />
-              <p className="text-sm text-gray-300 font-medium">
-                {language === 'te' 
-                  ? 'ఇంకా ఏ నెలా వేలం పాట నమోదు కాలేదు' 
-                  : 'No chit auctions or lotteries recorded yet'}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                {language === 'te'
-                  ? 'సభ్యులు పాట పాడుకున్నప్పుడు పైన ఉన్న "+ ఈ నెల పాట నమోదు చేయండి" బటన్ ద్వారా సులభంగా నమోదు చేయండి.'
-                  : 'Click "+ Record Chit Auction" above to record the winning member, auction discount, and prize payout.'}
-              </p>
-            </div>
-          ) : (
-            <div className="table-responsive-container">
-              <table className="ledger-table">
-                <thead>
-                  <tr>
-                    <th>{language === 'te' ? 'నెల' : 'Month'}</th>
-                    <th>{language === 'te' ? 'పాట పాడుకున్న సభ్యుడు' : 'Winner Member'}</th>
-                    <th>{language === 'te' ? 'విధానం' : 'Method'}</th>
-                    <th>{language === 'te' ? 'మొత్తం చిట్ విలువ' : 'Chit Value'}</th>
-                    <th>{language === 'te' ? 'చేతికి అందిన మొత్తం' : 'Net Prize Distributed'}</th>
-                    <th>{language === 'te' ? 'వచ్చే నెల వాయిదా' : 'Next Month Installment'}</th>
-                    <th>{language === 'te' ? 'తేదీ' : 'Date'}</th>
-                    <th>{language === 'te' ? 'స్థితి' : 'Status'}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {groupLiftings.map(lift => (
-                    <tr key={lift.id} className="ledger-row">
-                      <td className="font-bold text-center">
-                        <span className="month-badge text-xs font-mono font-bold text-amber-400">
-                          {language === 'te' ? `నెల ${lift.month}` : `Month ${lift.month}`}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="font-bold text-white flex items-center gap-1.5">
-                          <span className="text-amber-400">#{lift.memberNo || ''}</span>
-                          <span>{language === 'te' ? lift.memberNameTe : lift.memberName}</span>
+        {/* 4-COLUMN MASTER TABLE WITH OPTION A WINNER BADGES */}
+        <div className="table-responsive-container mt-3">
+          <table className="master-table">
+            <thead>
+              <tr>
+                <th className="th-month">{language === 'te' ? 'నెల & విజేత' : 'Month & Winner'}</th>
+                <th className="th-val">{language === 'te' ? 'చిట్ విలువ' : 'Chit Value'}</th>
+                <th className="th-nottaken">
+                  <div className="th-stacked-header">
+                    <span>{language === 'te' ? 'చిట్ తీసుకోని వారి వాయిదా' : 'Chit Not Taken'}</span>
+                    <span className="th-sub-note">{language === 'te' ? '(తగ్గింపు వాయిదా)' : '(Discounted)'}</span>
+                  </div>
+                </th>
+                <th className="th-taken">
+                  <div className="th-stacked-header">
+                    <span>{language === 'te' ? 'చిట్ తీసుకున్న వారి వాయిదా' : 'Chit Taken Rate'}</span>
+                    <span className="th-sub-note">{language === 'te' ? '(స్థిర వాయిదా)' : '(Fixed Post-Lift)'}</span>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {MASTER_SCHEDULE.map(item => {
+                const isCurrent = item.month === currentGroup.currentMonth;
+                const isPast = item.month < currentGroup.currentMonth;
+                const notTaken = getScheduleNotTakenAmount(item, language);
+                const monthLifting = groupLiftings.find(l => l.month === item.month);
+                const winnerName = monthLifting 
+                  ? (language === 'te' ? (monthLifting.memberNameTe || monthLifting.memberName) : monthLifting.memberName)
+                  : null;
+
+                return (
+                  <tr key={item.month} className={`schedule-row ${isCurrent ? 'current-active-row active-row' : ''} ${isPast ? 'past-row' : ''}`}>
+                    <td className="td-month">
+                      <div className="sched-cell-stack">
+                        <div className="sched-month-top">
+                          <span className="sched-pill-no">#{item.month}</span>
+                          {isCurrent && (
+                            <span className="sched-current-dot-pill" title={language === 'te' ? 'ప్రస్తుత నెల' : 'Current Month'}>
+                              {language === 'te' ? 'ప్రస్తుతం' : 'Active'}
+                            </span>
+                          )}
                         </div>
-                      </td>
-                      <td>
-                        <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
-                          lift.liftType === 'auction' 
-                            ? 'bg-amber-950/60 text-amber-300 border border-amber-800/40' 
-                            : 'bg-purple-950/60 text-purple-300 border border-purple-800/40'
-                        }`}>
-                          {lift.liftType === 'auction' 
-                            ? (language === 'te' ? 'చిట్ తీసుకున్నారు' : 'Chit Lifted') 
-                            : (language === 'te' ? 'లక్కీ డ్రా' : 'Lucky Draw')}
+                        <span className="sched-month-subtext">
+                          {MONTH_SHORT_NAMES[item.month]
+                            ? (language === 'te' ? MONTH_SHORT_NAMES[item.month].te : MONTH_SHORT_NAMES[item.month].en)
+                            : `M${item.month}`}
                         </span>
-                      </td>
-                      <td className="font-mono text-white text-xs">
-                        ₹{(lift.chitValue || currentGroup.totalValue || 200000).toLocaleString('en-IN')}
-                      </td>
-                      <td className="font-mono font-bold text-emerald-400 text-sm">
-                        ₹{(lift.netDistributedAmount || 180000).toLocaleString('en-IN')}
-                      </td>
-                      <td className="font-mono font-bold text-amber-400 text-xs">
-                        ₹{(currentGroup.fixedTakenInstallment || 11500).toLocaleString('en-IN')}
-                      </td>
-                      <td className="text-xs text-gray-400 font-mono">
-                        {lift.date}
-                      </td>
-                      <td>
-                        <span className="badge-paid text-xs">
-                          <CheckCircle2 size={12} />
-                          <span>{language === 'te' ? 'చెల్లించబడింది' : 'Distributed'}</span>
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                        {winnerName && (
+                          <span className="sched-winner-pill" title={language === 'te' ? `చిట్ తీసుకున్నవారు: ${winnerName}` : `Lifted by: ${winnerName}`}>
+                            👑 {winnerName} {monthLifting?.memberNo ? `(#${monthLifting.memberNo})` : ''}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="td-val font-mono font-bold text-gray-200">
+                      ₹{item.chitValue.toLocaleString('en-IN')}
+                    </td>
+                    <td className="td-nottaken font-mono font-bold text-amber-400">
+                      {notTaken === 0 ? '₹0' : `₹${notTaken.toLocaleString('en-IN')}`}
+                    </td>
+                    <td className="td-taken font-mono font-bold text-emerald-400">
+                      ₹{item.takenAmount.toLocaleString('en-IN')}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </section>
 

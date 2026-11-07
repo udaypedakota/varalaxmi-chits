@@ -49,6 +49,29 @@ export function getMonthDisplayName(month: number, lang: 'te' | 'en' = 'te'): st
   return lang === 'te' ? `నెల ${month} (${meta.te})` : `Month ${month} (${meta.en})`;
 }
 
+export const MONTH_SHORT_NAMES: { [key: number]: { en: string; te: string } } = {
+  1: { en: "Dec '26", te: "డిసెం '26" },
+  2: { en: "Jan '27", te: "జన '27" },
+  3: { en: "Feb '27", te: "ఫిబ్ర '27" },
+  4: { en: "Mar '27", te: "మార్చి '27" },
+  5: { en: "Apr '27", te: "ఏప్రి '27" },
+  6: { en: "May '27", te: "మే '27" },
+  7: { en: "Jun '27", te: "జూన్ '27" },
+  8: { en: "Jul '27", te: "జూలై '27" },
+  9: { en: "Aug '27", te: "ఆగ '27" },
+  10: { en: "Sep '27", te: "సెప్టెం '27" },
+  11: { en: "Oct '27", te: "అక్టో '27" },
+  12: { en: "Nov '27", te: "నవం '27" },
+  13: { en: "Dec '27", te: "డిసెం '27" },
+  14: { en: "Jan '28", te: "జన '28" },
+  15: { en: "Feb '28", te: "ఫిబ్ర '28" },
+  16: { en: "Mar '28", te: "మార్చి '28" },
+  17: { en: "Apr '28", te: "ఏప్రి '28" },
+  18: { en: "May '28", te: "మే '28" },
+  19: { en: "Jun '28", te: "జూన్ '28" },
+  20: { en: "Jul '28", te: "జూలై '28" }
+};
+
 // Updated Master 20-Month Schedule as per Sri Varalaxmi Chits Official Specifications Chart:
 // Total Chit Value: ₹2,00,000 | 20 Months | 20 Members | Fixed Taken Rate: ₹11,500
 // Column 1: Month (S.No) / నెల (నెం)

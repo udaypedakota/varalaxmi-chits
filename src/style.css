@@ -4736,23 +4736,23 @@ select.form-input option,
 
   .master-table th.th-month,
   .master-table td.td-month {
-    width: 23% !important;
+    width: 28% !important;
   }
 
   .master-table th.th-val,
   .master-table td.td-val {
-    width: 25% !important;
+    width: 24% !important;
     font-size: 0.72rem !important;
   }
 
   .master-table th.th-nottaken,
   .master-table td.td-nottaken {
-    width: 26% !important;
+    width: 24% !important;
   }
 
   .master-table th.th-taken,
   .master-table td.td-taken {
-    width: 26% !important;
+    width: 24% !important;
   }
 
   .sched-cell-stack {
@@ -5545,6 +5545,31 @@ select.form-input option,
   align-items: center !important;
   justify-content: space-between !important;
   font-size: 0.82rem !important;
+}
+
+.sched-winner-pill {
+  margin-top: 2px !important;
+  display: inline-block !important;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.15)) !important;
+  border: 1px solid rgba(245, 158, 11, 0.55) !important;
+  color: #FCD34D !important;
+  font-size: 0.65rem !important;
+  font-weight: 800 !important;
+  padding: 1px 4px !important;
+  border-radius: 5px !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4) !important;
+  line-height: 1.2 !important;
+}
+
+@media (max-width: 640px) {
+  .sched-winner-pill {
+    font-size: 0.58rem !important;
+    padding: 1px 3px !important;
+  }
 }
 
 /* Push notification action pill in dropdown */
