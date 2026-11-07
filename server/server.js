@@ -318,26 +318,6 @@ async function connectDB() {
       // Purge organizer from members collection if present
       await MemberModel.deleteMany({ $or: [{ role: 'organizer' }, { phone: '8790859546' }] });
 
-      // User requested fresh start: purge all existing members from Group A & Group B for fresh entry
-      const purgeFlag = await AuditLogModel.findOne({ action: 'PURGE_MEMBERS_FOR_FRESH_ENTRY_V7' });
-      if (!purgeFlag) {
-        console.log('🧹 Purging all existing members, payments, lotteries, and liftings from MongoDB Atlas for clean start...');
-        await MemberModel.deleteMany({});
-        await PaymentModel.deleteMany({});
-        await LotteryModel.deleteMany({});
-        await LiftingModel.deleteMany({});
-        await GroupModel.updateMany({}, { $set: { currentMonth: 1 } });
-        await AuditLogModel.create({
-          id: 'audit-purge-fresh-start-v7',
-          groupId: 'grp-1',
-          action: 'PURGE_MEMBERS_FOR_FRESH_ENTRY_V7',
-          performedBy: 'system',
-          timestamp: new Date(),
-          details: 'All old Group A and Group B members cleared as requested by user for fresh manual entry.'
-        });
-        console.log('✅ MongoDB Atlas cleaned! 0 members across Group A and Group B.');
-      }
-
       // Check if empty, if so, seed automatically with clean slate Month 1
       const groupCount = await GroupModel.countDocuments();
       if (groupCount === 0) {
