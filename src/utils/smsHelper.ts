@@ -69,6 +69,14 @@ export const openDeviceSms = (phone: string, message: string) => {
   const cleanPhone = phone.replace(/\D/g, '');
   const formattedPhone = cleanPhone.length === 10 ? `+91${cleanPhone}` : cleanPhone;
   const isIOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
+  
+  // Guarantee copy to clipboard so message is never lost even if SMS app fails
+  if (typeof navigator !== 'undefined' && navigator.clipboard) {
+    try {
+      navigator.clipboard.writeText(message);
+    } catch {}
+  }
+
   const separator = isIOS ? '&' : '?';
   const smsUrl = `sms:${formattedPhone}${separator}body=${encodeURIComponent(message)}`;
   

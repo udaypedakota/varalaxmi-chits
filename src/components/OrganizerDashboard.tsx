@@ -1529,7 +1529,17 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                         organizerName: currentGroup.organizerName,
                         organizerPhone: currentGroup.organizerPhone,
                       });
+                      const isMobile = typeof navigator !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
                       openDeviceSms(enrolledSuccessMember.phone, text);
+                      if (!isMobile) {
+                        showToast(
+                          language === 'te' ? '📋 SMS సందేశం కాపీ అయింది!' : '📋 SMS Text Copied!',
+                          language === 'te' 
+                            ? 'మొబైల్ ఫోన్‌లో అయితే నేరుగా SMS యాప్ ఓపెన్ అవుతుంది. కంప్యూటర్‌లో WhatsApp వాడండి.' 
+                            : 'Opens native SMS app on phones. On desktop PC, use WhatsApp.',
+                          'info'
+                        );
+                      }
                     }}
                   >
                     <MessageSquare size={18} />
