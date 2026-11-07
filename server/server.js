@@ -60,7 +60,7 @@ const GroupSchema = new Schema({
   monthlyInstallment: { type: Number, required: true },
   fixedTakenInstallment: { type: Number, default: 11500 },
   commissionPercent: { type: Number, default: 5 }, // 5%
-  currentMonth: { type: Number, default: 3 },
+  currentMonth: { type: Number, default: 1 },
   paymentDueDay: { type: Number, default: 10 },
   organizerName: { type: String, default: 'Siva (Organizer)' },
   organizerPhone: { type: String, default: '8790859546' },
@@ -244,82 +244,116 @@ let memoryStore = {
 
 let isMongoConnected = false;
 
-// Connect to MongoDB Atlas
+// Monitor Mongoose Connection Lifecycle
+mongoosePkg.connection.on('connected', () => {
+  isMongoConnected = true;
+  console.log('✅ MongoDB Atlas connection active');
+});
+
+mongoosePkg.connection.on('error', (err) => {
+  isMongoConnected = false;
+  console.error('❌ MongoDB Atlas connection error:', err.message);
+});
+
+mongoosePkg.connection.on('disconnected', () => {
+  isMongoConnected = false;
+  console.log('⚠️ MongoDB Atlas disconnected');
+});
+
+let dbPromise = null;
+
+// Connect to MongoDB Atlas (with connection caching & auto-retry)
 async function connectDB() {
-  const uri = process.env.MONGODB_URI;
-  if (!uri || uri.includes('<username>')) {
-    console.log('⚠️ MongoDB Atlas URI not configured or placeholder detected. Running with In-Memory fallback.');
+  if (mongoosePkg.connection.readyState === 1) {
+    isMongoConnected = true;
     return;
   }
-
-  try {
-    mongoosePkg.set('strictQuery', false);
-    await mongoosePkg.connect(uri, {
-      serverSelectionTimeoutMS: 5000
-    });
-    isMongoConnected = true;
-    console.log('✅ Successfully connected to MongoDB Atlas Cloud Database!');
-    
-    // Auto-normalize Group details and update Organizer Siva phone number to 8790859546
-    await GroupModel.updateMany(
-      {},
-      { 
-        $set: { 
-          organizerPhone: '8790859546',
-          organizerUpiId: '8790859546@ybl',
-          totalValue: 200000,
-          totalMonths: 20,
-          totalMembers: 20,
-          monthlyInstallment: 10000,
-          fixedTakenInstallment: 11500
-        } 
-      }
-    );
-    await GroupModel.updateOne(
-      { id: 'grp-2' },
-      { 
-        $set: { 
-          name: 'Sri Varalaxmi Chits (Group B)',
-          nameTe: 'శ్రీ వరలక్ష్మి చిట్స్ (గ్రూప్ B)',
-          totalValue: 200000, 
-          totalMonths: 20, 
-          totalMembers: 20, 
-          monthlyInstallment: 10000,
-          currentMonth: 1 
-        } 
-      }
-    );
-    // Purge organizer from members collection if present
-    await MemberModel.deleteMany({ $or: [{ role: 'organizer' }, { phone: '8801147452' }, { phone: '8790859546' }] });
-
-    // User requested fresh start: purge all existing members from Group A & Group B for fresh entry
-    const purgeFlag = await AuditLogModel.findOne({ action: 'PURGE_MEMBERS_FOR_FRESH_ENTRY_V7' });
-    if (!purgeFlag) {
-      console.log('🧹 Purging all existing members, payments, lotteries, and liftings from MongoDB Atlas for clean start...');
-      await MemberModel.deleteMany({});
-      await PaymentModel.deleteMany({});
-      await LotteryModel.deleteMany({});
-      await LiftingModel.deleteMany({});
-      await GroupModel.updateMany({}, { $set: { currentMonth: 1 } });
-      await AuditLogModel.create({
-        id: 'audit-purge-fresh-start-v7',
-        timestamp: new Date().toISOString(),
-        action: 'PURGE_MEMBERS_FOR_FRESH_ENTRY_V7',
-        details: 'All old Group A and Group B members cleared as requested by user for fresh manual entry.'
-      });
-      console.log('✅ MongoDB Atlas cleaned! 0 members across Group A and Group B.');
-    }
-
-    // Check if empty, if so, seed automatically with clean slate Month 1
-    const groupCount = await GroupModel.countDocuments();
-    if (groupCount === 0) {
-      console.log('🌱 Seeding clean slate Month 1 data to MongoDB Atlas...');
-      await seedDatabase();
-    }
-  } catch (err) {
-    console.error('⚠️ MongoDB Atlas connection error:', err.message);
-    console.log('Running in Hybrid In-Memory Fallback mode.');
+  if (dbPromise) {
+    return dbPromise;
   }
+
+  const uri = process.env.MONGODB_URI || 'mongodb+srv://ramukorla3_db_user:Uday8329@badmintiondatabase.vizmqp0.mongodb.net/varalaxmi_chits?retryWrites=true&w=majority';
+
+  dbPromise = (async () => {
+    try {
+      mongoosePkg.set('strictQuery', false);
+      await mongoosePkg.connect(uri, {
+        serverSelectionTimeoutMS: 8000,
+        connectTimeoutMS: 10000,
+        socketTimeoutMS: 45000,
+        maxPoolSize: 10
+      });
+      isMongoConnected = true;
+      console.log('✅ Successfully connected to MongoDB Atlas Cloud Database!');
+      
+      // Auto-normalize Group details and update Organizer Siva phone number to 8790859546
+      await GroupModel.updateMany(
+        {},
+        { 
+          $set: { 
+            organizerPhone: '8790859546',
+            organizerUpiId: '8790859546@ybl',
+            totalValue: 200000,
+            totalMonths: 20,
+            totalMembers: 20,
+            monthlyInstallment: 10000,
+            fixedTakenInstallment: 11500
+          } 
+        }
+      );
+      await GroupModel.updateOne(
+        { id: 'grp-2' },
+        { 
+          $set: { 
+            name: 'Sri Varalaxmi Chits (Group B)',
+            nameTe: 'శ్రీ వరలక్ష్మి చిట్స్ (గ్రూప్ B)',
+            totalValue: 200000, 
+            totalMonths: 20, 
+            totalMembers: 20, 
+            monthlyInstallment: 10000,
+            currentMonth: 1 
+          } 
+        }
+      );
+      // Purge organizer from members collection if present
+      await MemberModel.deleteMany({ $or: [{ role: 'organizer' }, { phone: '8801147452' }, { phone: '8790859546' }] });
+
+      // User requested fresh start: purge all existing members from Group A & Group B for fresh entry
+      const purgeFlag = await AuditLogModel.findOne({ action: 'PURGE_MEMBERS_FOR_FRESH_ENTRY_V7' });
+      if (!purgeFlag) {
+        console.log('🧹 Purging all existing members, payments, lotteries, and liftings from MongoDB Atlas for clean start...');
+        await MemberModel.deleteMany({});
+        await PaymentModel.deleteMany({});
+        await LotteryModel.deleteMany({});
+        await LiftingModel.deleteMany({});
+        await GroupModel.updateMany({}, { $set: { currentMonth: 1 } });
+        await AuditLogModel.create({
+          id: 'audit-purge-fresh-start-v7',
+          groupId: 'grp-1',
+          action: 'PURGE_MEMBERS_FOR_FRESH_ENTRY_V7',
+          performedBy: 'system',
+          timestamp: new Date(),
+          details: 'All old Group A and Group B members cleared as requested by user for fresh manual entry.'
+        });
+        console.log('✅ MongoDB Atlas cleaned! 0 members across Group A and Group B.');
+      }
+
+      // Check if empty, if so, seed automatically with clean slate Month 1
+      const groupCount = await GroupModel.countDocuments();
+      if (groupCount === 0) {
+        console.log('🌱 Seeding clean slate Month 1 data to MongoDB Atlas...');
+        await seedDatabase();
+      }
+    } catch (err) {
+      console.error('⚠️ MongoDB Atlas connection error:', err.message);
+      isMongoConnected = false;
+      console.log('Running in Hybrid In-Memory Fallback mode.');
+    } finally {
+      dbPromise = null;
+    }
+  })();
+
+  return dbPromise;
 }
 
 async function seedDatabase() {
@@ -437,17 +471,36 @@ async function sendPushNotification(query, payload) {
 
 // ---------------- API ROUTES ----------------
 
+// Middleware: Ensure DB connection is active before processing API calls & disable caching
+app.use('/api', async (req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
+  if (mongoosePkg.connection.readyState !== 1) {
+    await connectDB();
+  }
+  isMongoConnected = (mongoosePkg.connection.readyState === 1);
+  next();
+});
+
 // 1. Health & Database Status
 app.get('/api/status', async (req, res) => {
+  const connected = mongoosePkg.connection.readyState === 1;
+  isMongoConnected = connected;
   let counts = { groups: 0, members: 0, payments: 0, lottery: 0, liftings: 0 };
-  if (isMongoConnected) {
-    counts = {
-      groups: await GroupModel.countDocuments(),
-      members: await MemberModel.countDocuments(),
-      payments: await PaymentModel.countDocuments(),
-      lottery: await LotteryModel.countDocuments(),
-      liftings: await LiftingModel.countDocuments()
-    };
+  if (connected) {
+    try {
+      counts = {
+        groups: await GroupModel.countDocuments(),
+        members: await MemberModel.countDocuments(),
+        payments: await PaymentModel.countDocuments(),
+        lottery: await LotteryModel.countDocuments(),
+        liftings: await LiftingModel.countDocuments()
+      };
+    } catch (e) {
+      console.error('Error fetching counts:', e.message);
+    }
   } else {
     counts = {
       groups: memoryStore.groups.length,
@@ -460,8 +513,8 @@ app.get('/api/status', async (req, res) => {
 
   res.json({
     status: 'online',
-    isMongoConnected,
-    database: isMongoConnected ? 'MongoDB Atlas (Live)' : 'In-Memory / Local Storage Sync',
+    isMongoConnected: connected,
+    database: connected ? 'MongoDB Atlas (Live)' : 'In-Memory / Local Storage Sync',
     counts,
     timestamp: new Date().toISOString()
   });

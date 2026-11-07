@@ -393,7 +393,7 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const syncData = async () => {
       try {
-        const res = await fetch('/api/status');
+        const res = await fetch(`/api/status?_t=${Date.now()}`);
         if (res.ok) {
           const data = await res.json();
           setDbStatus({
