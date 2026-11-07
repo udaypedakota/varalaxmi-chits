@@ -5,6 +5,7 @@ import { PaymentRecord, Member } from '../types/chit';
 import { 
   Users, 
   CheckCircle2, 
+  Check, 
   Clock, 
   AlertTriangle, 
   Dices, 
@@ -101,6 +102,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
     payment: PaymentRecord;
     member: Member | null;
   } | null>(null);
+  const [isPinCopied, setIsPinCopied] = useState(false);
 
   const handleAddMemberSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1389,64 +1391,116 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             )}
 
             {enrolledSuccessMember ? (
-              <div className="enroll-success-stage py-2 text-center animate-fade">
-                <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-                  <CheckCircle2 size={28} />
+              <div className="enroll-success-stage animate-fade">
+                {/* Glowing Success Header */}
+                <div className="enroll-success-badge-wrap">
+                  <div className="enroll-success-badge">
+                    <CheckCircle2 size={24} className="text-emerald-400" />
+                  </div>
+                  <div className="text-left">
+                    <h4 className="enroll-success-title">
+                      {language === 'te' ? 'సభ్యుడు విజయవంతంగా చేర్చబడ్డాడు!' : 'Member Enrolled Successfully!'}
+                    </h4>
+                    <p className="enroll-success-sub">
+                      {language === 'te' 
+                        ? 'లాగిన్ పాస్‌వర్డ్ & వివరాలు సిద్ధమయ్యాయి' 
+                        : 'Login credentials generated • Ready to share'}
+                    </p>
+                  </div>
                 </div>
-                <h4 className="text-base font-bold text-white mb-0.5">
-                  {language === 'te' ? 'సభ్యుడు విజయవంతంగా చేర్చబడ్డాడు!' : 'Member Enrolled Successfully!'}
-                </h4>
-                <p className="text-xs text-amber-300 mb-3">
-                  {language === 'te' ? 'పాస్‌వర్డ్ / లాగిన్ వివరాలను SMS ద్వారా పంపండి:' : 'Send login credentials to the member via SMS:'}
-                </p>
 
-                <div className="bg-slate-900/80 border border-slate-700/60 rounded-xl p-3 text-left mb-3.5 space-y-1.5 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">{language === 'te' ? 'సభ్యుని పేరు:' : 'Member Name:'}</span>
-                    <strong className="text-white">{enrolledSuccessMember.name}</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">{language === 'te' ? 'మొబైల్ నంబర్:' : 'Mobile Number:'}</span>
-                    <strong className="text-amber-400 font-mono">+91 {enrolledSuccessMember.phone}</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">{language === 'te' ? 'సెక్యూరిటీ PIN (పాస్‌వర్డ్):' : 'Security PIN (Password):'}</span>
-                    <strong className="text-emerald-400 font-mono tracking-widest font-bold">{enrolledSuccessMember.pin}</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">{language === 'te' ? 'చిట్ గ్రూప్:' : 'Chit Group:'}</span>
-                    <strong className="text-yellow-400">{enrolledSuccessMember.groupName}</strong>
-                  </div>
-                  {enrolledSuccessMember.chitNote && (
-                    <div className="pt-2 text-xs text-amber-300 font-medium border-t border-gray-800 text-center">
-                      ✨ {enrolledSuccessMember.chitNote}
+                {/* Digital Luxury Passbook Slip */}
+                <div className="membership-slip-card">
+                  {/* Slip Header */}
+                  <div className="membership-slip-header">
+                    <div className="membership-slip-brand">
+                      <span className="slip-brand-logo">🪙</span>
+                      <div>
+                        <div className="slip-brand-title">SRI VARALAXMI CHITS</div>
+                        <div className="slip-brand-sub">{enrolledSuccessMember.groupName} • ₹2,00,000 Scheme</div>
+                      </div>
                     </div>
-                  )}
+                    <span className="slip-group-badge">
+                      {enrolledSuccessMember.groupName}
+                    </span>
+                  </div>
+
+                  {/* Perforated Divider */}
+                  <div className="slip-divider">
+                    <span className="slip-notch left" />
+                    <span className="slip-line" />
+                    <span className="slip-notch right" />
+                  </div>
+
+                  {/* Slip Body Details */}
+                  <div className="membership-slip-body">
+                    {/* Member Name */}
+                    <div className="slip-info-row">
+                      <span className="slip-label">
+                        {language === 'te' ? 'సభ్యుని పేరు' : 'Member Name'}
+                      </span>
+                      <strong className="slip-val-name">
+                        {enrolledSuccessMember.name}
+                      </strong>
+                    </div>
+
+                    {/* Mobile Number */}
+                    <div className="slip-info-row">
+                      <span className="slip-label">
+                        {language === 'te' ? 'మొబైల్ నంబర్' : 'Mobile Number'}
+                      </span>
+                      <span className="slip-val-phone font-mono">
+                        +91 {enrolledSuccessMember.phone}
+                      </span>
+                    </div>
+
+                    {/* Highlighted Security PIN Box with 1-Tap Copy */}
+                    <div className="slip-pin-highlight-box">
+                      <div className="pin-highlight-left">
+                        <span className="pin-box-label">
+                          {language === 'te' ? 'సెక్యూరిటీ పిన్ (Login PIN)' : 'Security PIN (Password)'}
+                        </span>
+                        <div className="pin-box-value font-mono">
+                          {enrolledSuccessMember.pin}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn-copy-pin"
+                        onClick={() => {
+                          navigator.clipboard.writeText(enrolledSuccessMember.pin);
+                          setIsPinCopied(true);
+                          setTimeout(() => setIsPinCopied(false), 2500);
+                        }}
+                        title={language === 'te' ? 'పిన్ కాపీ చేయండి' : 'Copy PIN'}
+                      >
+                        {isPinCopied ? (
+                          <>
+                            <Check size={14} className="text-emerald-400" />
+                            <span className="text-emerald-400 font-bold">{language === 'te' ? 'కాపీ అయింది!' : 'Copied!'}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy size={14} />
+                            <span>{language === 'te' ? 'కాపీ' : 'Copy PIN'}</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    {enrolledSuccessMember.chitNote && (
+                      <div className="slip-note-box">
+                        ✨ {enrolledSuccessMember.chitNote}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="space-y-2">
+                {/* Instant Share Buttons (Clean Side-by-Side 50/50 Grid) */}
+                <div className="enroll-share-grid">
                   <button
                     type="button"
-                    className="btn-sms-share w-full py-2.5 flex items-center justify-center gap-2"
-                    onClick={() => {
-                      const text = getEnrollmentSmsText({
-                        memberName: enrolledSuccessMember.name,
-                        phone: enrolledSuccessMember.phone,
-                        pin: enrolledSuccessMember.pin,
-                        groupName: enrolledSuccessMember.groupName,
-                        organizerName: currentGroup.organizerName,
-                        organizerPhone: currentGroup.organizerPhone,
-                      });
-                      openDeviceSms(enrolledSuccessMember.phone, text);
-                    }}
-                  >
-                    <MessageSquare size={16} />
-                    <span>{language === 'te' ? '📱 SMS ద్వారా పిన్ పంపండి (English SMS)' : '📱 Send Credentials via SMS'}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn-whatsapp-share w-full py-2.5 flex items-center justify-center gap-2"
+                    className="btn-whatsapp-share-modern"
                     onClick={() => {
                       const text = getEnrollmentSmsText({
                         memberName: enrolledSuccessMember.name,
@@ -1459,29 +1513,55 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                       openWhatsApp(enrolledSuccessMember.phone, text);
                     }}
                   >
-                    <Send size={16} />
-                    <span>{language === 'te' ? '💬 WhatsApp లో పంపండి' : '💬 Send via WhatsApp'}</span>
+                    <MessageCircle size={18} />
+                    <span>WhatsApp</span>
                   </button>
 
-                  <div className="flex gap-2 pt-1">
-                    <button
-                      type="button"
-                      className="btn-secondary flex-1 py-2 text-xs"
-                      onClick={() => setEnrolledSuccessMember(null)}
-                    >
-                      <span>{language === 'te' ? '+ మరొకరిని చేర్చండి' : '+ Enroll Another'}</span>
-                    </button>
-                    <button
-                      type="button"
-                      className="btn-secondary flex-1 py-2 text-xs"
-                      onClick={() => {
-                        setEnrolledSuccessMember(null);
-                        setIsAddMemberOpen(false);
-                      }}
-                    >
-                      <span>{language === 'te' ? 'ముగించు (Close)' : 'Done / Close'}</span>
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    className="btn-sms-share-modern"
+                    onClick={() => {
+                      const text = getEnrollmentSmsText({
+                        memberName: enrolledSuccessMember.name,
+                        phone: enrolledSuccessMember.phone,
+                        pin: enrolledSuccessMember.pin,
+                        groupName: enrolledSuccessMember.groupName,
+                        organizerName: currentGroup.organizerName,
+                        organizerPhone: currentGroup.organizerPhone,
+                      });
+                      openDeviceSms(enrolledSuccessMember.phone, text);
+                    }}
+                  >
+                    <MessageSquare size={18} />
+                    <span>SMS PIN</span>
+                  </button>
+                </div>
+
+                {/* Secondary Action Buttons */}
+                <div className="enroll-bottom-actions">
+                  <button
+                    type="button"
+                    className="btn-enroll-another"
+                    onClick={() => {
+                      setEnrolledSuccessMember(null);
+                      setIsPinCopied(false);
+                    }}
+                  >
+                    <UserPlus size={15} />
+                    <span>{language === 'te' ? '+ మరొకరిని చేర్చండి' : '+ Enroll Another'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-enroll-done"
+                    onClick={() => {
+                      setEnrolledSuccessMember(null);
+                      setIsPinCopied(false);
+                      setIsAddMemberOpen(false);
+                    }}
+                  >
+                    <Check size={15} />
+                    <span>{language === 'te' ? 'పూర్తయింది (Done)' : 'Done / Close'}</span>
+                  </button>
                 </div>
               </div>
             ) : (
