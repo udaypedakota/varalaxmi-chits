@@ -1,7 +1,7 @@
 import React from 'react';
 import { useChit } from '../context/ChitContext';
 import { PaymentRecord, Member } from '../types/chit';
-import { X, Printer, Share2, CheckCircle2, Sparkles, MessageSquare } from 'lucide-react';
+import { X, Printer, Share2, CheckCircle2, MessageSquare } from 'lucide-react';
 import { LanguageToggle } from './LanguageToggle';
 import { openDeviceSms, getPaymentReceiptSmsText } from '../utils/smsHelper';
 
@@ -81,7 +81,11 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ payment, member, isO
           {/* Header */}
           <div className="receipt-header-banner">
             <div className="receipt-logo-wrap">
-              <Sparkles size={28} className="text-yellow-400" />
+              <img 
+                src="/chit-app-icon-192.png" 
+                alt="Sri Varalaxmi Chits Logo" 
+                className="receipt-logo-img" 
+              />
             </div>
             <h2 className="receipt-org-title">{language === 'te' ? 'శ్రీ వరలక్ష్మి చిట్స్' : 'Sri Varalaxmi Chits'}</h2>
             <h3 className="receipt-org-subtitle">SRI VARALAXMI CHITS (₹2,00,000 SCHEME)</h3>
