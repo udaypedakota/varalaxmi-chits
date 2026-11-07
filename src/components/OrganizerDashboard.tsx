@@ -422,8 +422,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             <Gavel size={15} className="shrink-0" />
             <span>
               {language === 'te' 
-                ? `🔨 ఈ నెల పాట నమోదు` 
-                : `🔨 Record Auction (M${currentGroup.currentMonth})`}
+                ? `ఈ నెల పాట నమోదు` 
+                : `Record Auction`}
             </span>
           </button>
 

@@ -1746,20 +1746,24 @@ select.form-input option,
 
 .org-tools-bar {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 0.5rem;
   margin-top: 0.65rem;
   width: 100%;
+  box-sizing: border-box;
 }
 
 @media (max-width: 600px) {
   .org-tools-bar {
-    grid-template-columns: 1fr 1fr;
-    gap: 0.4rem;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0.35rem;
   }
 }
 
 .btn-tool-lottery {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1767,14 +1771,21 @@ select.form-input option,
   background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
   border: none;
   color: #070B19;
-  padding: 0.55rem 0.75rem;
+  padding: 0.55rem 0.45rem;
   border-radius: 10px;
   font-weight: 750;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   cursor: pointer;
   box-shadow: 0 3px 10px rgba(245, 158, 11, 0.3);
   transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.btn-tool-lottery span {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.78rem;
 }
 
 .btn-tool-lottery:hover {
@@ -1787,6 +1798,9 @@ select.form-input option,
 }
 
 .btn-tool-whatsapp {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1794,13 +1808,20 @@ select.form-input option,
   background: rgba(16, 185, 129, 0.14);
   border: 1px solid rgba(16, 185, 129, 0.45);
   color: #6EE7B7;
-  padding: 0.55rem 0.75rem;
+  padding: 0.55rem 0.45rem;
   border-radius: 10px;
   font-weight: 750;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.btn-tool-whatsapp span {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.78rem;
 }
 
 .btn-tool-whatsapp:hover {
