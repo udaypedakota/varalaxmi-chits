@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 import { useChit } from '../context/ChitContext';
 import { MASTER_SCHEDULE, getInstallmentForMember, getMonthDisplayName, MONTH_SHORT_NAMES, getScheduleNotTakenAmount } from '../data/scheduleData';
 import { PaymentRecord, Member } from '../types/chit';
-import { 
-  Users, 
-  CheckCircle2, 
-  Check, 
-  Clock, 
-  AlertTriangle, 
-  Dices, 
-  Share2, 
-  ChevronRight, 
-  Search, 
+import {
+  Users,
+  CheckCircle2,
+  Check,
+  Clock,
+  AlertTriangle,
+  Dices,
+  Share2,
+  ChevronRight,
+  Search,
   Calendar,
   Award,
   CreditCard,
@@ -39,11 +39,11 @@ import {
   LayoutGrid,
   Table as TableIcon
 } from 'lucide-react';
-import { 
-  openDeviceSms, 
-  openWhatsApp, 
-  getEnrollmentSmsText, 
-  getPaymentReceiptSmsText 
+import {
+  openDeviceSms,
+  openWhatsApp,
+  getEnrollmentSmsText,
+  getPaymentReceiptSmsText
 } from '../utils/smsHelper';
 
 interface OrganizerDashboardProps {
@@ -52,19 +52,19 @@ interface OrganizerDashboardProps {
 }
 
 export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenReceipt, onOpenLottery }) => {
-  const { 
+  const {
     activeGroup,
-    scheme, 
+    scheme,
     members,
-    groupMembers, 
-    groupPayments, 
+    groupMembers,
+    groupPayments,
     groupLiftings,
     groupLotteryHistory,
     recordChitLifting,
-    approvePayment, 
-    rejectPayment, 
+    approvePayment,
+    rejectPayment,
     setCurrentMonth,
-    switchUser, 
+    switchUser,
     addMember,
     deleteMember,
     groups,
@@ -158,7 +158,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
       phone: cleanPhone,
       pin: finalPin,
       groupName,
-      chitNote: existingInGroup.length > 0 
+      chitNote: existingInGroup.length > 0
         ? (language === 'te' ? `గమనిక: ఈ నంబర్‌పై ఇది ${existingInGroup.length + 1}వ చిట్టీగా (Ticket #${existingInGroup.length + 1}) విజయవంతంగా నమోదైంది.` : `Note: Registered as Chit #${existingInGroup.length + 1} for this member.`)
         : undefined
     });
@@ -217,9 +217,9 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
     ...groupLotteryHistory.map(lot => lot.winnerMemberId),
     ...groupMembers.filter(m => m.hasLiftedChit).map(m => m.id)
   ]);
-  const eligibleWinningMembers = groupMembers.filter(m => 
-    !liftedMemberIds.has(m.id) && 
-    !m.hasLiftedChit && 
+  const eligibleWinningMembers = groupMembers.filter(m =>
+    !liftedMemberIds.has(m.id) &&
+    !m.hasLiftedChit &&
     m.role !== 'organizer'
   );
 
@@ -280,7 +280,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
 
   const currentMonthApproved = approvedPayments.filter(p => p.month === currentGroup.currentMonth);
   const currentMonthPending = groupPayments.filter(p => p.month === currentGroup.currentMonth && p.status === 'pending');
-  
+
   const currentMonthCollectedAmount = currentMonthApproved.reduce((sum, p) => sum + p.amount, 0);
   const pendingApprovalsCount = currentMonthPending.length;
 
@@ -295,7 +295,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
 
   // Filtered members
   const filteredMembers = groupMembers.filter(m => {
-    const matchesSearch = 
+    const matchesSearch =
       m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       m.nameTe.toLowerCase().includes(searchTerm.toLowerCase()) ||
       m.phone.includes(searchTerm) ||
@@ -325,8 +325,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
           <div className="month-picker-pill">
             <Calendar size={15} />
             <span>{language === 'te' ? 'ప్రస్తుత నెల:' : 'Active Month:'}</span>
-            <select 
-              value={currentGroup.currentMonth} 
+            <select
+              value={currentGroup.currentMonth}
               onChange={e => setCurrentMonth(parseInt(e.target.value, 10))}
               className="month-select"
             >
@@ -361,8 +361,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               <span className="cur">₹</span>{currentMonthCollectedAmount.toLocaleString('en-IN')}
             </div>
             <span className="metric-sub">
-              {language === 'te' 
-                ? `${currentMonthApproved.length} / ${groupMembers.length} మంది చెల్లించారు` 
+              {language === 'te'
+                ? `${currentMonthApproved.length} / ${groupMembers.length} మంది చెల్లించారు`
                 : `${currentMonthApproved.length} of ${groupMembers.length} Paid`}
             </span>
           </div>
@@ -376,8 +376,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               {liftedMembersCount} <small className="text-sm font-normal">/ {eligibleMembersCount}</small>
             </div>
             <span className="metric-sub">
-              {language === 'te' 
-                ? `${eligibleMembersCount} మంది లక్కీ డ్రాకు అర్హులు` 
+              {language === 'te'
+                ? `${eligibleMembersCount} మంది లక్కీ డ్రాకు అర్హులు`
                 : `${eligibleMembersCount} eligible for Lucky Draw`}
             </span>
           </div>
@@ -391,21 +391,21 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               <span className="cur">₹</span>{totalCommissionEarned.toLocaleString('en-IN')}
             </div>
             <span className="metric-sub">
-              {language === 'te' 
-                ? (completedAuctionsCount === 0 
-                    ? `0 పాటలు పూర్తయ్యాయి (వేలం పాటకు ₹${monthlyCommissionAmount.toLocaleString('en-IN')})` 
-                    : `${completedAuctionsCount} / ${currentGroup.totalMonths} పాటలు పూర్తయ్యాయి (${currentGroup.commissionPercent || 5}% కమిషన్)`)
-                : (completedAuctionsCount === 0 
-                    ? `0 of ${currentGroup.totalMonths} Auctions Done (₹${monthlyCommissionAmount.toLocaleString('en-IN')}/auction)` 
-                    : `${completedAuctionsCount} of ${currentGroup.totalMonths} Auctions Done (${currentGroup.commissionPercent || 5}% rate)`)}
+              {language === 'te'
+                ? (completedAuctionsCount === 0
+                  ? `0 పాటలు పూర్తయ్యాయి (వేలం పాటకు ₹${monthlyCommissionAmount.toLocaleString('en-IN')})`
+                  : `${completedAuctionsCount} / ${currentGroup.totalMonths} పాటలు పూర్తయ్యాయి (${currentGroup.commissionPercent || 5}% కమిషన్)`)
+                : (completedAuctionsCount === 0
+                  ? `0 of ${currentGroup.totalMonths} Auctions Done (₹${monthlyCommissionAmount.toLocaleString('en-IN')}/auction)`
+                  : `${completedAuctionsCount} of ${currentGroup.totalMonths} Auctions Done (${currentGroup.commissionPercent || 5}% rate)`)}
             </span>
           </div>
         </div>
 
         {/* Quick Action Tools Bar (Compact & Responsive on Mobile) */}
         <div className="org-tools-bar">
-          <button 
-            type="button" 
+          <button
+            type="button"
             className="btn-tool-lottery"
             onClick={() => {
               setLiftMonth(currentGroup.currentMonth);
@@ -417,14 +417,14 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
           >
             <Award size={15} className="shrink-0" />
             <span>
-              {language === 'te' 
-                ? `ఈ నెల చిట్ నమోదు` 
+              {language === 'te'
+                ? `ఈ నెల చిట్ నమోదు`
                 : `Record Chit / Lift`}
             </span>
           </button>
 
-          <button 
-            type="button" 
+          <button
+            type="button"
             className="btn-tool-whatsapp"
             onClick={() => setIsBroadcastModalOpen(true)}
             title={language === 'te' ? 'గ్రూప్ సభ్యులందరికీ వాట్సాప్ సందేశం' : 'WhatsApp Group Broadcast Notice'}
@@ -465,18 +465,17 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
 
                   <div className="pending-card-mid flex items-center justify-between gap-2 text-xs py-1">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className={`px-2 py-0.5 rounded font-bold text-xs ${
-                        p.paymentMode === 'Cash'
+                      <span className={`px-2 py-0.5 rounded font-bold text-xs ${p.paymentMode === 'Cash'
                           ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                           : p.paymentMode === 'PhonePe'
-                          ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
-                          : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                      }`}>
-                        {p.paymentMode === 'Cash' 
+                            ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
+                            : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                        }`}>
+                        {p.paymentMode === 'Cash'
                           ? (language === 'te' ? '💵 నగదు (Cash)' : '💵 Cash')
                           : p.paymentMode === 'PhonePe'
-                          ? '📱 PhonePe / GPay'
-                          : '🏦 UPI'}
+                            ? '📱 PhonePe / GPay'
+                            : '🏦 UPI'}
                       </span>
                       {p.utr && p.utr !== 'Cash' && p.utr !== p.paymentMode && (
                         <span className="pending-utr font-mono text-gray-400">Ref: {p.utr}</span>
@@ -504,8 +503,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                   )}
 
                   <div className="pending-card-actions">
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       className="btn-approve"
                       onClick={() => {
                         approvePayment(p.id);
@@ -516,8 +515,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                       <CheckCircle2 size={16} />
                       <span>{language === 'te' ? '✓ స్వీకరించబడింది (Received)' : '✓ Mark Received'}</span>
                     </button>
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       className="btn-reject"
                       onClick={() => {
                         const confirmReject = window.confirm(language === 'te'
@@ -617,7 +616,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                 const isPast = item.month < currentGroup.currentMonth;
                 const notTaken = getScheduleNotTakenAmount(item, language);
                 const monthLifting = groupLiftings.find(l => l.month === item.month);
-                const winnerName = monthLifting 
+                const winnerName = monthLifting
                   ? (language === 'te' ? (monthLifting.memberNameTe || monthLifting.memberName) : monthLifting.memberName)
                   : null;
 
@@ -670,8 +669,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               {language === 'te' ? `${currentGroup.nameTe} - సభ్యుల పూర్తి డైరెక్టరీ` : `${currentGroup.name} - Member Directory`}
             </h3>
             <p className="section-subtitle">
-              {language === 'te' 
-                ? 'సభ్యుల చెల్లింపు వివరాలు, ఇప్పటివరకు చెల్లించిన మొత్తం మరియు లక్కీ డ్రా అర్హత' 
+              {language === 'te'
+                ? 'సభ్యుల చెల్లింపు వివరాలు, ఇప్పటివరకు చెల్లించిన మొత్తం మరియు లక్కీ డ్రా అర్హత'
                 : 'Live tracking of each member total paid and chit status'}
             </p>
           </div>
@@ -680,8 +679,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
           <div className="ledger-controls">
             <div className="search-input-wrap">
               <Search size={16} />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder={language === 'te' ? 'పేరు లేదా ఫోన్ నంబర్...' : 'Search name or phone...'}
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
@@ -689,29 +688,29 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               />
             </div>
             <div className="filter-pill-group">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className={`filter-pill ${filterStatus === 'all' ? 'active' : ''}`}
                 onClick={() => setFilterStatus('all')}
               >
                 {language === 'te' ? `అందరూ (${groupMembers.length})` : `All (${groupMembers.length})`}
               </button>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className={`filter-pill ${filterStatus === 'eligible' ? 'active' : ''}`}
                 onClick={() => setFilterStatus('eligible')}
               >
                 {language === 'te' ? `లక్కీ డ్రాకు అర్హులు (${eligibleMembersCount})` : `Draw Eligible (${eligibleMembersCount})`}
               </button>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className={`filter-pill ${filterStatus === 'lifted' ? 'active' : ''}`}
                 onClick={() => setFilterStatus('lifted')}
               >
                 {language === 'te' ? `చిట్ ఎత్తినవారు (${liftedMembersCount})` : `Chit Lifted (${liftedMembersCount})`}
               </button>
             </div>
-            
+
             <button
               type="button"
               className="btn-seed-data py-2 px-3 text-xs flex items-center gap-1.5 ml-auto"
@@ -727,7 +726,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
         {filteredMembers.length > 0 && (
           <div className="member-directory-toolbar">
             <span className="member-count-badge">
-              {language === 'te' 
+              {language === 'te'
                 ? <>మొత్తం సభ్యులు: <strong>{filteredMembers.length} మంది</strong></>
                 : <>Total Members: <strong>{filteredMembers.length}</strong></>}
             </span>
@@ -760,8 +759,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
           <div className="text-center py-10 border border-dashed border-gray-800 rounded-xl bg-gray-950/40 my-3">
             <Users size={36} className="mx-auto text-gray-500 mb-2" />
             <p className="text-sm font-semibold text-gray-300">
-              {language === 'te' 
-                ? 'ఈ గ్రూప్‌లో ఇంకా సభ్యులు చేర్చబడలేదు' 
+              {language === 'te'
+                ? 'ఈ గ్రూప్‌లో ఇంకా సభ్యులు చేర్చబడలేదు'
                 : 'No members enrolled in this group yet'}
             </p>
             <p className="text-xs text-gray-500 mt-1 max-w-md mx-auto">
@@ -792,12 +791,12 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               const isExpanded = expandedMemberId === m.id;
 
               return (
-                <div 
-                  key={m.id} 
+                <div
+                  key={m.id}
                   className={`member-expandable-card ${isExpanded ? 'active' : ''}`}
                 >
                   {/* Clickable Card Header (Row) */}
-                  <div 
+                  <div
                     className="member-card-header"
                     onClick={() => setExpandedMemberId(prev => prev === m.id ? null : m.id)}
                     role="button"
@@ -1107,8 +1106,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
 
                             {isPaid && curPay ? (
                               <>
-                                <button 
-                                  type="button" 
+                                <button
+                                  type="button"
                                   className="btn-cell-receipt"
                                   onClick={() => onOpenReceipt(curPay, m)}
                                   title={language === 'te' ? 'రసీదు వీక్షించండి' : 'View Receipt'}
@@ -1126,8 +1125,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                                 </button>
                               </>
                             ) : (
-                              <button 
-                                type="button" 
+                              <button
+                                type="button"
                                 className="btn-cell-switch text-xs py-1 px-2"
                                 onClick={() => switchUser(m.id)}
                                 title={language === 'te' ? 'ఈ సభ్యుని పాస్‌బుక్ చూడండి' : 'Open Passbook as Member'}
@@ -1191,7 +1190,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
       {/* 6. MODAL: WHATSAPP GROUP BROADCAST NOTICE (User Specified Format) */}
       {isBroadcastModalOpen && (() => {
         const activeMonthLifting = groupLiftings.find(l => l.month === currentGroup.currentMonth);
-        const winnerMember = activeMonthLifting 
+        const winnerMember = activeMonthLifting
           ? groupMembers.find(m => m.id === activeMonthLifting.memberId)
           : null;
 
@@ -1200,7 +1199,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
           : (language === 'te' ? 'ఇంకా పాట జరగలేదు (Pending Auction)' : 'Auction Pending');
 
         const activeMonthSchedule = MASTER_SCHEDULE.find(s => s.month === currentGroup.currentMonth);
-        const defaultInstallmentAmount = activeMonthSchedule 
+        const defaultInstallmentAmount = activeMonthSchedule
           ? (language === 'te' ? activeMonthSchedule.notTakenAmountTe || activeMonthSchedule.notTakenAmount : activeMonthSchedule.notTakenAmount)
           : 10000;
 
@@ -1217,14 +1216,14 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
         const monthNameText = getMonthDisplayName(currentGroup.currentMonth, language);
 
         // Receiver PhonePe number & Name: ALWAYS THE PERSON WHO LIFTED THE CHIT (Winner)!
-        const receiverName = customReceiverName.trim() || (winnerMember 
+        const receiverName = customReceiverName.trim() || (winnerMember
           ? (language === 'te' ? (winnerMember.nameTe || winnerMember.name) : winnerMember.name)
           : (activeMonthLifting ? activeMonthLifting.memberName : (language === 'te' ? 'చిట్టీ విజేత పేరు' : 'Chit Winner Name')));
 
         const receiverPhone = customReceiverPhone.trim() || (winnerMember ? winnerMember.phone : (language === 'te' ? 'విజేత ఫోన్‌పే నంబర్' : 'Winner PhonePe Number'));
 
-        const officialBroadcastText = 
-`📢 *${language === 'te' ? currentGroup.nameTe : currentGroup.name}*
+        const officialBroadcastText =
+          `📢 *${language === 'te' ? currentGroup.nameTe : currentGroup.name}*
 నెల ${currentGroup.currentMonth} వేలం పాట వివరాలు & వాయిదా నోటీస్
 ━━━━━━━━━━━━━━━━━━━━━
 • Chit Scheme : ₹${currentGroup.totalValue.toLocaleString('en-IN')} (${currentGroup.totalMonths} Months)
@@ -1259,8 +1258,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               </div>
 
               <p className="text-xs text-amber-300 mb-2.5">
-                {language === 'te' 
-                  ? 'ఈ క్రింది సందేశాన్ని మీ చిట్ వాట్సాప్ గ్రూప్‌లో షేర్ చేయండి:' 
+                {language === 'te'
+                  ? 'ఈ క్రింది సందేశాన్ని మీ చిట్ వాట్సాప్ గ్రూప్‌లో షేర్ చేయండి:'
                   : 'Share this notice directly to your chit WhatsApp group:'}
               </p>
 
@@ -1304,8 +1303,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                   </div>
                 </div>
                 <p className="text-[11px] text-gray-400 m-0">
-                  {language === 'te' 
-                    ? '* సభ్యులందరూ ఈ నంబర్‌కే ఫోన్‌పే ద్వారా నేరుగా డబ్బులు పంపుతారు.' 
+                  {language === 'te'
+                    ? '* సభ్యులందరూ ఈ నంబర్‌కే ఫోన్‌పే ద్వారా నేరుగా డబ్బులు పంపుతారు.'
                     : '* All members will send payments directly to this PhonePe number.'}
                 </p>
               </div>
@@ -1340,8 +1339,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                 >
                   <Copy size={14} />
                   <span>
-                    {isBroadcastCopied 
-                      ? (language === 'te' ? '✓ సందేశం కాపీ అయింది!' : '✓ Message Copied!') 
+                    {isBroadcastCopied
+                      ? (language === 'te' ? '✓ సందేశం కాపీ అయింది!' : '✓ Message Copied!')
                       : (language === 'te' ? '📋 సందేశం కాపీ చేయండి (Copy Text)' : '📋 Copy Text')}
                   </span>
                 </button>
@@ -1360,9 +1359,9 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                 <UserPlus size={18} />
                 <span>{language === 'te' ? 'కొత్త సభ్యుని చేర్చండి' : 'Enroll New Chit Member'}</span>
               </h3>
-              <button 
-                type="button" 
-                className="btn-modal-close static" 
+              <button
+                type="button"
+                className="btn-modal-close static"
                 onClick={() => setIsAddMemberOpen(false)}
               >
                 <X size={18} />
@@ -1387,8 +1386,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                       {language === 'te' ? 'సభ్యుడు విజయవంతంగా చేర్చబడ్డాడు!' : 'Member Enrolled Successfully!'}
                     </h4>
                     <p className="enroll-success-sub">
-                      {language === 'te' 
-                        ? 'లాగిన్ పాస్‌వర్డ్ & వివరాలు సిద్ధమయ్యాయి' 
+                      {language === 'te'
+                        ? 'లాగిన్ పాస్‌వర్డ్ & వివరాలు సిద్ధమయ్యాయి'
                         : 'Login credentials generated • Ready to share'}
                     </p>
                   </div>
@@ -1519,8 +1518,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                       if (!isMobile) {
                         showToast(
                           language === 'te' ? '📋 SMS సందేశం కాపీ అయింది!' : '📋 SMS Text Copied!',
-                          language === 'te' 
-                            ? 'మొబైల్ ఫోన్‌లో అయితే నేరుగా SMS యాప్ ఓపెన్ అవుతుంది. కంప్యూటర్‌లో WhatsApp వాడండి.' 
+                          language === 'te'
+                            ? 'మొబైల్ ఫోన్‌లో అయితే నేరుగా SMS యాప్ ఓపెన్ అవుతుంది. కంప్యూటర్‌లో WhatsApp వాడండి.'
                             : 'Opens native SMS app on phones. On desktop PC, use WhatsApp.',
                           'info'
                         );
@@ -1573,7 +1572,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                   >
                     {groups.map(g => {
                       const isGroupB = g.id === 'grp-2' || g.name.includes('Group B') || g.nameTe?.includes('గ్రూప్ B');
-                      const label = isGroupB 
+                      const label = isGroupB
                         ? (language === 'te' ? 'గ్రూప్ B' : 'Group B')
                         : (language === 'te' ? 'గ్రూప్ A' : 'Group A');
                       return (
@@ -1647,9 +1646,9 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
         <div className="modal-backdrop animate-fade" onClick={() => setIsLiftingModalOpen(false)}>
           <div className="lifting-modal-card luxury-card animate-fade relative" onClick={e => e.stopPropagation()}>
             {/* Top-Right Absolute Close Cross Mark */}
-            <button 
-              type="button" 
-              className="btn-modal-close" 
+            <button
+              type="button"
+              className="btn-modal-close"
               onClick={() => setIsLiftingModalOpen(false)}
               aria-label="Close modal"
             >
@@ -1704,8 +1703,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                     <span>{language === 'te' ? 'చిట్ ఎత్తిన సభ్యుడు (Winning Member)' : 'Winning Member'}</span>
                   </label>
                   <span className="text-[11px] text-amber-400">
-                    {language === 'te' 
-                      ? `అర్హులైన సభ్యులు: ${eligibleWinningMembers.length}` 
+                    {language === 'te'
+                      ? `అర్హులైన సభ్యులు: ${eligibleWinningMembers.length}`
                       : `Eligible: ${eligibleWinningMembers.length}`}
                   </span>
                 </div>

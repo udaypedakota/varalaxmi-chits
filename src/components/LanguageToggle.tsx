@@ -15,7 +15,7 @@ export const LanguageToggle: React.FC<LanguageToggleProps> = ({ className = '', 
       {showIcon && <Globe size={15} className="lang-globe-icon" />}
       <button
         type="button"
-        className={`lang-option-pill ${language === 'te' ? 'active' : ''}`}
+        className={`lang-option-pill pill-te ${language === 'te' ? 'active' : ''}`}
         onClick={() => setLanguage('te')}
         title="తెలుగు భాషను ఎంచుకోండి"
         aria-pressed={language === 'te'}
@@ -24,7 +24,7 @@ export const LanguageToggle: React.FC<LanguageToggleProps> = ({ className = '', 
       </button>
       <button
         type="button"
-        className={`lang-option-pill ${language === 'en' ? 'active' : ''}`}
+        className={`lang-option-pill pill-en ${language === 'en' ? 'active' : ''}`}
         onClick={() => setLanguage('en')}
         title="Switch to English"
         aria-pressed={language === 'en'}

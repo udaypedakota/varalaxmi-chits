@@ -106,12 +106,12 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, initial
         <header className="login-frame-top-bar">
           <button 
             type="button" 
-            className="login-back-btn" 
+            className={`login-back-btn ${language === 'te' ? 'is-te' : 'is-en'}`}
             onClick={onClose}
-            aria-label="Back"
+            aria-label={language === 'te' ? 'వెనుకకు' : 'Back'}
           >
-            <ArrowLeft size={18} />
-            <span>{language === 'te' ? 'శ్రీ వరలక్ష్మి చిట్స్' : 'Sri Varalaxmi Chits'}</span>
+            <ArrowLeft size={16} className="login-back-icon shrink-0" />
+            <span className="login-back-title">{language === 'te' ? 'శ్రీ వరలక్ష్మి చిట్స్' : 'Sri Varalaxmi Chits'}</span>
           </button>
           <LanguageToggle />
         </header>
