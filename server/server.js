@@ -585,6 +585,11 @@ app.put('/api/groups/:groupId', async (req, res) => {
 
 // 5. Members Management
 app.get('/api/members', async (req, res) => {
+  if (mongoosePkg.connection.readyState !== 1) {
+    await connectDB();
+  }
+  isMongoConnected = (mongoosePkg.connection.readyState === 1);
+
   if (isMongoConnected) {
     const members = await MemberModel.find({});
     return res.json(members);
@@ -595,7 +600,12 @@ app.get('/api/members', async (req, res) => {
 app.get('/api/members/lookup', async (req, res) => {
   const { phone } = req.query;
   if (!phone) return res.status(400).json({ error: 'Phone number required' });
-  const cleanPhone = phone.toString().trim();
+  const cleanPhone = phone.toString().trim().replace(/\D/g, '');
+  if (mongoosePkg.connection.readyState !== 1) {
+    await connectDB();
+  }
+  isMongoConnected = (mongoosePkg.connection.readyState === 1);
+
   if (isMongoConnected) {
     const members = await MemberModel.find({ phone: cleanPhone });
     return res.json(members);
@@ -606,6 +616,11 @@ app.get('/api/members/lookup', async (req, res) => {
 
 app.get('/api/groups/:groupId/members', async (req, res) => {
   const { groupId } = req.params;
+  if (mongoosePkg.connection.readyState !== 1) {
+    await connectDB();
+  }
+  isMongoConnected = (mongoosePkg.connection.readyState === 1);
+
   if (isMongoConnected) {
     const members = await MemberModel.find({ groupId });
     return res.json(members);
@@ -616,6 +631,11 @@ app.get('/api/groups/:groupId/members', async (req, res) => {
 
 app.post('/api/groups/:groupId/members', async (req, res) => {
   try {
+    if (mongoosePkg.connection.readyState !== 1) {
+      await connectDB();
+    }
+    isMongoConnected = (mongoosePkg.connection.readyState === 1);
+
     const { groupId } = req.params;
     const memberName = req.body.name || 'Member';
     
@@ -628,13 +648,17 @@ app.post('/api/groups/:groupId/members', async (req, res) => {
       memberNo = existingCount + 1;
     }
 
+    let phone = (req.body.phone || '').toString().trim().replace(/\D/g, '');
+    if (phone.startsWith('91') && phone.length > 10) phone = phone.slice(2);
+    if (phone.startsWith('0') && phone.length > 10) phone = phone.slice(1);
+
     const newMember = {
       id: req.body.id || `m-${Date.now()}`,
       groupId,
       memberNo,
       name: memberName,
       nameTe: req.body.nameTe || memberName,
-      phone: req.body.phone || '',
+      phone,
       pin: req.body.pin || '1234',
       role: 'member',
       totalPaidSoFar: Number(req.body.totalPaidSoFar) || 0,

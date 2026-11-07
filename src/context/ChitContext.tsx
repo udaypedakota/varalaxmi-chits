@@ -32,7 +32,7 @@ interface ChitContextType {
   registerMember: (memberData: { name: string; phone: string; pin: string; groupId?: string }) => { success: boolean; error?: string; member?: Member };
   logout: () => void;
   switchUser: (memberId: string) => void;
-  addMember: (memberData: { name: string; nameTe?: string; phone: string; pin?: string; groupId?: string }) => Member;
+  addMember: (memberData: { name: string; nameTe?: string; phone: string; pin?: string; groupId?: string }) => Promise<Member>;
   deleteMember: (memberId: string) => void;
   updateMemberPin: (memberId: string, newPin: string) => void;
 
@@ -441,7 +441,18 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const apiMembers = await memRes.json();
             if (apiMembers && apiMembers.length > 0) {
               const validMembers = apiMembers.filter((m: Member) => m.role !== 'organizer' && m.phone !== '8790859546' && m.phone !== '8801147452');
-              setMembers(validMembers);
+              // Retain any newly created local members that Atlas might still be writing
+              setMembers(prev => {
+                const apiIds = new Set(validMembers.map((m: Member) => m.id));
+                const apiPhones = new Set(validMembers.map((m: Member) => `${m.groupId}_${m.phone}`));
+                const recentLocal = prev.filter(m => 
+                  !apiIds.has(m.id) && 
+                  !apiPhones.has(`${m.groupId}_${m.phone}`) &&
+                  m.id.startsWith('m-') && 
+                  (Date.now() - Number(m.id.replace('m-', '')) < 25000)
+                );
+                return [...validMembers, ...recentLocal];
+              });
               setCurrentUser(prev => {
                 if (!prev || prev.role === 'organizer') return prev;
                 const refreshed = validMembers.find((m: Member) => m.id === prev.id || m.phone === prev.phone);
@@ -618,12 +629,15 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }).catch(() => {});
   };
 
-  const addMember = (memberData: { name: string; nameTe?: string; phone: string; pin?: string; groupId?: string }): Member => {
+  const addMember = async (memberData: { name: string; nameTe?: string; phone: string; pin?: string; groupId?: string }): Promise<Member> => {
     const targetGroupId = memberData.groupId || activeGroupId;
+    let cleanPhone = memberData.phone.trim().replace(/\D/g, '');
+    if (cleanPhone.startsWith('91') && cleanPhone.length > 10) cleanPhone = cleanPhone.slice(2);
+    if (cleanPhone.startsWith('0') && cleanPhone.length > 10) cleanPhone = cleanPhone.slice(1);
+    const cleanPin = memberData.pin?.trim() || '1234';
+
     const realMembersInGroup = members.filter(m => m.groupId === targetGroupId && m.role !== 'organizer');
     const nextNo = realMembersInGroup.length + 1;
-    const cleanPhone = memberData.phone.trim().replace(/\D/g, '');
-    const cleanPin = memberData.pin?.trim() || '1234';
 
     const newMember: Member = {
       id: `m-${Date.now()}`,
@@ -637,14 +651,35 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
       hasLiftedChit: false,
       totalPaidSoFar: 0
     };
-    setMembers(prev => [...prev, newMember]);
+
+    // Optimistically update React state and LocalStorage immediately
+    setMembers(prev => [...prev.filter(m => m.id !== newMember.id), newMember]);
+    try {
+      const currentSaved = localStorage.getItem(STORAGE_KEYS.MEMBERS);
+      const parsed = currentSaved ? JSON.parse(currentSaved) : [];
+      localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify([...parsed.filter((m: Member) => m.id !== newMember.id), newMember]));
+    } catch {}
 
     // Save to Atlas Cloud
-    fetch(`/api/groups/${targetGroupId}/members`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newMember)
-    }).catch(err => console.error('Error saving member:', err));
+    try {
+      const res = await fetch(`/api/groups/${targetGroupId}/members`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newMember)
+      });
+      if (res.ok) {
+        const saved = await res.json();
+        if (saved && saved.id) {
+          setMembers(prev => prev.map(m => m.id === newMember.id ? saved : m));
+          return saved;
+        }
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        console.error('Server error saving member:', errData);
+      }
+    } catch (err) {
+      console.error('Network error saving member to cloud:', err);
+    }
 
     return newMember;
   };

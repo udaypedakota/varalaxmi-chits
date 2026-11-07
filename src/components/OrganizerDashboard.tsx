@@ -91,6 +91,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
   const [memberViewMode, setMemberViewMode] = useState<'cards' | 'table'>('cards');
   const [expandedMemberId, setExpandedMemberId] = useState<string | null>(null);
   const [addMemberError, setAddMemberError] = useState('');
+  const [isEnrollingMember, setIsEnrollingMember] = useState(false);
   const [enrolledSuccessMember, setEnrolledSuccessMember] = useState<{
     name: string;
     phone: string;
@@ -104,7 +105,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
   } | null>(null);
   const [isPinCopied, setIsPinCopied] = useState(false);
 
-  const handleAddMemberSubmit = (e: React.FormEvent) => {
+  const handleAddMemberSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAddMemberError('');
 
@@ -113,9 +114,15 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
       return;
     }
 
-    const cleanPhone = newMemberPhone.trim().replace(/\D/g, '');
+    let cleanPhone = newMemberPhone.trim().replace(/\D/g, '');
+    if (cleanPhone.startsWith('91') && cleanPhone.length > 10) cleanPhone = cleanPhone.slice(2);
+    if (cleanPhone.startsWith('0') && cleanPhone.length > 10) cleanPhone = cleanPhone.slice(1);
     if (cleanPhone.length !== 10) {
-      setAddMemberError(language === 'te' ? 'సరైన 10 అంకెల మొబైల్ నంబర్ నమోదు చేయండి' : 'Enter valid 10-digit phone');
+      setAddMemberError(
+        language === 'te' 
+          ? 'దయచేసి సరైన 10 అంకెల మొబైల్ నంబర్ నమోదు చేయండి (ఉదా: 9848012345)' 
+          : 'Please enter a valid 10-digit mobile number'
+      );
       return;
     }
 
@@ -145,27 +152,34 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
       finalName = `${finalName} (Chit ${existingInGroup.length + 1})`;
     }
 
-    addMember({
-      name: finalName,
-      nameTe: finalName,
-      phone: cleanPhone,
-      pin: finalPin,
-      groupId: targetGroup.id
-    });
+    setIsEnrollingMember(true);
+    try {
+      await addMember({
+        name: finalName,
+        nameTe: finalName,
+        phone: cleanPhone,
+        pin: finalPin,
+        groupId: targetGroup.id
+      });
 
-    setEnrolledSuccessMember({
-      name: finalName,
-      phone: cleanPhone,
-      pin: finalPin,
-      groupName,
-      chitNote: existingInGroup.length > 0
-        ? (language === 'te' ? `గమనిక: ఈ నంబర్‌పై ఇది ${existingInGroup.length + 1}వ చిట్టీగా (Ticket #${existingInGroup.length + 1}) విజయవంతంగా నమోదైంది.` : `Note: Registered as Chit #${existingInGroup.length + 1} for this member.`)
-        : undefined
-    });
+      setEnrolledSuccessMember({
+        name: finalName,
+        phone: cleanPhone,
+        pin: finalPin,
+        groupName,
+        chitNote: existingInGroup.length > 0
+          ? (language === 'te' ? `గమనిక: ఈ నంబర్‌పై ఇది ${existingInGroup.length + 1}వ చిట్టీగా (Ticket #${existingInGroup.length + 1}) విజయవంతంగా నమోదైంది.` : `Note: Registered as Chit #${existingInGroup.length + 1} for this member.`)
+          : undefined
+      });
 
-    setNewMemberName('');
-    setNewMemberPhone('');
-    setNewMemberPin('1234');
+      setNewMemberName('');
+      setNewMemberPhone('');
+      setNewMemberPin('1234');
+    } catch (err: any) {
+      setAddMemberError(err?.message || (language === 'te' ? 'సభ్యుని చేర్చడంలో లోపం ఏర్పడింది. మళ్ళీ ప్రయత్నించండి.' : 'Error enrolling member. Please try again.'));
+    } finally {
+      setIsEnrollingMember(false);
+    }
   };
 
   const handleShareLoginSms = (m: Member) => {
@@ -714,7 +728,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             <button
               type="button"
               className="btn-seed-data py-2 px-3 text-xs flex items-center gap-1.5 ml-auto"
-              onClick={() => { setIsAddMemberOpen(true); setAddMemberError(''); setEnrolledSuccessMember(null); }}
+              onClick={() => { setSelectedEnrollGroupId(currentGroup.id); setIsAddMemberOpen(true); setAddMemberError(''); setEnrolledSuccessMember(null); }}
             >
               <UserPlus size={14} className="text-amber-400" />
               <span>{language === 'te' ? '+ సభ్యుని చేర్చండి' : '+ Add Member'}</span>
@@ -771,7 +785,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             <button
               type="button"
               className="btn-primary mt-3 text-xs py-2 px-4 inline-flex items-center gap-1.5"
-              onClick={() => { setIsAddMemberOpen(true); setAddMemberError(''); setEnrolledSuccessMember(null); }}
+              onClick={() => { setSelectedEnrollGroupId(currentGroup.id); setIsAddMemberOpen(true); setAddMemberError(''); setEnrolledSuccessMember(null); }}
             >
               <UserPlus size={14} />
               <span>{language === 'te' ? '+ సభ్యుని నమోదు చేయండి' : '+ Add Member'}</span>
@@ -1607,11 +1621,17 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                     <span className="input-prefix">+91</span>
                     <input
                       type="tel"
-                      maxLength={10}
+                      maxLength={15}
                       className="form-input"
                       placeholder="10-digit mobile"
                       value={newMemberPhone}
-                      onChange={e => setNewMemberPhone(e.target.value.replace(/\D/g, ''))}
+                      onChange={e => {
+                        let val = e.target.value.replace(/\D/g, '');
+                        if (val.startsWith('91') && val.length > 10) val = val.slice(2);
+                        if (val.startsWith('0') && val.length > 10) val = val.slice(1);
+                        if (val.length > 10) val = val.slice(0, 10);
+                        setNewMemberPhone(val);
+                      }}
                       required
                     />
                   </div>
@@ -1632,8 +1652,12 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                   />
                 </div>
 
-                <button type="submit" className="btn-primary w-full mt-2">
-                  <span>{language === 'te' ? 'సభ్యుని గ్రూప్‌లో చేర్చండి' : 'Enroll Member in Group'}</span>
+                <button type="submit" className="btn-primary w-full mt-2" disabled={isEnrollingMember}>
+                  {isEnrollingMember ? (
+                    <span>{language === 'te' ? 'నమోదు అవుతోంది...' : 'Enrolling Member...'}</span>
+                  ) : (
+                    <span>{language === 'te' ? 'సభ్యుని గ్రూప్‌లో చేర్చండి' : 'Enroll Member in Group'}</span>
+                  )}
                 </button>
               </form>
             )}
