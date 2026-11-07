@@ -12,7 +12,6 @@ import {
   ChevronRight, 
   Search, 
   Calendar,
-  Sparkles,
   Award,
   CreditCard,
   FileCheck,
@@ -302,25 +301,18 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
       {/* 1. ORGANIZER TOP HERO BANNER */}
       <section className="organizer-hero-banner animate-fade">
         <div className="org-hero-top">
-          <div className="hero-chip organizer">
-            <Sparkles size={16} className="text-yellow-300" />
-            <span>{language === 'te' ? 'నిర్వాహకుని నియంత్రణ కేంద్రం' : 'Organizer Control Center'}</span>
-          </div>
-
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className="month-picker-pill">
-              <Calendar size={15} />
-              <span>{language === 'te' ? 'ప్రస్తుత నెల:' : 'Active Month:'}</span>
-              <select 
-                value={currentGroup.currentMonth} 
-                onChange={e => setCurrentMonth(parseInt(e.target.value, 10))}
-                className="month-select"
-              >
-                {Array.from({ length: currentGroup.totalMonths }, (_, i) => i + 1).map(m => (
-                  <option key={m} value={m}>{getMonthDisplayName(m, language)}</option>
-                ))}
-              </select>
-            </div>
+          <div className="month-picker-pill">
+            <Calendar size={15} />
+            <span>{language === 'te' ? 'ప్రస్తుత నెల:' : 'Active Month:'}</span>
+            <select 
+              value={currentGroup.currentMonth} 
+              onChange={e => setCurrentMonth(parseInt(e.target.value, 10))}
+              className="month-select"
+            >
+              {Array.from({ length: currentGroup.totalMonths }, (_, i) => i + 1).map(m => (
+                <option key={m} value={m}>{getMonthDisplayName(m, language)}</option>
+              ))}
+            </select>
           </div>
         </div>
 

@@ -1665,7 +1665,7 @@ select.form-input option,
 
 .org-hero-top {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   margin-bottom: 1.25rem;
   flex-wrap: wrap;
@@ -4879,10 +4879,15 @@ select.form-input option,
   }
 
   .org-hero-top {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.65rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     margin-bottom: 0.85rem;
+  }
+
+  .month-picker-pill {
+    width: 100%;
+    justify-content: center;
   }
 
   .org-metrics-grid {
