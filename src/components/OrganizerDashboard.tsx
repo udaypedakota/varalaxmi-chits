@@ -885,6 +885,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
              ============================================================ */
           <div className="member-cards-list">
             {filteredMembers.map(m => {
+              const isAuctionDone = groupLiftings.some(l => l.month === currentGroup.currentMonth);
               const monthDue = getInstallmentForMember(currentGroup.currentMonth, m, language);
               const curPay = groupPayments.find(p => p.memberId === m.id && p.month === currentGroup.currentMonth && p.status === 'approved')
                 || groupPayments.find(p => p.memberId === m.id && p.month === currentGroup.currentMonth && p.status === 'pending');
@@ -928,6 +929,11 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                         <span className="card-badge-pending">
                           <Clock size={12} />
                           <span>{language === 'te' ? 'పరిశీలనలో' : 'Pending'}</span>
+                        </span>
+                      ) : !isAuctionDone ? (
+                        <span className="card-badge-pending bg-amber-500/10 border border-amber-500/20 text-amber-300">
+                          <Gavel size={12} />
+                          <span>{language === 'te' ? 'పాట పెండింగ్' : 'Auction Pending'}</span>
                         </span>
                       ) : (
                         <span className="card-badge-due">
@@ -1126,6 +1132,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                 </thead>
                 <tbody>
                   {filteredMembers.map(m => {
+                    const isAuctionDone = groupLiftings.some(l => l.month === currentGroup.currentMonth);
                     const monthDue = getInstallmentForMember(currentGroup.currentMonth, m, language);
                     const curPay = groupPayments.find(p => p.memberId === m.id && p.month === currentGroup.currentMonth && p.status === 'approved')
                       || groupPayments.find(p => p.memberId === m.id && p.month === currentGroup.currentMonth && p.status === 'pending');
@@ -1179,6 +1186,10 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                             <span className="status-badge-paid">{language === 'te' ? 'చెల్లించారు' : 'Paid'}</span>
                           ) : isPending ? (
                             <span className="status-badge-pending">{language === 'te' ? 'పరిశీలనలో ఉంది' : 'Pending'}</span>
+                          ) : !isAuctionDone ? (
+                            <span className="status-badge-pending bg-amber-500/10 border border-amber-500/20 text-amber-300">
+                              {language === 'te' ? 'పాట పెండింగ్' : 'Auction Pending'}
+                            </span>
                           ) : (
                             <span className="status-badge-due">{language === 'te' ? 'బాకీ ఉంది' : 'Due'}</span>
                           )}

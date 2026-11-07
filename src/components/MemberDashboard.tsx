@@ -96,6 +96,10 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
     p => p.memberId === currentUser.id && p.month === currentGroup.currentMonth
   );
 
+  // Current Month Chit Lifting & Auction Status (Option A)
+  const currentMonthLifting = groupLiftings.find(l => l.month === currentGroup.currentMonth);
+  const isCurrentMonthAuctionCompleted = Boolean(currentMonthLifting);
+
   const isCurrentMonthPaid = Boolean(currentMonthApprovedPayment);
   const isCurrentMonthPending = !isCurrentMonthPaid && Boolean(currentMonthPendingPayment);
 
@@ -296,6 +300,8 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
             <h3 className="section-heading">
               {isCurrentMonthPaid
                 ? (language === 'te' ? 'ఈ నెల వాయిదా పూర్తయింది' : 'Current Month Completed')
+                : !isCurrentMonthAuctionCompleted
+                ? (language === 'te' ? 'ఈ నెల చిట్టీ పాట పెండింగ్' : 'Current Month Auction Pending')
                 : (language === 'te' ? 'ఈ నెల చెల్లించవలసిన సొమ్ము' : 'Current Month Due')}
             </h3>
           </div>
@@ -303,6 +309,11 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
             <div className="due-date-pill bg-emerald-500/15 border-emerald-500/30 text-emerald-300">
               <CheckCircle2 size={15} className="text-emerald-400" />
               <span>{language === 'te' ? 'చెల్లించబడింది' : 'Paid & Approved'}</span>
+            </div>
+          ) : !isCurrentMonthAuctionCompleted ? (
+            <div className="due-date-pill bg-amber-500/15 border-amber-500/30 text-amber-300">
+              <Gavel size={15} className="text-amber-400" />
+              <span>{language === 'te' ? 'పాట ఇంకా జరగలేదు' : 'Auction Pending'}</span>
             </div>
           ) : (
             <div className="due-date-pill">
@@ -314,12 +325,16 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
 
         <div className="due-amount-hero">
           <div className="due-figure-col">
-            <div className={`due-amount-number ${isCurrentMonthPaid ? 'text-emerald-400' : ''}`}>
+            <div className={`due-amount-number ${isCurrentMonthPaid ? 'text-emerald-400' : !isCurrentMonthAuctionCompleted ? 'text-amber-400/80' : ''}`}>
               ₹{(isCurrentMonthPaid ? (currentMonthPayment?.amount || currentMonthDue) : currentMonthDue).toLocaleString('en-IN')}
             </div>
             <span className="due-label">
               {isCurrentMonthPaid
                 ? (language === 'te' ? `నెల ${currentGroup.currentMonth} వాయిదా విజయవంతంగా చెల్లించబడింది` : `Month ${currentGroup.currentMonth} Installment Successfully Paid`)
+                : isCurrentMonthPending
+                ? (language === 'te' ? 'వాయిదా పరిశీలనలో ఉంది' : 'Verification Pending')
+                : !isCurrentMonthAuctionCompleted
+                ? (language === 'te' ? 'ఈ నెల ప్రాథమిక వాయిదా (పాట పూర్తయ్యాక ఖరారు)' : 'Base Installment (Finalized after auction)')
                 : currentUser.hasLiftedChit && currentUser.liftedMonth !== undefined && currentGroup.currentMonth > currentUser.liftedMonth
                 ? (language === 'te' ? 'స్థిర వాయిదా (Fixed Rate)' : 'Fixed Installment Rate')
                 : (language === 'te' ? 'ఈ నెల వాయిదా మొత్తం' : 'Monthly Due Installment')}
@@ -336,6 +351,11 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
               <span className="badge-pending">
                 <Clock size={18} />
                 <span>{language === 'te' ? 'పరిశీలనలో ఉంది' : 'Verification Pending'}</span>
+              </span>
+            ) : !isCurrentMonthAuctionCompleted ? (
+              <span className="badge-pending bg-amber-500/15 border border-amber-500/30 text-amber-300">
+                <Gavel size={18} />
+                <span>{language === 'te' ? 'పాట పెండింగ్' : 'Auction Pending'}</span>
               </span>
             ) : (
               <span className="badge-due">
@@ -402,9 +422,46 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
           </div>
         )}
 
-        {/* Simple & Clean Payment Submission: ONLY shown if NOT paid and NOT pending */}
-        {!isCurrentMonthPaid && !isCurrentMonthPending && (
+        {/* If Auction has NOT happened yet: Show Clear "Auction Pending" Banner (Option A) */}
+        {!isCurrentMonthPaid && !isCurrentMonthPending && !isCurrentMonthAuctionCompleted && (
+          <div className="auction-pending-card luxury-card border border-amber-500/30 bg-gradient-to-br from-amber-950/20 to-gray-950 p-6 rounded-2xl mt-4 text-center animate-fade">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 mb-3 shadow-lg shadow-amber-500/5">
+              <Gavel size={28} className="text-amber-400" />
+            </div>
+            <h4 className="font-bold text-white text-base sm:text-lg mb-1.5 flex items-center justify-center gap-2">
+              <span>{language === 'te' ? '🔔 ఈ నెల చిట్టీ పాట ఇంకా జరగలేదు' : '🔔 Chit Auction Not Yet Conducted'}</span>
+            </h4>
+            <p className="text-xs sm:text-sm text-gray-300 max-w-md mx-auto mb-4 leading-relaxed">
+              {language === 'te'
+                ? `నెల ${currentGroup.currentMonth} చిట్టీ పాట (Auction / Lucky Draw) ఇంకా నిర్వహించబడలేదు. నిర్వాహకుడు శివ గారు చిట్టీ పాట నమోదు చేసిన తర్వాత మాత్రమే సభ్యుల వాయిదా చెల్లింపు ప్రారంభమవుతుంది.`
+                : `Month ${currentGroup.currentMonth} chit auction / lucky draw has not been conducted yet. Member installment payment will open once Organizer Siva records the monthly auction result.`}
+            </p>
+            <div className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300">
+              <Clock size={14} className="text-amber-400" />
+              <span>{language === 'te' ? 'నిర్వాహకుడు పాట నమోదు చేసిన వెంటనే పేమెంట్ ఆప్షన్ ఓపెన్ అవుతుంది' : 'Payment option opens once auction is recorded'}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Simple & Clean Payment Submission: ONLY shown if Auction Completed, NOT paid and NOT pending */}
+        {!isCurrentMonthPaid && !isCurrentMonthPending && isCurrentMonthAuctionCompleted && (
           <div className="payment-submission-box luxury-card border border-amber-500/20 bg-gray-950/70 p-4 rounded-xl mt-4">
+            {currentMonthLifting && (
+              <div className="auction-winner-banner mb-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between flex-wrap gap-2 text-xs">
+                <div className="flex items-center gap-2 text-amber-300 font-semibold">
+                  <Award size={16} className="text-yellow-400 shrink-0" />
+                  <span>
+                    {language === 'te'
+                      ? `నెల ${currentGroup.currentMonth} విజేత: ${currentMonthLifting.memberNameTe || currentMonthLifting.memberName} (#${currentMonthLifting.memberNo || ''})`
+                      : `Month ${currentGroup.currentMonth} Lifted By: ${currentMonthLifting.memberName} (#${currentMonthLifting.memberNo || ''})`}
+                  </span>
+                </div>
+                <span className="text-emerald-400 font-bold">
+                  ₹{(currentMonthLifting.chitValue || 200000).toLocaleString('en-IN')}
+                </span>
+              </div>
+            )}
+
             <h4 className="payment-box-title font-bold text-white text-sm mb-3 flex items-center gap-2">
               <CreditCard size={17} className="text-amber-400" />
               <span>{language === 'te' ? 'వాయిదా చెల్లింపు నమోదు (Record Payment)' : 'Record Monthly Payment'}</span>
