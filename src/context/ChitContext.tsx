@@ -689,12 +689,12 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // 1. Organizer Login Check (Siva)
     if (cleanPhone === '8790859546' || cleanPhone === '8801147452' || cleanPhone === activeGroup.organizerPhone) {
-      if (cleanPin !== '1234' && cleanPin !== '8329') {
+      if (cleanPin !== '9546' && cleanPin !== '8329') {
         return {
           success: false,
           error: language === 'te'
-            ? 'ఆర్గనైజర్ సెక్యూరిటీ పిన్ తప్పుగా ఉంది. (PIN: 1234 or 8329)'
-            : 'Incorrect organizer PIN. (PIN: 1234 or 8329)'
+            ? 'ఆర్గనైజర్ సెక్యూరిటీ పిన్ తప్పుగా ఉంది. (PIN: 9546)'
+            : 'Incorrect organizer PIN. (PIN: 9546)'
         };
       }
       const orgUser: Member = {
