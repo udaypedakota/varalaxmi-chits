@@ -291,6 +291,23 @@ async function connectDB() {
     // Purge organizer from members collection if present
     await MemberModel.deleteMany({ $or: [{ role: 'organizer' }, { phone: '8801147452' }, { phone: '8790859546' }] });
 
+    // User requested fresh start: purge all existing members from Group A & Group B for fresh entry
+    const purgeFlag = await AuditLogModel.findOne({ action: 'PURGE_MEMBERS_FOR_FRESH_ENTRY_V7' });
+    if (!purgeFlag) {
+      console.log('🧹 Purging all existing members, payments, lotteries, and liftings from MongoDB Atlas for clean start...');
+      await MemberModel.deleteMany({});
+      await PaymentModel.deleteMany({});
+      await LotteryModel.deleteMany({});
+      await LiftingModel.deleteMany({});
+      await AuditLogModel.create({
+        id: 'audit-purge-fresh-start-v7',
+        timestamp: new Date().toISOString(),
+        action: 'PURGE_MEMBERS_FOR_FRESH_ENTRY_V7',
+        details: 'All old Group A and Group B members cleared as requested by user for fresh manual entry.'
+      });
+      console.log('✅ MongoDB Atlas cleaned! 0 members across Group A and Group B.');
+    }
+
     // Check if empty, if so, seed automatically with clean slate Month 1
     const groupCount = await GroupModel.countDocuments();
     if (groupCount === 0) {
@@ -319,7 +336,7 @@ async function seedDatabase() {
   } else {
     memoryStore = {
       groups: JSON.parse(JSON.stringify(INITIAL_GROUPS)),
-      members: JSON.parse(JSON.stringify(INITIAL_MEMBERS)),
+      members: [],
       payments: [],
       lottery: [],
       liftings: [],
@@ -331,26 +348,21 @@ async function seedDatabase() {
 
 async function truncateDatabase() {
   if (isMongoConnected) {
-    // Clear all transaction records (payments, lotteries, liftings, audit logs)
+    // Clear all members and transaction records for fresh entry
+    await MemberModel.deleteMany({});
     await PaymentModel.deleteMany({});
     await LotteryModel.deleteMany({});
     await LiftingModel.deleteMany({});
     await NotificationModel.deleteMany({});
     await AuditLogModel.deleteMany({});
-    // Reset all members to Month 1 clean slate (0 paid, 0 lifted)
-    await MemberModel.updateMany({}, { hasLiftedChit: false, liftedMonth: null, totalPaidSoFar: 0 });
     // Reset groups to Month 1
     await GroupModel.updateMany({}, { currentMonth: 1 });
   } else {
+    memoryStore.members = [];
     memoryStore.payments = [];
     memoryStore.lottery = [];
     memoryStore.liftings = [];
     memoryStore.audit = [];
-    memoryStore.members.forEach(m => {
-      m.hasLiftedChit = false;
-      m.liftedMonth = null;
-      m.totalPaidSoFar = 0;
-    });
     memoryStore.groups.forEach(g => {
       g.currentMonth = 1;
     });
@@ -615,6 +627,34 @@ app.delete('/api/members/:memberId', async (req, res) => {
       return res.json({ success: true });
     }
     memoryStore.members = memoryStore.members.filter(m => m.id !== memberId);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Delete all members (or group-specific) for fresh enrollment
+app.delete('/api/members', async (req, res) => {
+  try {
+    const { groupId } = req.query;
+    const filter = groupId ? { groupId } : {};
+    if (isMongoConnected) {
+      const result = await MemberModel.deleteMany(filter);
+      if (!groupId) {
+        await PaymentModel.deleteMany({});
+        await LotteryModel.deleteMany({});
+        await LiftingModel.deleteMany({});
+      }
+      return res.json({ success: true, deletedCount: result.deletedCount });
+    }
+    if (groupId) {
+      memoryStore.members = memoryStore.members.filter(m => m.groupId !== groupId);
+    } else {
+      memoryStore.members = [];
+      memoryStore.payments = [];
+      memoryStore.lottery = [];
+      memoryStore.liftings = [];
+    }
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
