@@ -201,7 +201,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
     const appUrl = window.location.origin;
     const msg = encodeURIComponent(
       `నమస్కారం ${m.nameTe || m.name} గారు,\n` +
-      `శ్రీ వరలక్ష్మి చిట్స్ (${groupName}) లో మీ మెంబర్షిప్ #${m.memberNo} నమోదు చేయబడింది.\n\n` +
+      `శ్రీ వరలక్ష్మి చిట్స్ లో మీ మెంబర్షిప్ #${m.memberNo} నమోదు చేయబడింది.\n\n` +
       `📱 మీ లాగిన్ మొబైల్: ${m.phone}\n` +
       `🔑 మీ సెక్యూరిటీ పిన్: ${m.pin}\n` +
       `🌐 పాస్‌బుక్ లాగిన్ లింక్: ${appUrl}\n\n` +

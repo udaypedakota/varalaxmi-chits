@@ -26,14 +26,15 @@ export interface PaymentReceiptSmsParams {
  * 1. New Member Enrollment SMS (English)
  */
 export const getEnrollmentSmsText = (params: EnrollmentSmsParams): string => {
-  const org = params.organizerName || 'Siva';
+  const org = params.organizerName && params.organizerName.includes('Organizer') 
+    ? params.organizerName 
+    : `${params.organizerName || 'Siva'} (Organizer)`;
   const orgPhone = params.organizerPhone || '8790859546';
-  const group = params.groupName || 'Group A';
   const url = params.appUrl || (typeof window !== 'undefined' ? window.location.origin : 'https://varalaxmi-chits.vercel.app');
 
   return (
     `Sri Varalaxmi Chits:\n` +
-    `Hello ${params.memberName}, welcome to Sri Varalaxmi Chits (${group})!\n\n` +
+    `Hello ${params.memberName}, welcome to Sri Varalaxmi Chits!\n\n` +
     `Your Login Credentials:\n` +
     `Mobile: ${params.phone}\n` +
     `Security PIN: ${params.pin}\n` +
