@@ -79,6 +79,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
   const [previewProofUrl, setPreviewProofUrl] = useState<string | null>(null);
   const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
   const [isBroadcastCopied, setIsBroadcastCopied] = useState(false);
+  const [customReceiverName, setCustomReceiverName] = useState('');
+  const [customReceiverPhone, setCustomReceiverPhone] = useState('');
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
   const [newMemberName, setNewMemberName] = useState('');
   const [newMemberPhone, setNewMemberPhone] = useState('');
@@ -392,14 +394,19 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
           <button 
             type="button" 
             className="btn-tool-lottery"
-            onClick={onOpenLottery}
-            title={language === 'te' ? 'లక్కీ డ్రా నిర్వహించండి' : 'Launch Lucky Draw'}
+            onClick={() => {
+              setLiftMonth(currentGroup.currentMonth);
+              setLiftMemberId('');
+              setLiftError('');
+              setIsLiftingModalOpen(true);
+            }}
+            title={language === 'te' ? 'ఈ నెల వేలం పాట నమోదు చేయండి' : 'Record Monthly Chit Auction'}
           >
-            <Dices size={15} className="shrink-0" />
+            <Gavel size={15} className="shrink-0" />
             <span>
               {language === 'te' 
-                ? `🎰 లక్కీ డ్రా (నెల ${currentGroup.currentMonth})` 
-                : `🎰 Lucky Draw (M${currentGroup.currentMonth})`}
+                ? `🔨 ఈ నెల పాట నమోదు` 
+                : `🔨 Record Auction (M${currentGroup.currentMonth})`}
             </span>
           </button>
 
@@ -1182,14 +1189,18 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
       {/* 6. MODAL: WHATSAPP GROUP BROADCAST NOTICE (User Specified Format) */}
       {isBroadcastModalOpen && (() => {
         const activeMonthLifting = groupLiftings.find(l => l.month === currentGroup.currentMonth);
+        const winnerMember = activeMonthLifting 
+          ? groupMembers.find(m => m.id === activeMonthLifting.memberId)
+          : null;
+
+        const broadcastWinnerName = activeMonthLifting
+          ? (language === 'te' ? (activeMonthLifting.memberNameTe || activeMonthLifting.memberName) : activeMonthLifting.memberName)
+          : (language === 'te' ? 'ఇంకా పాట జరగలేదు (Pending Auction)' : 'Auction Pending');
+
         const activeMonthSchedule = MASTER_SCHEDULE.find(s => s.month === currentGroup.currentMonth);
         const defaultInstallmentAmount = activeMonthSchedule 
           ? (language === 'te' ? activeMonthSchedule.notTakenAmountTe || activeMonthSchedule.notTakenAmount : activeMonthSchedule.notTakenAmount)
           : 10000;
-
-        const broadcastWinner = activeMonthLifting
-          ? (activeMonthLifting.memberNameTe ? `${activeMonthLifting.memberNameTe} (${activeMonthLifting.memberName})` : activeMonthLifting.memberName)
-          : (language === 'te' ? 'ఇంకా పాట జరగలేదు (Pending Auction)' : 'Auction Pending');
 
         const broadcastLoss = activeMonthLifting && activeMonthLifting.liftType === 'auction'
           ? `₹${activeMonthLifting.bidDiscount.toLocaleString('en-IN')}`
@@ -1203,24 +1214,31 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
 
         const monthNameText = getMonthDisplayName(currentGroup.currentMonth, language);
 
+        // Receiver PhonePe number & Name: ALWAYS THE PERSON WHO LIFTED THE CHIT (Winner)!
+        const receiverName = customReceiverName.trim() || (winnerMember 
+          ? (language === 'te' ? (winnerMember.nameTe || winnerMember.name) : winnerMember.name)
+          : (activeMonthLifting ? activeMonthLifting.memberName : (language === 'te' ? 'చిట్టీ విజేత పేరు' : 'Chit Winner Name')));
+
+        const receiverPhone = customReceiverPhone.trim() || (winnerMember ? winnerMember.phone : (language === 'te' ? 'విజేత ఫోన్‌పే నంబర్' : 'Winner PhonePe Number'));
+
         const officialBroadcastText = 
 `📢 *${language === 'te' ? currentGroup.nameTe : currentGroup.name}*
 నెల ${currentGroup.currentMonth} వేలం పాట వివరాలు & వాయిదా నోటీస్
 ━━━━━━━━━━━━━━━━━━━━━
 • Chit Scheme : ₹${currentGroup.totalValue.toLocaleString('en-IN')} (${currentGroup.totalMonths} Months)
 • Month       : నెల ${currentGroup.currentMonth} (${monthNameText})
-• చిట్టీ విజేత : ${broadcastWinner}
+• చిట్టీ విజేత : ${broadcastWinnerName}
 • Loss (పాట తగ్గింపు)  : ${broadcastLoss}
 • Bonus (సభ్యుల లాభం) : ${broadcastBonus}
 • Amount to Pay (వాయిదా): ${broadcastAmountToPay}
 ━━━━━━━━━━━━━━━━━━━━━
 ⚠️ *Plz arrange amount with in 3 days.*
-(దయచేసి 3 రోజులలోపు ఈ నెల వాయిదా సొమ్ము పంపవలసిందిగా కోరుతున్నాము.)
+(సభ్యులందరూ మీ వాయిదా సొమ్మును నేరుగా ఈ నెల చిట్టీ తీసుకున్న విజేతకు PhonePe/GPay ద్వారా పంపవలసిందిగా కోరుతున్నాము.)
 
-📱 PhonePe / GPay : ${currentGroup.organizerPhone}
-👤 Name           : Siva (${currentGroup.organizerName})
-💳 UPI ID         : ${currentGroup.organizerUpiId}
+📱 PhonePe / GPay : ${receiverPhone}
+👤 Name (గ్రహీత)   : ${receiverName}
 ━━━━━━━━━━━━━━━━━━━━━
+నిర్వాహకుడు: శివ (${currentGroup.organizerPhone})
 ధన్యవాదాలు! - శ్రీ వరలక్ష్మి చిట్స్`;
 
         return (
@@ -1243,6 +1261,52 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                   ? 'ఈ క్రింది సందేశాన్ని మీ చిట్ వాట్సాప్ గ్రూప్‌లో షేర్ చేయండి:' 
                   : 'Share this notice directly to your chit WhatsApp group:'}
               </p>
+
+              {/* Receiver Info Box (Winner Details) */}
+              <div className="bg-slate-900/90 border border-amber-500/30 rounded-xl p-3 mb-3 text-xs space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-amber-300">
+                    {language === 'te' ? '💰 డబ్బులు అందుకోవలసిన చిట్టీ విజేత (Receiver):' : '💰 Chit Winner (Money Receiver Details):'}
+                  </span>
+                  {winnerMember && (
+                    <span className="text-[11px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                      ✓ ఆటోమేటిక్ సెలెక్ట్
+                    </span>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-2 pt-0.5">
+                  <div>
+                    <label className="text-gray-400 block mb-1 text-[11px]">
+                      {language === 'te' ? 'గ్రహీత పేరు (Name):' : 'Receiver Name:'}
+                    </label>
+                    <input
+                      type="text"
+                      className="form-input text-xs py-1.5"
+                      placeholder={winnerMember ? (winnerMember.nameTe || winnerMember.name) : 'విజేత పేరు'}
+                      value={customReceiverName}
+                      onChange={e => setCustomReceiverName(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-gray-400 block mb-1 text-[11px]">
+                      {language === 'te' ? 'PhonePe / GPay నంబర్:' : 'PhonePe / GPay No:'}
+                    </label>
+                    <input
+                      type="tel"
+                      maxLength={10}
+                      className="form-input text-xs py-1.5 font-mono"
+                      placeholder={winnerMember ? winnerMember.phone : '10-digit mobile'}
+                      value={customReceiverPhone}
+                      onChange={e => setCustomReceiverPhone(e.target.value.replace(/\D/g, ''))}
+                    />
+                  </div>
+                </div>
+                <p className="text-[11px] text-gray-400 m-0">
+                  {language === 'te' 
+                    ? '* సభ్యులందరూ ఈ నంబర్‌కే ఫోన్‌పే ద్వారా నేరుగా డబ్బులు పంపుతారు.' 
+                    : '* All members will send payments directly to this PhonePe number.'}
+                </p>
+              </div>
 
               {/* Live WhatsApp Chat Bubble Preview */}
               <div className="bg-[#0b141a] border border-[#202c33] rounded-2xl p-3.5 mb-3.5 shadow-inner">
