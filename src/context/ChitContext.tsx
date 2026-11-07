@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { ChitGroup, Member, PaymentRecord, LotteryRecord, ChitNotification, ChitLiftingRecord } from '../types/chit';
 import { DEFAULT_GROUPS } from '../data/defaultGroups';
 import { DEFAULT_MEMBERS } from '../data/defaultMembers';
@@ -24,6 +24,8 @@ interface ChitContextType {
   members: Member[];
   groupMembers: Member[];
   currentUser: Member | null;
+  userChits: Member[];
+  switchActiveChit: (memberId: string) => void;
   language: 'te' | 'en';
   setLanguage: (lang: 'te' | 'en') => void;
   login: (phone: string, pin: string, groupId?: string) => Promise<{ success: boolean; error?: string }>;
@@ -552,6 +554,37 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const groupLotteryHistory = lotteryHistory.filter(l => !l.groupId || l.groupId === activeGroupId);
   const groupLiftings = liftings.filter(l => !l.groupId || l.groupId === activeGroupId);
 
+  // All chits belonging to the current logged-in member's phone number
+  const userChits = useMemo(() => {
+    if (!currentUser || currentUser.role === 'organizer') return [];
+    const cleanPhone = (currentUser.phone || '').trim().replace(/\D/g, '');
+    if (!cleanPhone) return [currentUser];
+    const matching = members.filter(m => m.role !== 'organizer' && (m.phone || '').trim().replace(/\D/g, '') === cleanPhone);
+    return matching.length > 0 ? matching : [currentUser];
+  }, [currentUser, members]);
+
+  const switchActiveChit = (memberId: string) => {
+    const target = members.find(m => m.id === memberId);
+    if (target) {
+      setCurrentUser(target);
+      if (target.groupId) {
+        setActiveGroupId(target.groupId);
+      }
+      try {
+        localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(target));
+        sessionStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(target));
+      } catch {}
+      const targetGroup = groups.find(g => g.id === target.groupId);
+      const groupName = targetGroup ? (language === 'te' ? targetGroup.nameTe : targetGroup.name) : '';
+      showToast(
+        language === 'te' ? `🎟️ చిట్టీ #${target.memberNo} కి మారారు` : `🎟️ Switched to Chit #${target.memberNo}`,
+        language === 'te' ? `${target.nameTe || target.name} • ${groupName}` : `${target.name} • ${groupName}`,
+        'info'
+      );
+      registerPushForUser(target);
+    }
+  };
+
   // Group Actions
   const createGroup = (groupData: Partial<ChitGroup>) => {
     const newId = `grp-${Date.now()}`;
@@ -774,9 +807,12 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setActiveGroupId(matchedMember.groupId);
     }
     const memberDisplayName = language === 'te' ? (matchedMember.nameTe || matchedMember.name) : matchedMember.name;
+    const multiChitMsg = memberMatches.length > 1
+      ? (language === 'te' ? ` (మొత్తం ${memberMatches.length} చిట్టీలు)` : ` (${memberMatches.length} Chits linked)`)
+      : '';
     showToast(
       language === 'te' ? `✨ స్వాగతం, ${memberDisplayName} గారు!` : `✨ Welcome back, ${memberDisplayName}!`,
-      language === 'te' ? `సభ్యత్వ సంఖ్య #${matchedMember.memberNo}. మీ పాస్‌బుక్ సిద్ధంగా ఉంది.` : `Member #${matchedMember.memberNo}. Passbook is ready.`,
+      language === 'te' ? `సభ్యత్వ సంఖ్య #${matchedMember.memberNo}${multiChitMsg}. మీ పాస్‌బుక్ సిద్ధంగా ఉంది.` : `Member #${matchedMember.memberNo}${multiChitMsg}. Passbook is ready.`,
       'info'
     );
     registerPushForUser(matchedMember);
@@ -1196,6 +1232,8 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
         members,
         groupMembers,
         currentUser,
+        userChits,
+        switchActiveChit,
         language,
         setLanguage,
         login,

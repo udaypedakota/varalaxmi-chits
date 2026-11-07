@@ -54,6 +54,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
   const { 
     activeGroup,
     scheme, 
+    members,
     groupMembers, 
     groupPayments, 
     groupLiftings,
@@ -94,6 +95,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
     phone: string;
     pin: string;
     groupName: string;
+    chitNote?: string;
   } | null>(null);
   const [approvedPaymentSuccess, setApprovedPaymentSuccess] = useState<{
     payment: PaymentRecord;
@@ -115,27 +117,48 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
       return;
     }
 
-    if (groupMembers.some(m => m.phone === cleanPhone)) {
-      setAddMemberError(language === 'te' ? 'ఈ మొబైల్ నంబర్ గల సభ్యుడు ఇప్పటికే ఉన్నారు' : 'Member with this phone already exists');
-      return;
-    }
-
     const targetGroup = groups.find(g => g.id === (selectedEnrollGroupId || currentGroup.id)) || currentGroup;
     const groupName = targetGroup.id === 'grp-2' || targetGroup.name.includes('Group B') ? 'Group B' : 'Group A';
 
+    // 1. Group capacity check (Max totalMembers, e.g. 20)
+    const targetGroupMembers = members.filter(m => m.groupId === targetGroup.id && m.role !== 'organizer');
+    if (targetGroupMembers.length >= targetGroup.totalMembers) {
+      setAddMemberError(
+        language === 'te'
+          ? `${groupName} లో గరిష్టంగా ${targetGroup.totalMembers} మంది సభ్యులు మాత్రమే ఉండగలరు. గ్రూప్ ఇప్పటికే నిండిపోయింది.`
+          : `${groupName} is full (${targetGroup.totalMembers}/${targetGroup.totalMembers} members enrolled).`
+      );
+      return;
+    }
+
+    // 2. Multi-Chit Support:
+    // If this phone already has chits in this group or other groups, reuse their existing PIN and suffix name
+    const existingInGroup = targetGroupMembers.filter(m => m.phone === cleanPhone);
+    const existingAcrossGroups = members.filter(m => m.phone === cleanPhone && m.role !== 'organizer');
+    const existingPin = existingAcrossGroups.length > 0 ? existingAcrossGroups[0].pin : null;
+    const finalPin = existingPin || (newMemberPin.trim() || '1234');
+
+    let finalName = newMemberName.trim();
+    if (existingInGroup.length > 0 && !finalName.toLowerCase().includes('chit') && !finalName.includes('టికెట్')) {
+      finalName = `${finalName} (Chit ${existingInGroup.length + 1})`;
+    }
+
     addMember({
-      name: newMemberName.trim(),
-      nameTe: newMemberName.trim(),
+      name: finalName,
+      nameTe: finalName,
       phone: cleanPhone,
-      pin: newMemberPin.trim() || '1234',
-      groupId: selectedEnrollGroupId || currentGroup.id
+      pin: finalPin,
+      groupId: targetGroup.id
     });
 
     setEnrolledSuccessMember({
-      name: newMemberName.trim(),
+      name: finalName,
       phone: cleanPhone,
-      pin: newMemberPin.trim() || '1234',
-      groupName
+      pin: finalPin,
+      groupName,
+      chitNote: existingInGroup.length > 0 
+        ? (language === 'te' ? `గమనిక: ఈ నంబర్‌పై ఇది ${existingInGroup.length + 1}వ చిట్టీగా (Ticket #${existingInGroup.length + 1}) విజయవంతంగా నమోదైంది.` : `Note: Registered as Chit #${existingInGroup.length + 1} for this member.`)
+        : undefined
     });
 
     setNewMemberName('');
@@ -1394,6 +1417,11 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                     <span className="text-gray-400">{language === 'te' ? 'చిట్ గ్రూప్:' : 'Chit Group:'}</span>
                     <strong className="text-yellow-400">{enrolledSuccessMember.groupName}</strong>
                   </div>
+                  {enrolledSuccessMember.chitNote && (
+                    <div className="pt-2 text-xs text-amber-300 font-medium border-t border-gray-800 text-center">
+                      ✨ {enrolledSuccessMember.chitNote}
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">

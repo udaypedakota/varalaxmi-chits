@@ -45,7 +45,9 @@ import {
   Trophy,
   Banknote,
   Smartphone,
-  CreditCard
+  CreditCard,
+  Ticket,
+  Check
 } from 'lucide-react';
 
 interface MemberDashboardProps {
@@ -53,7 +55,20 @@ interface MemberDashboardProps {
 }
 
 export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt }) => {
-  const { scheme, activeGroup, currentUser, groupPayments, groupLotteryHistory, groupLiftings, submitPayment, language, showToast } = useChit();
+  const { 
+    scheme, 
+    activeGroup, 
+    groups,
+    currentUser, 
+    userChits, 
+    switchActiveChit, 
+    groupPayments, 
+    groupLotteryHistory, 
+    groupLiftings, 
+    submitPayment, 
+    language, 
+    showToast 
+  } = useChit();
 
   const [paymentMode, setPaymentMode] = useState<'Cash' | 'PhonePe' | 'UPI'>('Cash');
   const [utrInput, setUtrInput] = useState('');
@@ -118,6 +133,57 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
 
   return (
     <div className="dashboard-content">
+      {/* MULTI-CHIT SELECTOR: When member holds 2 or more chits */}
+      {userChits && userChits.length > 1 && (
+        <section className="multi-chit-banner animate-fade">
+          <div className="multi-chit-bar-header">
+            <Ticket size={18} className="text-yellow-400" />
+            <span className="font-semibold text-white text-xs sm:text-sm">
+              {language === 'te' 
+                ? `మీ నంబర్‌పై ${userChits.length} చిట్టీలు ఉన్నాయి. ఖాతా పుస్తకం చూడటానికి చిట్టీని ఎంచుకోండి:` 
+                : `You hold ${userChits.length} Chits. Select a ticket to view passbook:`}
+            </span>
+          </div>
+          <div className="multi-chit-grid">
+            {userChits.map(chit => {
+              const chitGroup = groups.find(g => g.id === chit.groupId);
+              const isSelected = chit.id === currentUser.id;
+              const gName = chitGroup?.id === 'grp-2' || chitGroup?.name.includes('Group B') ? 'Group B' : 'Group A';
+              return (
+                <button
+                  key={chit.id}
+                  type="button"
+                  className={`multi-chit-card-btn ${isSelected ? 'active-ticket' : ''}`}
+                  onClick={() => switchActiveChit(chit.id)}
+                >
+                  <div className="chit-btn-left">
+                    <span className="chit-slot-badge">#{chit.memberNo}</span>
+                    <div className="chit-slot-details">
+                      <strong className="chit-slot-name">{language === 'te' ? chit.nameTe : chit.name}</strong>
+                      <span className="chit-slot-meta">{gName} • ₹{(chitGroup?.totalValue || 200000).toLocaleString('en-IN')}</span>
+                    </div>
+                  </div>
+                  <div className="chit-btn-right">
+                    {isSelected ? (
+                      <span className="chit-active-pill">
+                        <Check size={13} /> {language === 'te' ? 'యాక్టివ్' : 'Active'}
+                      </span>
+                    ) : (
+                      <span className="chit-switch-hint">
+                        {language === 'te' ? 'చూడండి ➔' : 'View ➔'}
+                      </span>
+                    )}
+                    {chit.hasLiftedChit && (
+                      <span className="chit-lifted-pill">{language === 'te' ? 'చిట్ లిఫ్ట్' : 'Lifted'}</span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {/* 1. UNIFIED LUXURY MEMBER PASSBOOK HERO */}
       <section className="hero-total-card animate-fade">
         <div className="hero-top-row">
@@ -127,6 +193,13 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
           </div>
           <div className="hero-member-id">
             #{currentUser.memberNo} {language === 'te' ? currentUser.nameTe : currentUser.name}
+            {userChits && userChits.length > 1 && (
+              <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                {language === 'te' 
+                  ? `${userChits.findIndex(c => c.id === currentUser.id) + 1}వ చిట్టీ` 
+                  : `Chit ${userChits.findIndex(c => c.id === currentUser.id) + 1} of ${userChits.length}`}
+              </span>
+            )}
           </div>
         </div>
 
