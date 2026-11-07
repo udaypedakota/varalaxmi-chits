@@ -399,22 +399,18 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             </span>
           </div>
 
-          {/* Metric 4: Organizer Commission Module (Section 8) */}
+          {/* Metric 4: Total Chit Amount */}
           <div className="metric-box purple">
             <span className="metric-label">
-              {language === 'te' ? 'ఆర్గనైజర్ కమిషన్' : 'Organizer Commission'}
+              {language === 'te' ? 'మొత్తం చిట్ అమౌంట్' : 'Total Chit Amount'}
             </span>
             <div className="metric-value">
-              <span className="cur">₹</span>{totalCommissionEarned.toLocaleString('en-IN')}
+              <span className="cur">₹</span>{(currentGroup.totalValue || 200000).toLocaleString('en-IN')}
             </div>
             <span className="metric-sub">
               {language === 'te'
-                ? (completedAuctionsCount === 0
-                  ? `0 పాటలు పూర్తయ్యాయి (వేలం పాటకు ₹${monthlyCommissionAmount.toLocaleString('en-IN')})`
-                  : `${completedAuctionsCount} / ${currentGroup.totalMonths} పాటలు పూర్తయ్యాయి (${currentGroup.commissionPercent || 5}% కమిషన్)`)
-                : (completedAuctionsCount === 0
-                  ? `0 of ${currentGroup.totalMonths} Auctions Done (₹${monthlyCommissionAmount.toLocaleString('en-IN')}/auction)`
-                  : `${completedAuctionsCount} of ${currentGroup.totalMonths} Auctions Done (${currentGroup.commissionPercent || 5}% rate)`)}
+                ? `${currentGroup.totalMonths || 20} నెలలు • 20 మంది సభ్యులు`
+                : `${currentGroup.totalMonths || 20} Months • 20 Members`}
             </span>
           </div>
         </div>
