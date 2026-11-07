@@ -414,13 +414,13 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               setLiftError('');
               setIsLiftingModalOpen(true);
             }}
-            title={language === 'te' ? 'ఈ నెల వేలం పాట నమోదు చేయండి' : 'Record Monthly Chit Auction'}
+            title={language === 'te' ? 'ఈ నెల చిట్ నమోదు చేయండి' : 'Record Monthly Chit / Lift'}
           >
-            <Gavel size={15} className="shrink-0" />
+            <Award size={15} className="shrink-0" />
             <span>
               {language === 'te' 
-                ? `ఈ నెల పాట నమోదు` 
-                : `Record Auction`}
+                ? `ఈ నెల చిట్ నమోదు` 
+                : `Record Chit / Lift`}
             </span>
           </button>
 
@@ -551,16 +551,16 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               <div>
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <h3 className="section-title m-0 text-base font-bold text-white">
-                    {language === 'te' ? 'నెలసరి వేలం పాట & చిట్ ఎత్తిన వివరాలు (పాట పాడుకున్నవారు)' : 'Monthly Auction & Chit Winners Register'}
+                    {language === 'te' ? 'నెలసరి చిట్ తీసుకున్నవారి వివరాలు' : 'Monthly Chit Lift Register'}
                   </h3>
                   <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30 whitespace-nowrap">
-                    {groupLiftings.length} / {currentGroup.totalMonths} {language === 'te' ? 'నెలలు పూర్తయ్యాయి' : 'Months'}
+                    {groupLiftings.length} / {currentGroup.totalMonths} {language === 'te' ? 'నెలలు' : 'Months'}
                   </span>
                 </div>
                 <p className="section-subtitle m-0 text-xs text-gray-400">
                   {language === 'te'
-                    ? 'ప్రతి నెల పాట లేదా లక్కీ డ్రా ద్వారా చిట్ ఎత్తిన సభ్యుడు మరియు చేతికి అందిన నికర మొత్తం'
-                    : 'Month-by-month winner tracking, auction discounts, and net prize money paid'}
+                    ? 'ప్రతి నెల చిట్ తీసుకున్న సభ్యుడు మరియు చేతికి అందిన నికర మొత్తం వివరాలు'
+                    : 'Month-by-month winner tracking and net prize money paid'}
                 </p>
               </div>
             </div>
@@ -577,8 +577,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                 setIsLiftingModalOpen(true);
               }}
             >
-              <Gavel size={14} className="shrink-0" />
-              <span>{language === 'te' ? '+ ఈ నెల పాట నమోదు చేయండి' : '+ Record Chit Auction'}</span>
+              <Award size={14} className="shrink-0" />
+              <span>{language === 'te' ? '+ ఈ నెల చిట్ నమోదు' : '+ Record Chit / Lift'}</span>
             </button>
             <button
               type="button"
@@ -643,7 +643,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                             : 'bg-purple-950/60 text-purple-300 border border-purple-800/40'
                         }`}>
                           {lift.liftType === 'auction' 
-                            ? (language === 'te' ? 'వేలం పాట' : 'Auction Bid') 
+                            ? (language === 'te' ? 'చిట్ తీసుకున్నారు' : 'Chit Lifted') 
                             : (language === 'te' ? 'లక్కీ డ్రా' : 'Lucky Draw')}
                         </span>
                       </td>
@@ -1671,15 +1671,12 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             <div className="mb-4 pb-2 border-b border-gray-800 pr-10">
               <div className="flex items-center gap-2.5">
                 <span className="p-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0">
-                  <Gavel size={22} />
+                  <Award size={22} />
                 </span>
                 <div className="min-w-0">
                   <h3 className="text-sm sm:text-base font-bold text-white m-0 truncate">
-                    {language === 'te' ? 'నెలసరి వేలం పాట / చిట్ ఎత్తిన వివరాలు' : 'Record Monthly Auction / Lift'}
+                    {language === 'te' ? 'నెలసరి చిట్ నమోదు / Record Monthly Chit / Lift' : 'Record Monthly Chit / Lift'}
                   </h3>
-                  <p className="text-xs text-amber-400 m-0 font-semibold truncate">
-                    {currentGroup.id === 'grp-2' || currentGroup.name.includes('Group B') ? (language === 'te' ? 'గ్రూప్ B • ₹2,00,000 పథకం' : 'Group B • ₹2,00,000 Scheme') : (language === 'te' ? 'గ్రూప్ A • ₹2,00,000 పథకం' : 'Group A • ₹2,00,000 Scheme')}
-                  </p>
                 </div>
               </div>
             </div>
@@ -1747,7 +1744,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               <div className="form-field">
                 <label className="field-label text-xs">
                   <Award size={14} />
-                  <span>{language === 'te' ? 'చిట్ తీసుకునే పద్ధతి (Lifting Method)' : 'Lifting Method'}</span>
+                  <span>{language === 'te' ? 'తీసుకున్న పద్ధతి (Lifting Method)' : 'Lifting Method'}</span>
                 </label>
                 <div className="method-segmented-group">
                   <button
@@ -1755,8 +1752,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                     className={`method-segmented-btn ${liftType === 'auction' ? 'active' : ''}`}
                     onClick={() => setLiftType('auction')}
                   >
-                    <Gavel size={15} />
-                    <span>{language === 'te' ? 'వేలం పాట (Auction Bid)' : 'Auction Bid'}</span>
+                    <CheckCircle2 size={15} />
+                    <span>{language === 'te' ? 'చిట్ తీసుకున్నారు (Chit Lifted)' : 'Chit Lifted'}</span>
                   </button>
 
                   <button
@@ -1829,20 +1826,21 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                 />
               </div>
 
-              <div className="flex gap-2 pt-2">
+              <div className="lifting-modal-actions pt-2">
                 <button
                   type="button"
-                  className="btn-seed-data flex-1 text-xs py-2.5 rounded-xl font-semibold"
+                  className="btn-lifting-modal-action"
                   onClick={() => setIsLiftingModalOpen(false)}
                 >
-                  <span>{language === 'te' ? 'రద్దు చేయి' : 'Cancel'}</span>
+                  <X size={16} />
+                  <span>{language === 'te' ? 'రద్దు చేయి (Cancel)' : 'Cancel'}</span>
                 </button>
                 <button
                   type="submit"
-                  className="btn-primary flex-1 luxury-btn text-xs py-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5"
+                  className="btn-lifting-modal-action"
                 >
                   <CheckCircle2 size={16} />
-                  <span>{language === 'te' ? 'పాట నమోదు చేయి' : 'Save & Record Lift'}</span>
+                  <span>{language === 'te' ? 'నమోదు చేయి (Save)' : 'Confirm & Save'}</span>
                 </button>
               </div>
             </form>
