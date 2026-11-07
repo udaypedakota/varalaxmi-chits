@@ -150,7 +150,7 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [members, setMembers] = useState<Member[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.MEMBERS) || localStorage.getItem('sv_chits_members_v5');
     const parsed = saved ? JSON.parse(saved) : DEFAULT_MEMBERS;
-    return (parsed || []).filter((m: Member) => m.role !== 'organizer' && m.phone !== '8790859546' && m.phone !== '8801147452');
+    return (parsed || []).filter((m: Member) => m.role !== 'organizer' && m.phone !== '8790859546');
   });
 
   // 3. Payments State (Clean Slate: Empty for live entry)
@@ -440,7 +440,7 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (memRes.ok) {
             const apiMembers = await memRes.json();
             if (apiMembers && apiMembers.length > 0) {
-              const validMembers = apiMembers.filter((m: Member) => m.role !== 'organizer' && m.phone !== '8790859546' && m.phone !== '8801147452');
+              const validMembers = apiMembers.filter((m: Member) => m.role !== 'organizer' && m.phone !== '8790859546');
               // Retain any newly created local members that Atlas might still be writing
               setMembers(prev => {
                 const apiIds = new Set(validMembers.map((m: Member) => m.id));
@@ -756,7 +756,7 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const cleanPin = pin.trim();
 
     // 1. Organizer Login Check (Siva)
-    if (cleanPhone === '8790859546' || cleanPhone === '8801147452' || cleanPhone === activeGroup.organizerPhone) {
+    if (cleanPhone === '8790859546' || cleanPhone === activeGroup.organizerPhone) {
       if (cleanPin !== '9546' && cleanPin !== '8329') {
         return {
           success: false,

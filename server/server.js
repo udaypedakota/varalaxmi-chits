@@ -316,7 +316,7 @@ async function connectDB() {
         }
       );
       // Purge organizer from members collection if present
-      await MemberModel.deleteMany({ $or: [{ role: 'organizer' }, { phone: '8801147452' }, { phone: '8790859546' }] });
+      await MemberModel.deleteMany({ $or: [{ role: 'organizer' }, { phone: '8790859546' }] });
 
       // User requested fresh start: purge all existing members from Group A & Group B for fresh entry
       const purgeFlag = await AuditLogModel.findOne({ action: 'PURGE_MEMBERS_FOR_FRESH_ENTRY_V7' });
