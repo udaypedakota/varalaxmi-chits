@@ -6,6 +6,7 @@ export const NotificationDropdown: React.FC = () => {
   const { 
     notifications, 
     activeGroupId, 
+    currentUser,
     markNotificationAsRead, 
     markAllNotificationsAsRead, 
     language,
@@ -15,7 +16,16 @@ export const NotificationDropdown: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const groupNotifications = notifications.filter(n => !n.groupId || n.groupId === activeGroupId);
+  const groupNotifications = notifications.filter(n => {
+    if (n.groupId && n.groupId !== activeGroupId) return false;
+    if (currentUser?.role === 'organizer') {
+      return true; // Organizer sees all notifications
+    }
+    const isForMe = (n.targetMemberId && n.targetMemberId === currentUser?.id) || 
+                    (n.memberId && n.memberId === currentUser?.id);
+    const isPublic = n.targetRole === 'all' || n.type === 'lottery' || (!n.targetRole && !n.memberId && !n.targetMemberId);
+    return isForMe || isPublic;
+  });
   const unreadCount = groupNotifications.filter(n => !n.isRead).length;
 
   // Close when clicked outside

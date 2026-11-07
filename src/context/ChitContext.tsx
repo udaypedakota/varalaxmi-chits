@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { ChitGroup, Member, PaymentRecord, LotteryRecord, ChitNotification, ChitLiftingRecord } from '../types/chit';
 import { DEFAULT_GROUPS } from '../data/defaultGroups';
 import { DEFAULT_MEMBERS } from '../data/defaultMembers';
@@ -196,6 +196,11 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   });
 
+  const currentUserRef = useRef<Member | null>(currentUser);
+  useEffect(() => {
+    currentUserRef.current = currentUser;
+  }, [currentUser]);
+
   // Web Push Notification State (Phone Lock-Screen Alerts like Badminton App)
   const [isPushSupported, setIsPushSupported] = useState<boolean>(false);
   const [pushPermission, setPushPermission] = useState<NotificationPermission | 'unsupported'>('default');
@@ -363,6 +368,23 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     bc.onmessage = (event) => {
       if (event.data?.type === 'NOTIFICATION_TOAST' && event.data.notif) {
         const incomingNotif: ChitNotification = event.data.notif;
+
+        // TARGET FILTER: Do not show payment toasts to unrelated members!
+        const user = currentUserRef.current;
+        if (user) {
+          if (user.role === 'organizer') {
+            // Organizer sees all notifications
+          } else {
+            // Member only sees notifications meant for them or public announcements
+            const isForMe = (incomingNotif.targetMemberId && incomingNotif.targetMemberId === user.id) ||
+                            (incomingNotif.memberId && incomingNotif.memberId === user.id);
+            const isPublic = incomingNotif.targetRole === 'all' || incomingNotif.type === 'lottery' || (!incomingNotif.targetRole && !incomingNotif.memberId && !incomingNotif.targetMemberId);
+            if (!isForMe && !isPublic) {
+              return; // Do NOT show toast to other members!
+            }
+          }
+        }
+
         setActiveToast(incomingNotif);
         playChimeAudio();
         if (incomingNotif.id && !incomingNotif.id.startsWith('toast-')) {
@@ -455,7 +477,9 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
               });
               setCurrentUser(prev => {
                 if (!prev || prev.role === 'organizer') return prev;
-                const refreshed = validMembers.find((m: Member) => m.id === prev.id || m.phone === prev.phone);
+                // STRICT CHECK: Always match by ID first! If a member has 2 chits with the same phone, matching by phone flips ticket 2 back to ticket 1 every 2.5s!
+                const refreshed = validMembers.find((m: Member) => m.id === prev.id)
+                  || validMembers.find((m: Member) => (m.phone || '').replace(/\D/g, '') === (prev.phone || '').replace(/\D/g, ''));
                 return refreshed ? { ...prev, ...refreshed } : prev;
               });
             }

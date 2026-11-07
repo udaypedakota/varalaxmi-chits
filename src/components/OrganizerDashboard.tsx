@@ -886,7 +886,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
           <div className="member-cards-list">
             {filteredMembers.map(m => {
               const monthDue = getInstallmentForMember(currentGroup.currentMonth, m, language);
-              const curPay = groupPayments.find(p => p.memberId === m.id && p.month === currentGroup.currentMonth);
+              const curPay = groupPayments.find(p => p.memberId === m.id && p.month === currentGroup.currentMonth && p.status === 'approved')
+                || groupPayments.find(p => p.memberId === m.id && p.month === currentGroup.currentMonth && p.status === 'pending');
               const isPaid = curPay?.status === 'approved';
               const isPending = curPay?.status === 'pending';
               const isPinVisible = Boolean(showMemberPins[m.id]);
@@ -1126,7 +1127,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                 <tbody>
                   {filteredMembers.map(m => {
                     const monthDue = getInstallmentForMember(currentGroup.currentMonth, m, language);
-                    const curPay = groupPayments.find(p => p.memberId === m.id && p.month === currentGroup.currentMonth);
+                    const curPay = groupPayments.find(p => p.memberId === m.id && p.month === currentGroup.currentMonth && p.status === 'approved')
+                      || groupPayments.find(p => p.memberId === m.id && p.month === currentGroup.currentMonth && p.status === 'pending');
                     const isPaid = curPay?.status === 'approved';
                     const isPending = curPay?.status === 'pending';
                     const isPinVisible = Boolean(showMemberPins[m.id]);

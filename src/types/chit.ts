@@ -78,6 +78,8 @@ export interface ChitNotification {
   date: string;
   isRead: boolean;
   memberId?: string;
+  targetMemberId?: string;
+  targetRole?: 'organizer' | 'member' | 'all';
   groupId?: string;
 }
 

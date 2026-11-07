@@ -813,7 +813,8 @@ app.post('/api/groups/:groupId/payments', async (req, res) => {
   if (isMongoConnected) {
     const saved = await PaymentModel.create(newPayment);
     await NotificationModel.create(notif).catch(() => {});
-    sendPushNotification({}, {
+    // Send push notification ONLY to organizer!
+    sendPushNotification({ role: 'organizer' }, {
       title: '💰 కొత్త పేమెంట్ సమర్పించబడింది!',
       body: `${newPayment.memberName} (నెల ${newPayment.month}) ₹${newPayment.amount.toLocaleString('en-IN')} చెల్లించారు. పరిశీలించండి.`
     }).catch(() => {});
@@ -822,7 +823,7 @@ app.post('/api/groups/:groupId/payments', async (req, res) => {
   memoryStore.payments.push(newPayment);
   if (!memoryStore.notifications) memoryStore.notifications = [];
   memoryStore.notifications.unshift(notif);
-  sendPushNotification({}, {
+  sendPushNotification({ role: 'organizer' }, {
     title: '💰 కొత్త పేమెంట్ సమర్పించబడింది!',
     body: `${newPayment.memberName} (నెల ${newPayment.month}) ₹${newPayment.amount.toLocaleString('en-IN')} చెల్లించారు. పరిశీలించండి.`
   }).catch(() => {});
@@ -856,9 +857,9 @@ app.put('/api/payments/:paymentId/approve', async (req, res) => {
         targetMemberId: updated.memberId
       }).catch(() => {});
 
-      sendPushNotification({}, {
+      sendPushNotification({ memberId: updated.memberId }, {
         title: '✅ పేమెంట్ ఆమోదించబడింది!',
-        body: `${updated.memberName} గారి నెల ${updated.month} వాయిదా ₹${updated.amount.toLocaleString('en-IN')} ఆమోదించబడింది! రసీదు: ${updated.receiptNo}.`
+        body: `మీ నెల ${updated.month} వాయిదా ₹${updated.amount.toLocaleString('en-IN')} ఆమోదించబడింది! రసీదు: ${updated.receiptNo}.`
       }).catch(() => {});
     }
     return res.json(updated);
@@ -883,9 +884,9 @@ app.put('/api/payments/:paymentId/approve', async (req, res) => {
       targetMemberId: p.memberId
     });
 
-    sendPushNotification({}, {
+    sendPushNotification({ memberId: p.memberId }, {
       title: '✅ పేమెంట్ ఆమోదించబడింది!',
-      body: `${p.memberName} గారి నెల ${p.month} వాయిదా ₹${p.amount.toLocaleString('en-IN')} ఆమోదించబడింది! రసీదు: ${p.receiptNo}.`
+      body: `మీ నెల ${p.month} వాయిదా ₹${p.amount.toLocaleString('en-IN')} ఆమోదించబడింది! రసీదు: ${p.receiptNo}.`
     }).catch(() => {});
   }
   res.json(p);

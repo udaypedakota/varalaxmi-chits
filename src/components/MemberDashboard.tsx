@@ -86,12 +86,18 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
 
   // Calculate stats for current member
   const currentMonthDue = getInstallmentForMember(currentGroup.currentMonth, currentUser, language);
-  const currentMonthPayment = groupPayments.find(
+  const currentMonthApprovedPayment = groupPayments.find(
+    p => p.memberId === currentUser.id && p.month === currentGroup.currentMonth && p.status === 'approved'
+  );
+  const currentMonthPendingPayment = groupPayments.find(
+    p => p.memberId === currentUser.id && p.month === currentGroup.currentMonth && p.status === 'pending'
+  );
+  const currentMonthPayment = currentMonthApprovedPayment || currentMonthPendingPayment || groupPayments.find(
     p => p.memberId === currentUser.id && p.month === currentGroup.currentMonth
   );
 
-  const isCurrentMonthPaid = currentMonthPayment?.status === 'approved';
-  const isCurrentMonthPending = currentMonthPayment?.status === 'pending';
+  const isCurrentMonthPaid = Boolean(currentMonthApprovedPayment);
+  const isCurrentMonthPending = !isCurrentMonthPaid && Boolean(currentMonthPendingPayment);
 
   // Total paid calculation
   const approvedPayments = groupPayments.filter(
@@ -288,22 +294,33 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
               {getMonthDisplayName(currentGroup.currentMonth, language)}
             </span>
             <h3 className="section-heading">
-              {language === 'te' ? 'ఈ నెల చెల్లించవలసిన సొమ్ము' : 'Current Month Due'}
+              {isCurrentMonthPaid
+                ? (language === 'te' ? 'ఈ నెల వాయిదా పూర్తయింది' : 'Current Month Completed')
+                : (language === 'te' ? 'ఈ నెల చెల్లించవలసిన సొమ్ము' : 'Current Month Due')}
             </h3>
           </div>
-          <div className="due-date-pill">
-            <Calendar size={15} />
-            <span>{language === 'te' ? 'తేదీ 10 లోపు చెల్లించవలెను' : 'Pay Before 10th'}</span>
-          </div>
+          {isCurrentMonthPaid ? (
+            <div className="due-date-pill bg-emerald-500/15 border-emerald-500/30 text-emerald-300">
+              <CheckCircle2 size={15} className="text-emerald-400" />
+              <span>{language === 'te' ? 'చెల్లించబడింది' : 'Paid & Approved'}</span>
+            </div>
+          ) : (
+            <div className="due-date-pill">
+              <Calendar size={15} />
+              <span>{language === 'te' ? 'తేదీ 10 లోపు చెల్లించవలెను' : 'Pay Before 10th'}</span>
+            </div>
+          )}
         </div>
 
         <div className="due-amount-hero">
           <div className="due-figure-col">
-            <div className="due-amount-number">
-              ₹{currentMonthDue.toLocaleString('en-IN')}
+            <div className={`due-amount-number ${isCurrentMonthPaid ? 'text-emerald-400' : ''}`}>
+              ₹{(isCurrentMonthPaid ? (currentMonthPayment?.amount || currentMonthDue) : currentMonthDue).toLocaleString('en-IN')}
             </div>
             <span className="due-label">
-              {currentUser.hasLiftedChit && currentUser.liftedMonth !== undefined && currentGroup.currentMonth > currentUser.liftedMonth
+              {isCurrentMonthPaid
+                ? (language === 'te' ? `నెల ${currentGroup.currentMonth} వాయిదా విజయవంతంగా చెల్లించబడింది` : `Month ${currentGroup.currentMonth} Installment Successfully Paid`)
+                : currentUser.hasLiftedChit && currentUser.liftedMonth !== undefined && currentGroup.currentMonth > currentUser.liftedMonth
                 ? (language === 'te' ? 'స్థిర వాయిదా (Fixed Rate)' : 'Fixed Installment Rate')
                 : (language === 'te' ? 'ఈ నెల వాయిదా మొత్తం' : 'Monthly Due Installment')}
             </span>
@@ -328,6 +345,38 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
             )}
           </div>
         </div>
+
+        {/* Paid State: Show Official Receipt and Next Month notice */}
+        {isCurrentMonthPaid && currentMonthPayment && (
+          <div className="mt-4 pt-3 border-t border-gray-800 animate-fade">
+            <div className="paid-receipt-action">
+              <button 
+                type="button" 
+                className="btn-view-receipt w-full py-3"
+                onClick={() => onOpenReceipt(currentMonthPayment)}
+              >
+                <Receipt size={18} />
+                <span>{language === 'te' ? `నెల ${currentGroup.currentMonth} అధికారిక రసీదును చూడండి` : `View Month ${currentGroup.currentMonth} Official Receipt`}</span>
+              </button>
+            </div>
+
+            {currentGroup.currentMonth < currentGroup.totalMonths && (
+              <div className="next-installment-banner mt-3 p-3 rounded-xl bg-gray-950/70 border border-amber-500/20 flex items-center justify-between flex-wrap gap-2 text-xs">
+                <div className="flex items-center gap-2">
+                  <Calendar size={15} className="text-amber-400" />
+                  <span className="text-gray-300">
+                    {language === 'te'
+                      ? <>రాబోయే వాయిదా: <strong className="text-amber-300">నెల #{currentGroup.currentMonth + 1} ({MONTH_CALENDAR_NAMES[currentGroup.currentMonth + 1]?.te || ''})</strong></>
+                      : <>Next Upcoming: <strong className="text-amber-300">Month #{currentGroup.currentMonth + 1} ({MONTH_CALENDAR_NAMES[currentGroup.currentMonth + 1]?.en || ''})</strong></>}
+                  </span>
+                </div>
+                <span className="text-gray-400 text-[11px]">
+                  {language === 'te' ? 'గడువు తేదీ: 10వ తేదీ లోపు' : 'Pay before 10th'}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* If Pending Approval: Show Clear Pending State card (Prevents duplicate submissions!) */}
         {isCurrentMonthPending && (
@@ -469,18 +518,6 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
         )}
 
         {/* View Receipt button if paid */}
-        {isCurrentMonthPaid && currentMonthPayment && (
-          <div className="paid-receipt-action">
-            <button 
-              type="button" 
-              className="btn-view-receipt"
-              onClick={() => onOpenReceipt(currentMonthPayment)}
-            >
-              <Receipt size={18} />
-              <span>{language === 'te' ? `నెల ${scheme.currentMonth} అధికారిక రసీదును చూడండి` : `View Month ${scheme.currentMonth} Official Receipt`}</span>
-            </button>
-          </div>
-        )}
       </section>
 
       {/* 3. MASTER 20-MONTH SCHEDULE (Official 4-Column Schedule) */}
