@@ -259,10 +259,10 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
   const eligibleMembersCount = groupMembers.filter(m => !m.hasLiftedChit).length;
 
   // Commission Calculations (Section 8)
+  // Commission is earned strictly from actual completed monthly auctions (₹10,000 per completed auction/lifting)
   const monthlyCommissionAmount = (currentGroup.totalValue * (currentGroup.commissionPercent || 5)) / 100;
-  const totalCommissionEarned = monthlyCommissionAmount * currentGroup.currentMonth;
-  const commissionReceivedSoFar = monthlyCommissionAmount * Math.max(0, currentGroup.currentMonth - 1);
-  const commissionPendingThisMonth = monthlyCommissionAmount;
+  const totalCommissionEarned = groupLiftings.reduce((sum, l) => sum + (l.organizerCommission || 0), 0);
+  const completedAuctionsCount = groupLiftings.length;
 
   // Filtered members
   const filteredMembers = groupMembers.filter(m => {
@@ -370,8 +370,12 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             </div>
             <span className="metric-sub">
               {language === 'te' 
-                ? `${currentGroup.commissionPercent}% శాతం (నెలవారీ ₹${monthlyCommissionAmount.toLocaleString('en-IN')})` 
-                : `${currentGroup.commissionPercent}% rate (₹${monthlyCommissionAmount.toLocaleString('en-IN')}/mo)`}
+                ? (completedAuctionsCount === 0 
+                    ? `0 పాటలు పూర్తయ్యాయి (వేలం పాటకు ₹${monthlyCommissionAmount.toLocaleString('en-IN')})` 
+                    : `${completedAuctionsCount} / ${currentGroup.totalMonths} పాటలు పూర్తయ్యాయి (${currentGroup.commissionPercent || 5}% కమిషన్)`)
+                : (completedAuctionsCount === 0 
+                    ? `0 of ${currentGroup.totalMonths} Auctions Done (₹${monthlyCommissionAmount.toLocaleString('en-IN')}/auction)` 
+                    : `${completedAuctionsCount} of ${currentGroup.totalMonths} Auctions Done (${currentGroup.commissionPercent || 5}% rate)`)}
             </span>
           </div>
         </div>

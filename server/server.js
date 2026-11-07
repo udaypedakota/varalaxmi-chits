@@ -284,7 +284,8 @@ async function connectDB() {
           totalValue: 200000, 
           totalMonths: 20, 
           totalMembers: 20, 
-          monthlyInstallment: 10000 
+          monthlyInstallment: 10000,
+          currentMonth: 1 
         } 
       }
     );
@@ -299,6 +300,7 @@ async function connectDB() {
       await PaymentModel.deleteMany({});
       await LotteryModel.deleteMany({});
       await LiftingModel.deleteMany({});
+      await GroupModel.updateMany({}, { $set: { currentMonth: 1 } });
       await AuditLogModel.create({
         id: 'audit-purge-fresh-start-v7',
         timestamp: new Date().toISOString(),
@@ -644,6 +646,7 @@ app.delete('/api/members', async (req, res) => {
         await PaymentModel.deleteMany({});
         await LotteryModel.deleteMany({});
         await LiftingModel.deleteMany({});
+      await GroupModel.updateMany({}, { $set: { currentMonth: 1 } });
       }
       return res.json({ success: true, deletedCount: result.deletedCount });
     }
