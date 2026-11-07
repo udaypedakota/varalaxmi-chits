@@ -569,8 +569,9 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               </span>
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="section-title m-0 text-base font-bold text-white">
-                    {language === 'te' ? 'ప్రధాన 20 నెలల పట్టిక (Master Schedule)' : 'Master 20-Month Schedule'}
+                  <h3 className="section-title m-0 text-base font-bold text-white flex items-center gap-1.5">
+                    <span>{language === 'te' ? 'ప్రధాన 20 నెలల పట్టిక (Master Schedule)' : 'Master 20-Month Schedule'}</span>
+                    {isScheduleExpanded ? <ChevronUp size={16} className="text-amber-400" /> : <ChevronDown size={16} className="text-gray-400" />}
                   </h3>
                   <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30 whitespace-nowrap">
                     {groupLiftings.length} / {currentGroup.totalMonths} {language === 'te' ? 'నెలలు లిఫ్ట్ అయ్యాయి' : 'Lifted'}
@@ -607,15 +608,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               <Dices size={14} className="shrink-0" />
               <span>{language === 'te' ? '🎲 లక్కీ డ్రా నిర్వహించండి' : '🎲 Run Lucky Draw'}</span>
             </button>
-            <button
-              type="button"
-              className={`btn-accordion-toggle ${isScheduleExpanded ? 'expanded' : ''}`}
-              onClick={() => setIsScheduleExpanded(!isScheduleExpanded)}
-              title={isScheduleExpanded ? (language === 'te' ? 'టేబుల్ మడవండి' : 'Hide Table') : (language === 'te' ? 'పూర్తి టేబుల్ చూడండి' : 'View Table')}
-            >
-              <span>{isScheduleExpanded ? (language === 'te' ? 'మడవండి' : 'Hide') : (language === 'te' ? 'టేబుల్ చూడండి' : 'View Table')}</span>
-              {isScheduleExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
-            </button>
           </div>
         </div>
 
@@ -645,10 +637,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                 <strong className="text-emerald-400">₹{MASTER_SCHEDULE[0].takenAmount.toLocaleString('en-IN')}</strong>
               </span>
             </div>
-            <span className="text-xs text-amber-400 font-semibold flex items-center gap-1">
-              <span>{language === 'te' ? '20 నెలల పూర్తి పట్టిక చూడండి' : 'View 20-Month Table'}</span>
-              <ChevronDown size={14} />
-            </span>
+            <ChevronDown size={16} className="text-amber-400" />
           </div>
         )}
 
@@ -740,8 +729,9 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               </span>
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="section-title m-0 text-base font-bold text-white">
-                    {language === 'te' ? `${currentGroup.nameTe} - సభ్యుల పూర్తి డైరెక్టరీ` : `${currentGroup.name} - Member Directory`}
+                  <h3 className="section-title m-0 text-base font-bold text-white flex items-center gap-1.5">
+                    <span>{language === 'te' ? `${currentGroup.nameTe} - సభ్యుల పూర్తి డైరెక్టరీ` : `${currentGroup.name} - Member Directory`}</span>
+                    {isMembersExpanded ? <ChevronUp size={16} className="text-blue-400" /> : <ChevronDown size={16} className="text-gray-400" />}
                   </h3>
                   <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-semibold border border-blue-500/30 whitespace-nowrap">
                     {groupMembers.length} {language === 'te' ? 'సభ్యులు' : 'Members'}
@@ -756,7 +746,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             </div>
           </div>
 
-          {/* Quick Header Actions: + Add Member & Accordion Toggle */}
+          {/* Quick Header Actions: + Add Member */}
           <div className="flex items-center gap-2 flex-wrap">
             <button
               type="button"
@@ -766,16 +756,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             >
               <UserPlus size={15} />
               <span>{language === 'te' ? '+ సభ్యుని చేర్చండి' : '+ Add Member'}</span>
-            </button>
-
-            <button
-              type="button"
-              className={`btn-accordion-toggle ${isMembersExpanded ? 'expanded' : ''}`}
-              onClick={() => setIsMembersExpanded(!isMembersExpanded)}
-              title={isMembersExpanded ? (language === 'te' ? 'మడవండి' : 'Hide Members') : (language === 'te' ? 'సభ్యులను చూడండి' : 'View Members')}
-            >
-              <span>{isMembersExpanded ? (language === 'te' ? 'మడవండి' : 'Hide') : (language === 'te' ? 'సభ్యులను చూడండి' : 'View Members')}</span>
-              {isMembersExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
             </button>
           </div>
         </div>
@@ -804,10 +784,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                 {language === 'te' ? `చిట్ ఎత్తినవారు: ${liftedMembersCount} మంది` : `Chit Lifted: ${liftedMembersCount}`}
               </span>
             </div>
-            <span className="text-xs text-blue-400 font-semibold flex items-center gap-1">
-              <span>{language === 'te' ? 'సభ్యుల డైరెక్టరీ తెరవండి' : 'Open Member Directory'}</span>
-              <ChevronDown size={14} />
-            </span>
+            <ChevronDown size={16} className="text-blue-400" />
           </div>
         )}
 
