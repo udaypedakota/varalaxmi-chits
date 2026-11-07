@@ -532,10 +532,10 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="auction-header-actions">
             <button
               type="button"
-              className="btn-primary py-2 px-3 text-xs flex items-center gap-1.5"
+              className="btn-auction-action"
               onClick={() => {
                 setLiftMonth(currentGroup.currentMonth);
                 setLiftMemberId('');
@@ -543,15 +543,15 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                 setIsLiftingModalOpen(true);
               }}
             >
-              <Gavel size={14} />
+              <Gavel size={14} className="shrink-0" />
               <span>{language === 'te' ? '+ ఈ నెల పాట నమోదు చేయండి' : '+ Record Chit Auction'}</span>
             </button>
             <button
               type="button"
-              className="btn-seed-data py-2 px-3 text-xs flex items-center gap-1.5"
+              className="btn-auction-action"
               onClick={onOpenLottery}
             >
-              <Dices size={14} className="text-yellow-400" />
+              <Dices size={14} className="shrink-0" />
               <span>{language === 'te' ? '🎲 లక్కీ డ్రా నిర్వహించండి' : '🎲 Run Lucky Draw'}</span>
             </button>
           </div>
