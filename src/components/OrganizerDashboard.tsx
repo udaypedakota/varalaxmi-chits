@@ -36,6 +36,7 @@ import {
   MessageSquare,
   MessageCircle,
   ChevronDown,
+  ChevronUp,
   LayoutGrid,
   Table as TableIcon
 } from 'lucide-react';
@@ -87,6 +88,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
   const [newMemberPhone, setNewMemberPhone] = useState('');
   const [newMemberPin, setNewMemberPin] = useState('1234');
   const [selectedEnrollGroupId, setSelectedEnrollGroupId] = useState(currentGroup.id);
+  const [isScheduleExpanded, setIsScheduleExpanded] = useState(false);
+  const [isMembersExpanded, setIsMembersExpanded] = useState(true);
   const [showMemberPins, setShowMemberPins] = useState<{ [id: string]: boolean }>({});
   const [memberViewMode, setMemberViewMode] = useState<'cards' | 'table'>('cards');
   const [expandedMemberId, setExpandedMemberId] = useState<string | null>(null);
@@ -555,7 +558,11 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
       {/* 3.5 MASTER 20-MONTH SCHEDULE (Official Schedule with Option A Winner Tracking) */}
       <section className="schedule-section luxury-card mb-6">
         <div className="section-header-row flex justify-between items-center flex-wrap gap-3 pb-3 border-b border-gray-800">
-          <div>
+          <div
+            className="cursor-pointer select-none flex-1 min-w-[240px]"
+            onClick={() => setIsScheduleExpanded(!isScheduleExpanded)}
+            title={isScheduleExpanded ? (language === 'te' ? 'టేబుల్ మడవడానికి క్లిక్ చేయండి' : 'Click to collapse table') : (language === 'te' ? 'టేబుల్ తెరవడానికి క్లిక్ చేయండి' : 'Click to expand table')}
+          >
             <div className="flex items-center gap-2">
               <span className="p-2 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
                 <Calendar size={20} />
@@ -578,7 +585,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             </div>
           </div>
 
-          <div className="auction-header-actions">
+          <div className="auction-header-actions flex items-center gap-2 flex-wrap">
             <button
               type="button"
               className="btn-auction-action"
@@ -600,11 +607,54 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               <Dices size={14} className="shrink-0" />
               <span>{language === 'te' ? '🎲 లక్కీ డ్రా నిర్వహించండి' : '🎲 Run Lucky Draw'}</span>
             </button>
+            <button
+              type="button"
+              className={`btn-accordion-toggle ${isScheduleExpanded ? 'expanded' : ''}`}
+              onClick={() => setIsScheduleExpanded(!isScheduleExpanded)}
+              title={isScheduleExpanded ? (language === 'te' ? 'టేబుల్ మడవండి' : 'Hide Table') : (language === 'te' ? 'పూర్తి టేబుల్ చూడండి' : 'View Table')}
+            >
+              <span>{isScheduleExpanded ? (language === 'te' ? 'మడవండి' : 'Hide') : (language === 'te' ? 'టేబుల్ చూడండి' : 'View Table')}</span>
+              {isScheduleExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+            </button>
           </div>
         </div>
 
+        {/* Collapsed Compact Preview Bar */}
+        {!isScheduleExpanded && (
+          <div
+            className="collapsed-preview-strip"
+            onClick={() => setIsScheduleExpanded(true)}
+            role="button"
+            tabIndex={0}
+            title={language === 'te' ? '20 నెలల పూర్తి పట్టిక తెరవడానికి క్లిక్ చేయండి' : 'Click to open 20-Month Table'}
+          >
+            <div className="flex items-center gap-3 text-xs flex-wrap">
+              <span className="font-semibold text-amber-400">
+                {language === 'te' ? `ప్రస్తుతం: నెల #${currentGroup.currentMonth}` : `Current: Month #${currentGroup.currentMonth}`}
+              </span>
+              <span className="text-gray-500">|</span>
+              <span className="text-gray-300">
+                {language === 'te' ? 'తీసుకోని వారి వాయిదా: ' : 'Chit Not Taken: '}
+                <strong className="text-amber-300">
+                  ₹{getScheduleNotTakenAmount(MASTER_SCHEDULE.find(m => m.month === currentGroup.currentMonth) || MASTER_SCHEDULE[0], language).toLocaleString('en-IN')}
+                </strong>
+              </span>
+              <span className="text-gray-500">|</span>
+              <span className="text-gray-300">
+                {language === 'te' ? 'తీసుకున్న వారి వాయిదా: ' : 'Chit Taken Rate: '}
+                <strong className="text-emerald-400">₹{MASTER_SCHEDULE[0].takenAmount.toLocaleString('en-IN')}</strong>
+              </span>
+            </div>
+            <span className="text-xs text-amber-400 font-semibold flex items-center gap-1">
+              <span>{language === 'te' ? '20 నెలల పూర్తి పట్టిక చూడండి' : 'View 20-Month Table'}</span>
+              <ChevronDown size={14} />
+            </span>
+          </div>
+        )}
+
         {/* 4-COLUMN MASTER TABLE WITH OPTION A WINNER BADGES */}
-        <div className="table-responsive-container mt-3">
+        {isScheduleExpanded && (
+          <div className="table-responsive-container mt-3 animate-fade">
           <table className="master-table">
             <thead>
               <tr>
@@ -673,68 +723,133 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             </tbody>
           </table>
         </div>
+        )}
       </section>
 
       {/* 4. MEMBER LEDGER & TOTAL PAID TABLE */}
-      <section className="member-ledger-section">
-        <div className="ledger-header-row">
-          <div>
-            <h3 className="section-title">
-              {language === 'te' ? `${currentGroup.nameTe} - సభ్యుల పూర్తి డైరెక్టరీ` : `${currentGroup.name} - Member Directory`}
-            </h3>
-            <p className="section-subtitle">
-              {language === 'te'
-                ? 'సభ్యుల చెల్లింపు వివరాలు, ఇప్పటివరకు చెల్లించిన మొత్తం మరియు లక్కీ డ్రా అర్హత'
-                : 'Live tracking of each member total paid and chit status'}
-            </p>
+      <section className="member-ledger-section luxury-card">
+        <div className="ledger-header-row flex justify-between items-start flex-wrap gap-3 pb-3 border-b border-gray-800">
+          <div
+            className="cursor-pointer select-none flex-1 min-w-[240px]"
+            onClick={() => setIsMembersExpanded(!isMembersExpanded)}
+            title={isMembersExpanded ? (language === 'te' ? 'సభ్యుల లిస్ట్ మడవడానికి క్లిక్ చేయండి' : 'Click to collapse members') : (language === 'te' ? 'సభ్యుల లిస్ట్ తెరవడానికి క్లిక్ చేయండి' : 'Click to view members')}
+          >
+            <div className="flex items-center gap-2">
+              <span className="p-2 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                <Users size={20} />
+              </span>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="section-title m-0 text-base font-bold text-white">
+                    {language === 'te' ? `${currentGroup.nameTe} - సభ్యుల పూర్తి డైరెక్టరీ` : `${currentGroup.name} - Member Directory`}
+                  </h3>
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-semibold border border-blue-500/30 whitespace-nowrap">
+                    {groupMembers.length} {language === 'te' ? 'సభ్యులు' : 'Members'}
+                  </span>
+                </div>
+                <p className="section-subtitle m-0 text-xs text-gray-400 mt-0.5">
+                  {language === 'te'
+                    ? 'సభ్యుల చెల్లింపు వివరాలు, ఇప్పటివరకు చెల్లించిన మొత్తం మరియు లక్కీ డ్రా అర్హత'
+                    : 'Live tracking of each member total paid and chit status'}
+                </p>
+              </div>
+            </div>
           </div>
 
-          {/* Search & Filter */}
-          <div className="ledger-controls">
-            <div className="search-input-wrap">
-              <Search size={16} />
-              <input
-                type="text"
-                placeholder={language === 'te' ? 'పేరు లేదా ఫోన్ నంబర్...' : 'Search name or phone...'}
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className="search-input"
-              />
-            </div>
-            <div className="filter-pill-group">
-              <button
-                type="button"
-                className={`filter-pill ${filterStatus === 'all' ? 'active' : ''}`}
-                onClick={() => setFilterStatus('all')}
-              >
-                {language === 'te' ? `అందరూ (${groupMembers.length})` : `All (${groupMembers.length})`}
-              </button>
-              <button
-                type="button"
-                className={`filter-pill ${filterStatus === 'eligible' ? 'active' : ''}`}
-                onClick={() => setFilterStatus('eligible')}
-              >
-                {language === 'te' ? `లక్కీ డ్రాకు అర్హులు (${eligibleMembersCount})` : `Draw Eligible (${eligibleMembersCount})`}
-              </button>
-              <button
-                type="button"
-                className={`filter-pill ${filterStatus === 'lifted' ? 'active' : ''}`}
-                onClick={() => setFilterStatus('lifted')}
-              >
-                {language === 'te' ? `చిట్ ఎత్తినవారు (${liftedMembersCount})` : `Chit Lifted (${liftedMembersCount})`}
-              </button>
-            </div>
+          {/* Quick Header Actions: + Add Member & Accordion Toggle */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              type="button"
+              className="btn-add-member-pill"
+              onClick={() => { setSelectedEnrollGroupId(currentGroup.id); setIsAddMemberOpen(true); setAddMemberError(''); setEnrolledSuccessMember(null); }}
+              title={language === 'te' ? 'కొత్త సభ్యుని చేర్చండి' : 'Add New Member'}
+            >
+              <UserPlus size={15} />
+              <span>{language === 'te' ? '+ సభ్యుని చేర్చండి' : '+ Add Member'}</span>
+            </button>
 
             <button
               type="button"
-              className="btn-seed-data py-2 px-3 text-xs flex items-center gap-1.5 ml-auto"
-              onClick={() => { setSelectedEnrollGroupId(currentGroup.id); setIsAddMemberOpen(true); setAddMemberError(''); setEnrolledSuccessMember(null); }}
+              className={`btn-accordion-toggle ${isMembersExpanded ? 'expanded' : ''}`}
+              onClick={() => setIsMembersExpanded(!isMembersExpanded)}
+              title={isMembersExpanded ? (language === 'te' ? 'మడవండి' : 'Hide Members') : (language === 'te' ? 'సభ్యులను చూడండి' : 'View Members')}
             >
-              <UserPlus size={14} className="text-amber-400" />
-              <span>{language === 'te' ? '+ సభ్యుని చేర్చండి' : '+ Add Member'}</span>
+              <span>{isMembersExpanded ? (language === 'te' ? 'మడవండి' : 'Hide') : (language === 'te' ? 'సభ్యులను చూడండి' : 'View Members')}</span>
+              {isMembersExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
             </button>
           </div>
         </div>
+
+        {/* Collapsed Compact Preview Bar */}
+        {!isMembersExpanded && (
+          <div
+            className="collapsed-preview-strip"
+            onClick={() => setIsMembersExpanded(true)}
+            role="button"
+            tabIndex={0}
+            title={language === 'te' ? 'సభ్యుల పూర్తి వివరాలు తెరవడానికి క్లిక్ చేయండి' : 'Click to view member details'}
+          >
+            <div className="flex items-center gap-3 text-xs flex-wrap">
+              <span className="text-gray-300">
+                {language === 'te'
+                  ? <>నమోదైన సభ్యులు: <strong className="text-blue-400">{groupMembers.length} మంది</strong></>
+                  : <>Enrolled Members: <strong className="text-blue-400">{groupMembers.length}</strong></>}
+              </span>
+              <span className="text-gray-500">•</span>
+              <span className="text-emerald-400 font-semibold">
+                {language === 'te' ? `డ్రాకు అర్హులు: ${eligibleMembersCount} మంది` : `Draw Eligible: ${eligibleMembersCount}`}
+              </span>
+              <span className="text-gray-500">•</span>
+              <span className="text-amber-400 font-semibold">
+                {language === 'te' ? `చిట్ ఎత్తినవారు: ${liftedMembersCount} మంది` : `Chit Lifted: ${liftedMembersCount}`}
+              </span>
+            </div>
+            <span className="text-xs text-blue-400 font-semibold flex items-center gap-1">
+              <span>{language === 'te' ? 'సభ్యుల డైరెక్టరీ తెరవండి' : 'Open Member Directory'}</span>
+              <ChevronDown size={14} />
+            </span>
+          </div>
+        )}
+
+        {/* Expanded Content: Search, Filter, Toolbar & Member List */}
+        {isMembersExpanded && (
+          <div className="member-directory-body mt-3 animate-fade">
+            {/* Search & Filter */}
+            <div className="ledger-controls mb-3">
+              <div className="search-input-wrap">
+                <Search size={16} />
+                <input
+                  type="text"
+                  placeholder={language === 'te' ? 'పేరు లేదా ఫోన్ నంబర్...' : 'Search name or phone...'}
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  className="search-input"
+                />
+              </div>
+              <div className="filter-pill-group">
+                <button
+                  type="button"
+                  className={`filter-pill ${filterStatus === 'all' ? 'active' : ''}`}
+                  onClick={() => setFilterStatus('all')}
+                >
+                  {language === 'te' ? `అందరూ (${groupMembers.length})` : `All (${groupMembers.length})`}
+                </button>
+                <button
+                  type="button"
+                  className={`filter-pill ${filterStatus === 'eligible' ? 'active' : ''}`}
+                  onClick={() => setFilterStatus('eligible')}
+                >
+                  {language === 'te' ? `లక్కీ డ్రాకు అర్హులు (${eligibleMembersCount})` : `Draw Eligible (${eligibleMembersCount})`}
+                </button>
+                <button
+                  type="button"
+                  className={`filter-pill ${filterStatus === 'lifted' ? 'active' : ''}`}
+                  onClick={() => setFilterStatus('lifted')}
+                >
+                  {language === 'te' ? `చిట్ ఎత్తినవారు (${liftedMembersCount})` : `Chit Lifted (${liftedMembersCount})`}
+                </button>
+              </div>
+            </div>
 
         {/* Directory Toolbar: Count on Left, View Mode Switcher on Right */}
         {filteredMembers.length > 0 && (
@@ -1175,6 +1290,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               </table>
             </div>
           </>
+        )}
+          </div>
         )}
       </section>
 
