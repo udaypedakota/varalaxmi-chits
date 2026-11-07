@@ -34,6 +34,7 @@ import {
   EyeOff,
   Layers,
   MessageSquare,
+  MessageCircle,
   ChevronDown,
   LayoutGrid,
   Table as TableIcon
@@ -77,6 +78,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
   const [filterStatus, setFilterStatus] = useState<'all' | 'lifted' | 'eligible'>('all');
   const [previewProofUrl, setPreviewProofUrl] = useState<string | null>(null);
   const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
+  const [isBroadcastCopied, setIsBroadcastCopied] = useState(false);
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
   const [newMemberName, setNewMemberName] = useState('');
   const [newMemberPhone, setNewMemberPhone] = useState('');
@@ -385,18 +387,19 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
           </div>
         </div>
 
-        {/* Quick Action Tools Bar */}
+        {/* Quick Action Tools Bar (Compact & Responsive on Mobile) */}
         <div className="org-tools-bar">
           <button 
             type="button" 
             className="btn-tool-lottery"
             onClick={onOpenLottery}
+            title={language === 'te' ? 'లక్కీ డ్రా నిర్వహించండి' : 'Launch Lucky Draw'}
           >
-            <Dices size={20} />
+            <Dices size={15} className="shrink-0" />
             <span>
               {language === 'te' 
-                ? `🎰 నెల ${currentGroup.currentMonth} లక్కీ డ్రా నిర్వహించండి` 
-                : `🎰 Launch Month ${currentGroup.currentMonth} Lucky Draw`}
+                ? `🎰 లక్కీ డ్రా (నెల ${currentGroup.currentMonth})` 
+                : `🎰 Lucky Draw (M${currentGroup.currentMonth})`}
             </span>
           </button>
 
@@ -404,9 +407,10 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             type="button" 
             className="btn-tool-whatsapp"
             onClick={() => setIsBroadcastModalOpen(true)}
+            title={language === 'te' ? 'గ్రూప్ సభ్యులందరికీ వాట్సాప్ సందేశం' : 'WhatsApp Group Broadcast Notice'}
           >
-            <Send size={18} />
-            <span>{language === 'te' ? 'WhatsApp గ్రూప్ బ్రాడ్‌కాస్ట్' : 'WhatsApp Broadcast'}</span>
+            <MessageCircle size={15} className="text-emerald-400 shrink-0" />
+            <span>{language === 'te' ? 'WhatsApp బ్రాడ్‌కాస్ట్' : 'WhatsApp Broadcast'}</span>
           </button>
         </div>
       </section>
@@ -1175,60 +1179,111 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
         </div>
       )}
 
-      {/* 6. MODAL: WHATSAPP GROUP BROADCAST TEMPLATES (Section 10) */}
-      {isBroadcastModalOpen && (
-        <div className="modal-backdrop animate-fade" onClick={() => setIsBroadcastModalOpen(false)}>
-          <div className="login-modal-card luxury-card max-w-lg" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center mb-3">
-              <div className="flex items-center gap-2">
-                <Send size={18} className="text-emerald-400" />
-                <h3 className="text-white font-bold text-base">
-                  {language === 'te' ? 'WhatsApp గ్రూప్ బ్రాడ్‌కాస్ట్ సందేశాలు' : 'WhatsApp Group Broadcast Templates'}
-                </h3>
-              </div>
-              <button type="button" className="btn-modal-close static" onClick={() => setIsBroadcastModalOpen(false)}>
-                <X size={18} />
-              </button>
-            </div>
+      {/* 6. MODAL: WHATSAPP GROUP BROADCAST NOTICE (User Specified Format) */}
+      {isBroadcastModalOpen && (() => {
+        const activeMonthLifting = groupLiftings.find(l => l.month === currentGroup.currentMonth);
+        const activeMonthSchedule = MASTER_SCHEDULE.find(s => s.month === currentGroup.currentMonth);
+        const defaultInstallmentAmount = activeMonthSchedule 
+          ? (language === 'te' ? activeMonthSchedule.notTakenAmountTe || activeMonthSchedule.notTakenAmount : activeMonthSchedule.notTakenAmount)
+          : 10000;
 
-            <div className="broadcast-templates-list">
-              <div className="broadcast-template-card">
-                <strong className="text-sm text-yellow-300">📢 1. నెలవారీ వాయిదా రిమైండర్ (Monthly Due Notice)</strong>
-                <p className="text-xs text-gray-300 my-2 font-mono p-2 bg-slate-900 rounded">
-                  {`📢 *${currentGroup.nameTe} - నెల ${currentGroup.currentMonth} వాయిదా నోటీస్*\nనెల ${currentGroup.currentMonth} వాయిదా సొమ్ము తేదీ ${currentGroup.paymentDueDay} లోపు చెల్లించవలసిందిగా కోరుతున్నాము.\nUPI: ${currentGroup.organizerUpiId} (${currentGroup.organizerName})`}
-                </p>
-                <button
-                  type="button"
-                  className="btn-primary py-1 px-3 text-xs"
-                  onClick={() => {
-                    const text = encodeURIComponent(`📢 *${currentGroup.nameTe} - నెల ${currentGroup.currentMonth} వాయిదా నోటీస్*\nనెల ${currentGroup.currentMonth} వాయిదా సొమ్ము తేదీ ${currentGroup.paymentDueDay} లోపు చెల్లించవలసిందిగా కోరుతున్నాము.\nUPI: ${currentGroup.organizerUpiId} (${currentGroup.organizerName})`);
-                    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
-                  }}
-                >
-                  WhatsApp లో పంపండి (Share)
+        const broadcastWinner = activeMonthLifting
+          ? (activeMonthLifting.memberNameTe ? `${activeMonthLifting.memberNameTe} (${activeMonthLifting.memberName})` : activeMonthLifting.memberName)
+          : (language === 'te' ? 'ఇంకా పాట జరగలేదు (Pending Auction)' : 'Auction Pending');
+
+        const broadcastLoss = activeMonthLifting && activeMonthLifting.liftType === 'auction'
+          ? `₹${activeMonthLifting.bidDiscount.toLocaleString('en-IN')}`
+          : (activeMonthLifting?.liftType === 'lottery' ? '₹0 (లక్కీ డ్రా)' : '-');
+
+        const divAmount = activeMonthLifting?.dividendPerMember || 0;
+        const broadcastBonus = divAmount > 0 ? `₹${divAmount.toLocaleString('en-IN')}` : '-';
+        const broadcastAmountToPay = divAmount > 0
+          ? `₹${Math.max(0, currentGroup.monthlyInstallment - divAmount).toLocaleString('en-IN')}`
+          : `₹${defaultInstallmentAmount.toLocaleString('en-IN')}`;
+
+        const monthNameText = getMonthDisplayName(currentGroup.currentMonth, language);
+
+        const officialBroadcastText = 
+`📢 *${language === 'te' ? currentGroup.nameTe : currentGroup.name}*
+నెల ${currentGroup.currentMonth} వేలం పాట వివరాలు & వాయిదా నోటీస్
+━━━━━━━━━━━━━━━━━━━━━
+• Chit Scheme : ₹${currentGroup.totalValue.toLocaleString('en-IN')} (${currentGroup.totalMonths} Months)
+• Month       : నెల ${currentGroup.currentMonth} (${monthNameText})
+• చిట్టీ విజేత : ${broadcastWinner}
+• Loss (పాట తగ్గింపు)  : ${broadcastLoss}
+• Bonus (సభ్యుల లాభం) : ${broadcastBonus}
+• Amount to Pay (వాయిదా): ${broadcastAmountToPay}
+━━━━━━━━━━━━━━━━━━━━━
+⚠️ *Plz arrange amount with in 3 days.*
+(దయచేసి 3 రోజులలోపు ఈ నెల వాయిదా సొమ్ము పంపవలసిందిగా కోరుతున్నాము.)
+
+📱 PhonePe / GPay : ${currentGroup.organizerPhone}
+👤 Name           : Siva (${currentGroup.organizerName})
+💳 UPI ID         : ${currentGroup.organizerUpiId}
+━━━━━━━━━━━━━━━━━━━━━
+ధన్యవాదాలు! - శ్రీ వరలక్ష్మి చిట్స్`;
+
+        return (
+          <div className="modal-backdrop animate-fade" onClick={() => setIsBroadcastModalOpen(false)}>
+            <div className="login-modal-card luxury-card max-w-lg" onClick={e => e.stopPropagation()}>
+              <div className="flex justify-between items-center mb-3">
+                <div className="flex items-center gap-2">
+                  <MessageCircle size={20} className="text-emerald-400" />
+                  <h3 className="text-white font-bold text-base">
+                    {language === 'te' ? 'WhatsApp గ్రూప్ బ్రాడ్‌కాస్ట్ నోటీస్' : 'WhatsApp Group Broadcast Notice'}
+                  </h3>
+                </div>
+                <button type="button" className="btn-modal-close static" onClick={() => setIsBroadcastModalOpen(false)}>
+                  <X size={18} />
                 </button>
               </div>
 
-              <div className="broadcast-template-card mt-3">
-                <strong className="text-sm text-yellow-300">🏆 2. లక్కీ డ్రా ఫలితాల ప్రకటన (Lottery Result)</strong>
-                <p className="text-xs text-gray-300 my-2 font-mono p-2 bg-slate-900 rounded">
-                  {`🏆 *${currentGroup.nameTe} - లక్కీ డ్రా ఫలితాలు*\nనెల ${currentGroup.currentMonth} డిజిటల్ లక్కీ డ్రా విజయవంతంగా నిర్వహించబడింది.\nవిజేత ₹${currentGroup.totalValue.toLocaleString('en-IN')} చిట్ పొందారు.\nనిర్వాహకుడు: ${currentGroup.organizerName}`}
-                </p>
+              <p className="text-xs text-amber-300 mb-2.5">
+                {language === 'te' 
+                  ? 'ఈ క్రింది సందేశాన్ని మీ చిట్ వాట్సాప్ గ్రూప్‌లో షేర్ చేయండి:' 
+                  : 'Share this notice directly to your chit WhatsApp group:'}
+              </p>
+
+              {/* Live WhatsApp Chat Bubble Preview */}
+              <div className="bg-[#0b141a] border border-[#202c33] rounded-2xl p-3.5 mb-3.5 shadow-inner">
+                <div className="text-xs font-mono text-gray-200 whitespace-pre-wrap leading-relaxed select-all">
+                  {officialBroadcastText}
+                </div>
+              </div>
+
+              <div className="space-y-2">
                 <button
                   type="button"
-                  className="btn-primary py-1 px-3 text-xs"
+                  className="btn-whatsapp-share w-full py-2.5 flex items-center justify-center gap-2 font-bold text-sm shadow-lg"
                   onClick={() => {
-                    const text = encodeURIComponent(`🏆 *${currentGroup.nameTe} - లక్కీ డ్రా ఫలితాలు*\nనెల ${currentGroup.currentMonth} డిజిటల్ లక్కీ డ్రా విజయవంతంగా నిర్వహించబడింది.\nవిజేత ₹${currentGroup.totalValue.toLocaleString('en-IN')} చిట్ పొందారు.\nనిర్వాహకుడు: ${currentGroup.organizerName}`);
-                    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+                    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(officialBroadcastText)}`, '_blank');
                   }}
                 >
-                  WhatsApp లో పంపండి (Share)
+                  <MessageCircle size={18} />
+                  <span>{language === 'te' ? '💬 WhatsApp గ్రూప్‌లో షేర్ చేయండి' : '💬 Share on WhatsApp Group'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="btn-secondary w-full py-2 text-xs flex items-center justify-center gap-1.5"
+                  onClick={() => {
+                    navigator.clipboard.writeText(officialBroadcastText);
+                    setIsBroadcastCopied(true);
+                    setTimeout(() => setIsBroadcastCopied(false), 2500);
+                  }}
+                >
+                  <Copy size={14} />
+                  <span>
+                    {isBroadcastCopied 
+                      ? (language === 'te' ? '✓ సందేశం కాపీ అయింది!' : '✓ Message Copied!') 
+                      : (language === 'te' ? '📋 సందేశం కాపీ చేయండి (Copy Text)' : '📋 Copy Text')}
+                  </span>
                 </button>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* 6. ADD MEMBER MODAL (For Organizer to enroll members) */}
       {isAddMemberOpen && (
