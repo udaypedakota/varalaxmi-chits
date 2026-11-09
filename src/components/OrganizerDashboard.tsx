@@ -454,22 +454,32 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
       <section className="organizer-hero-banner animate-fade">
         <div className="org-hero-top">
           <div className="month-picker-pill">
-            <Calendar size={15} />
-            <span>{language === 'te' ? 'ప్రస్తుత నెల:' : 'Active Month:'}</span>
-            <select
-              value={currentGroup.currentMonth}
-              onChange={e => setCurrentMonth(parseInt(e.target.value, 10))}
-              className="month-select"
-            >
-              {Array.from({ length: currentGroup.totalMonths }, (_, i) => i + 1).map(m => {
-                const isLifted = completedMonthSet.has(m);
-                return (
-                  <option key={m} value={m}>
-                    {getMonthDisplayName(m, language)} {isLifted ? (language === 'te' ? '✓ (పూర్తయింది)' : '✓ (Completed)') : ''}
-                  </option>
-                );
-              })}
-            </select>
+            <div className="month-picker-label">
+              <Calendar size={14} className="shrink-0 text-amber-400" />
+              <span className="hidden sm:inline font-semibold">{language === 'te' ? 'ప్రస్తుత నెల:' : 'Active Month:'}</span>
+              <span className="sm:hidden font-semibold">{language === 'te' ? 'నెల:' : 'Month:'}</span>
+            </div>
+            <div className="month-select-wrapper">
+              <select
+                value={currentGroup.currentMonth}
+                onChange={e => setCurrentMonth(parseInt(e.target.value, 10))}
+                className="month-select"
+                aria-label={language === 'te' ? 'ప్రస్తుత నెల ఎంచుకోండి' : 'Select active month'}
+              >
+                {Array.from({ length: currentGroup.totalMonths }, (_, i) => i + 1).map(m => {
+                  const isLifted = completedMonthSet.has(m);
+                  const shortName = MONTH_SHORT_NAMES[m]?.[language] || '';
+                  const monthPrefix = language === 'te' ? `నెల ${m}` : `Month ${m}`;
+                  const statusSuffix = isLifted ? (language === 'te' ? ' ✓ పూర్తయింది' : ' ✓ Completed') : '';
+                  return (
+                    <option key={m} value={m}>
+                      {monthPrefix} {shortName ? `(${shortName})` : ''}{statusSuffix}
+                    </option>
+                  );
+                })}
+              </select>
+              <ChevronDown size={14} className="month-select-chevron" />
+            </div>
           </div>
         </div>
 
