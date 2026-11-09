@@ -970,6 +970,28 @@ app.post('/api/groups/:groupId/liftings', async (req, res) => {
     notes 
   } = req.body;
 
+  // 1. Strict Guard: Prevent duplicate liftings for the same month
+  const existingMonthLift = isMongoConnected
+    ? await LiftingModel.findOne({ groupId, month: Number(month) })
+    : (memoryStore.liftings || []).find(l => l.groupId === groupId && l.month === Number(month));
+
+  if (existingMonthLift) {
+    return res.status(400).json({ 
+      error: `నెల ${month} చిట్ ఇప్పటికే ${existingMonthLift.memberName} గారు తీసుకున్నారు! (Month ${month} chit has already been lifted)` 
+    });
+  }
+
+  // 2. Strict Guard: Prevent member from lifting twice
+  const memberAlreadyLifted = isMongoConnected
+    ? await LiftingModel.findOne({ groupId, memberId })
+    : (memoryStore.liftings || []).find(l => l.groupId === groupId && l.memberId === memberId);
+
+  if (memberAlreadyLifted) {
+    return res.status(400).json({ 
+      error: `${memberName} గారు ఇప్పటికే నెల ${memberAlreadyLifted.month} లో చిట్ తీసుకున్నారు! (Member has already lifted a chit)` 
+    });
+  }
+
   const newLifting = {
     id: `lift-${Date.now()}`,
     groupId,
@@ -1034,6 +1056,37 @@ app.post('/api/groups/:groupId/liftings', async (req, res) => {
   }).catch(() => {});
 
   res.json(newLifting);
+});
+
+app.delete('/api/groups/:groupId/liftings/:liftingId', async (req, res) => {
+  try {
+    const { groupId, liftingId } = req.params;
+    let lift = null;
+    if (isMongoConnected) {
+      lift = await LiftingModel.findOne({ id: liftingId, groupId });
+      if (lift) {
+        await LiftingModel.deleteOne({ id: liftingId, groupId });
+        await MemberModel.findOneAndUpdate(
+          { id: lift.memberId },
+          { hasLiftedChit: false, liftedMonth: null }
+        );
+      }
+    } else {
+      const idx = (memoryStore.liftings || []).findIndex(l => l.id === liftingId && l.groupId === groupId);
+      if (idx !== -1) {
+        lift = memoryStore.liftings[idx];
+        memoryStore.liftings.splice(idx, 1);
+        const mem = memoryStore.members.find(m => m.id === lift.memberId);
+        if (mem) {
+          mem.hasLiftedChit = false;
+          mem.liftedMonth = null;
+        }
+      }
+    }
+    res.json({ success: true, deleted: lift });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // 9. Dynamic Notifications API (Cross-Tab & Real-Time Sync)

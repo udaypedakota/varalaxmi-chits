@@ -949,6 +949,18 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Record Monthly Auction / Chit Lifting (పాట పాడుకున్నవారు)
   const recordChitLifting = async (liftingData: Partial<ChitLiftingRecord>): Promise<ChitLiftingRecord> => {
     const month = liftingData.month || activeGroup.currentMonth;
+
+    // Strict Guard: Prevent duplicate liftings for the same month
+    if (liftings.some(l => l.groupId === activeGroupId && l.month === month)) {
+      const existing = liftings.find(l => l.groupId === activeGroupId && l.month === month);
+      throw new Error(`నెల ${month} చిట్ ఇప్పటికే ${existing?.memberName} గారు తీసుకున్నారు!`);
+    }
+
+    // Strict Guard: Prevent a member from lifting twice
+    if (liftingData.memberId && liftings.some(l => l.groupId === activeGroupId && l.memberId === liftingData.memberId)) {
+      throw new Error(`ఈ సభ్యుడు ఇప్పటికే ఒక చిట్ తీసుకున్నారు!`);
+    }
+
     const chitValue = activeGroup.totalValue || 200000;
     const bidDiscount = Number(liftingData.bidDiscount) || 0;
     const organizerCommission = (chitValue * (activeGroup.commissionPercent || 5)) / 100;
