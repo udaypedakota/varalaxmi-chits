@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useChit } from '../context/ChitContext';
 import { MASTER_SCHEDULE, getInstallmentForMember, getMonthDisplayName, MONTH_SHORT_NAMES, getScheduleNotTakenAmount } from '../data/scheduleData';
 import { PaymentRecord, Member } from '../types/chit';
@@ -311,12 +311,47 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
     m.role !== 'organizer'
   );
 
+  // Set of all months that already have a chit lifting / winner recorded
+  const completedMonthSet = useMemo(() => {
+    return new Set(groupLiftings.map(l => Number(l.month)));
+  }, [groupLiftings]);
+
+  // Available remaining unlifted months (completed months are NEVER shown!)
+  const unliftedMonths = useMemo(() => {
+    return Array.from({ length: currentGroup.totalMonths || 20 }, (_, i) => i + 1)
+      .filter(m => !completedMonthSet.has(m));
+  }, [currentGroup.totalMonths, completedMonthSet]);
+
+  // Next available unlifted month
+  const nextPendingMonth = unliftedMonths.length > 0 ? unliftedMonths[0] : (currentGroup.totalMonths || 20);
+
   // Chit Lifting & Monthly Auction State (పాట పాడుకున్నవారు)
   const [isLiftingModalOpen, setIsLiftingModalOpen] = useState(false);
-  const [liftMonth, setLiftMonth] = useState(currentGroup.currentMonth);
+  const [liftMonth, setLiftMonth] = useState<number>(() => {
+    return unliftedMonths.length > 0 ? unliftedMonths[0] : currentGroup.currentMonth;
+  });
   const [liftMemberId, setLiftMemberId] = useState('');
   const [liftNotes, setLiftNotes] = useState('');
   const [liftError, setLiftError] = useState('');
+
+  const handleOpenLiftingModal = () => {
+    if (unliftedMonths.length === 0) {
+      showToast(
+        language === 'te' ? 'అన్ని చిట్స్ పూర్తయ్యాయి' : 'All Chits Completed',
+        language === 'te' ? 'ఈ గ్రూప్‌లోని అన్ని 20 నెలల చిట్స్ ఇప్పటికే పూర్తయ్యాయి.' : 'All 20 monthly chits have already been completed.',
+        'info'
+      );
+      return;
+    }
+    const defaultMonth = unliftedMonths.includes(currentGroup.currentMonth)
+      ? currentGroup.currentMonth
+      : unliftedMonths[0];
+    setLiftMonth(defaultMonth);
+    setLiftMemberId('');
+    setLiftNotes('');
+    setLiftError('');
+    setIsLiftingModalOpen(true);
+  };
 
   const calcChitVal = currentGroup.totalValue || 200000;
   const calcComm = (calcChitVal * (currentGroup.commissionPercent || 5)) / 100;
@@ -326,6 +361,15 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
   const handleSaveLiftingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLiftError('');
+
+    if (completedMonthSet.has(Number(liftMonth))) {
+      setLiftError(
+        language === 'te'
+          ? `నెల ${liftMonth} చిట్ ఇప్పటికే పూర్తయింది!`
+          : `Month ${liftMonth} chit has already been completed!`
+      );
+      return;
+    }
 
     if (!liftMemberId) {
       setLiftError(language === 'te' ? 'దయచేసి చిట్ తీసుకున్న సభ్యుడిని ఎంచుకోండి' : 'Please select a member');
@@ -418,9 +462,14 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               onChange={e => setCurrentMonth(parseInt(e.target.value, 10))}
               className="month-select"
             >
-              {Array.from({ length: currentGroup.totalMonths }, (_, i) => i + 1).map(m => (
-                <option key={m} value={m}>{getMonthDisplayName(m, language)}</option>
-              ))}
+              {Array.from({ length: currentGroup.totalMonths }, (_, i) => i + 1).map(m => {
+                const isLifted = completedMonthSet.has(m);
+                return (
+                  <option key={m} value={m}>
+                    {getMonthDisplayName(m, language)} {isLifted ? (language === 'te' ? '✓ (పూర్తయింది)' : '✓ (Completed)') : ''}
+                  </option>
+                );
+              })}
             </select>
           </div>
         </div>
@@ -491,19 +540,18 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
           <button
             type="button"
             className="btn-tool-lottery"
-            onClick={() => {
-              setLiftMonth(currentGroup.currentMonth);
-              setLiftMemberId('');
-              setLiftError('');
-              setIsLiftingModalOpen(true);
-            }}
-            title={language === 'te' ? 'ఈ నెల చిట్ నమోదు చేయండి' : 'Record Monthly Chit / Lift'}
+            onClick={handleOpenLiftingModal}
+            title={language === 'te' ? 'నెలసరి చిట్ నమోదు చేయండి' : 'Record Monthly Chit / Lift'}
           >
             <Award size={15} className="shrink-0" />
             <span>
               {language === 'te'
-                ? `ఈ నెల చిట్ నమోదు`
-                : `Record Chit / Lift`}
+                ? (completedMonthSet.has(currentGroup.currentMonth)
+                    ? (unliftedMonths.length > 0 ? `+ నెల ${nextPendingMonth} చిట్ నమోదు` : `అన్ని చిట్స్ పూర్తయ్యాయి`)
+                    : `ఈ నెల చిట్ నమోదు`)
+                : (completedMonthSet.has(currentGroup.currentMonth)
+                    ? (unliftedMonths.length > 0 ? `+ Record Month ${nextPendingMonth} Lift` : `All Lifts Completed`)
+                    : `Record Chit / Lift`)}
             </span>
           </button>
 
@@ -657,20 +705,35 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             <button
               type="button"
               className="btn-auction-action"
-              onClick={() => {
-                setLiftMonth(currentGroup.currentMonth);
-                setLiftMemberId('');
-                setLiftError('');
-                setIsLiftingModalOpen(true);
-              }}
+              onClick={handleOpenLiftingModal}
             >
               <Award size={14} className="shrink-0" />
-              <span>{language === 'te' ? '+ ఈ నెల చిట్ నమోదు' : '+ Record Chit / Lift'}</span>
+              <span>
+                {language === 'te'
+                  ? (completedMonthSet.has(currentGroup.currentMonth)
+                      ? (unliftedMonths.length > 0 ? `+ నెల ${nextPendingMonth} చిట్ నమోదు` : `అన్ని చిట్స్ పూర్తయ్యాయి`)
+                      : `+ ఈ నెల చిట్ నమోదు`)
+                  : (completedMonthSet.has(currentGroup.currentMonth)
+                      ? (unliftedMonths.length > 0 ? `+ Record Month ${nextPendingMonth} Lift` : `All Lifts Completed`)
+                      : `+ Record Chit / Lift`)}
+              </span>
             </button>
             <button
               type="button"
               className="btn-auction-action"
-              onClick={onOpenLottery}
+              onClick={() => {
+                if (completedMonthSet.has(currentGroup.currentMonth)) {
+                  showToast(
+                    language === 'te' ? `నెల ${currentGroup.currentMonth} పూర్తయింది` : `Month ${currentGroup.currentMonth} Completed`,
+                    language === 'te'
+                      ? `నెల ${currentGroup.currentMonth} చిట్ ఇప్పటికే పూర్తయింది. లక్కీ డ్రా కేవలం చిట్ ఎత్తని నెలలకే నిర్వహించబడుతుంది.`
+                      : `Month ${currentGroup.currentMonth} chit has already been lifted. Lucky draw is only for pending months.`,
+                    'info'
+                  );
+                  return;
+                }
+                onOpenLottery();
+              }}
             >
               <Dices size={14} className="shrink-0" />
               <span>{language === 'te' ? '🎲 లక్కీ డ్రా నిర్వహించండి' : '🎲 Run Lucky Draw'}</span>
@@ -1904,15 +1967,21 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                   <span>{language === 'te' ? 'చిట్ నెల (Month Number)' : 'Chit Month'}</span>
                 </label>
                 <select
-                  className="form-input"
+                  className="form-input font-bold text-amber-300"
                   value={liftMonth}
                   onChange={e => setLiftMonth(Number(e.target.value))}
                 >
-                  {Array.from({ length: currentGroup.totalMonths || 20 }, (_, i) => i + 1).map(m => (
-                    <option key={m} value={m}>
-                      {getMonthDisplayName(m, language)} {m === currentGroup.currentMonth ? (language === 'te' ? '(ప్రస్తుత నెల)' : '(Current)') : ''}
+                  {unliftedMonths.length === 0 ? (
+                    <option disabled value="">
+                      {language === 'te' ? 'అన్ని 20 నెలల చిట్స్ పూర్తయ్యాయి' : 'All 20 months completed'}
                     </option>
-                  ))}
+                  ) : (
+                    unliftedMonths.map(m => (
+                      <option key={m} value={m}>
+                        {getMonthDisplayName(m, language)} {m === currentGroup.currentMonth ? (language === 'te' ? '(ప్రస్తుత నెల)' : '(Current)') : ''}
+                      </option>
+                    ))
+                  )}
                 </select>
               </div>
 
