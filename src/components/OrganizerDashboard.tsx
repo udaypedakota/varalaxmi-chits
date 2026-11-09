@@ -302,7 +302,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
   // Set of all members who have already lifted the chit in any month (strict exclusion - never appear in later months)
   const liftedMemberIds = new Set([
     ...groupLiftings.map(l => l.memberId),
-    ...groupLotteryHistory.map(lot => lot.winnerMemberId),
     ...groupMembers.filter(m => m.hasLiftedChit).map(m => m.id)
   ]);
   const eligibleWinningMembers = groupMembers.filter(m =>
@@ -692,11 +691,32 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                     {groupLiftings.length} / {currentGroup.totalMonths} {language === 'te' ? 'నెలలు లిఫ్ట్ అయ్యాయి' : 'Lifted'}
                   </span>
                 </div>
-                <p className="section-subtitle m-0 text-xs text-gray-400 mt-0.5">
-                  {language === 'te'
-                    ? 'మొత్తం చిట్ విలువ: ₹2,00,000 • 20 నెలలు • ప్రతి నెల 10వ తేదీ లోపు చెల్లించవలెను'
-                    : 'Total Chit Value: ₹2,00,000 • 20 Months • Pay before 10th of every month'}
-                </p>
+                <div className="section-subtitle m-0 text-xs text-gray-400 mt-1 flex items-center gap-1.5 flex-wrap">
+                  <span>
+                    {language === 'te'
+                      ? 'మొత్తం చిట్ విలువ: ₹2,00,000 • 20 నెలలు'
+                      : 'Total Chit Value: ₹2,00,000 • 20 Months'}
+                  </span>
+                  <span className="text-gray-600">•</span>
+                  {(() => {
+                    const curLift = groupLiftings.find(l => l.month === currentGroup.currentMonth);
+                    const curWinner = curLift
+                      ? (language === 'te' ? (curLift.memberNameTe || curLift.memberName) : curLift.memberName)
+                      : null;
+                    if (curWinner) {
+                      return (
+                        <span className="text-emerald-400 font-bold inline-flex items-center gap-1">
+                          👑 {language === 'te' ? `నెల ${currentGroup.currentMonth} చిట్: ${curWinner} గారు తీసుకున్నారు` : `Month ${currentGroup.currentMonth}: Lifted by ${curWinner}`}
+                        </span>
+                      );
+                    }
+                    return (
+                      <span className="text-amber-400 font-medium">
+                        {language === 'te' ? `నెల ${currentGroup.currentMonth} చిట్: ఇంకా ఎవరూ తీసుకోలేదు (పాట పెండింగ్)` : `Month ${currentGroup.currentMonth}: Chit Not Taken (Pending)`}
+                      </span>
+                    );
+                  })()}
+                </div>
               </div>
             </div>
           </div>
@@ -742,34 +762,62 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
         </div>
 
         {/* Collapsed Compact Preview Bar */}
-        {!isScheduleExpanded && (
-          <div
-            className="collapsed-preview-strip"
-            onClick={() => setIsScheduleExpanded(true)}
-            role="button"
-            tabIndex={0}
-            title={language === 'te' ? '20 నెలల పూర్తి పట్టిక తెరవడానికి క్లిక్ చేయండి' : 'Click to open 20-Month Table'}
-          >
-            <div className="flex items-center gap-3 text-xs flex-wrap">
-              <span className="font-semibold text-amber-400">
-                {language === 'te' ? `ప్రస్తుతం: నెల #${currentGroup.currentMonth}` : `Current: Month #${currentGroup.currentMonth}`}
-              </span>
-              <span className="text-gray-500">|</span>
-              <span className="text-gray-300">
-                {language === 'te' ? 'తీసుకోని వారి వాయిదా: ' : 'Chit Not Taken: '}
-                <strong className="text-amber-300">
-                  ₹{getScheduleNotTakenAmount(MASTER_SCHEDULE.find(m => m.month === currentGroup.currentMonth) || MASTER_SCHEDULE[0], language).toLocaleString('en-IN')}
-                </strong>
-              </span>
-              <span className="text-gray-500">|</span>
-              <span className="text-gray-300">
-                {language === 'te' ? 'తీసుకున్న వారి వాయిదా: ' : 'Chit Taken Rate: '}
-                <strong className="text-emerald-400">₹{MASTER_SCHEDULE[0].takenAmount.toLocaleString('en-IN')}</strong>
-              </span>
+        {!isScheduleExpanded && (() => {
+          const activeMonthLifting = groupLiftings.find(l => l.month === currentGroup.currentMonth);
+          const activeWinnerName = activeMonthLifting
+            ? (language === 'te' ? (activeMonthLifting.memberNameTe || activeMonthLifting.memberName) : activeMonthLifting.memberName)
+            : null;
+          const notTakenVal = getScheduleNotTakenAmount(
+            MASTER_SCHEDULE.find(m => m.month === currentGroup.currentMonth) || MASTER_SCHEDULE[0],
+            language
+          );
+
+          return (
+            <div
+              className="collapsed-preview-strip"
+              onClick={() => setIsScheduleExpanded(true)}
+              role="button"
+              tabIndex={0}
+              title={language === 'te' ? '20 నెలల పూర్తి పట్టిక తెరవడానికి క్లిక్ చేయండి' : 'Click to open 20-Month Table'}
+            >
+              <div className="flex items-center gap-2.5 text-xs flex-wrap">
+                <span className="font-semibold text-amber-400">
+                  {language === 'te' ? `నెల #${currentGroup.currentMonth}:` : `Month #${currentGroup.currentMonth}:`}
+                </span>
+
+                {activeWinnerName ? (
+                  <>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-bold">
+                      👑 {language === 'te' ? `${activeWinnerName} గారు తీసుకున్నారు` : `Taken by ${activeWinnerName}`}
+                    </span>
+                    <span className="text-gray-500">|</span>
+                    <span className="text-gray-300">
+                      {language === 'te' ? 'తీసుకున్న వారి వాయిదా: ' : 'Chit Taken Rate: '}
+                      <strong className="text-emerald-400 font-bold">₹{MASTER_SCHEDULE[0].takenAmount.toLocaleString('en-IN')}</strong>
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/35 text-amber-300 font-medium">
+                      {language === 'te' ? 'చిట్ ఇంకా ఎవరూ తీసుకోలేదు (పాట పెండింగ్)' : 'Chit Not Taken (Pending)'}
+                    </span>
+                    <span className="text-gray-500">|</span>
+                    <span className="text-gray-300">
+                      {language === 'te' ? 'తీసుకోని వారి వాయిదా: ' : 'Chit Not Taken: '}
+                      <strong className="text-amber-300">₹{notTakenVal.toLocaleString('en-IN')}</strong>
+                    </span>
+                    <span className="text-gray-500">|</span>
+                    <span className="text-gray-300">
+                      {language === 'te' ? 'తీసుకున్న వారి వాయిదా: ' : 'Chit Taken Rate: '}
+                      <strong className="text-emerald-400 font-bold">₹{MASTER_SCHEDULE[0].takenAmount.toLocaleString('en-IN')}</strong>
+                    </span>
+                  </>
+                )}
+              </div>
+              <ChevronDown size={16} className="text-amber-400" />
             </div>
-            <ChevronDown size={16} className="text-amber-400" />
-          </div>
-        )}
+          );
+        })()}
 
         {/* 4-COLUMN MASTER TABLE WITH OPTION A WINNER BADGES */}
         {isScheduleExpanded && (
@@ -1996,35 +2044,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                     );
                   })}
                 </select>
-
-                {/* Small Box with Tick Mark showing Completed Months */}
-                {groupLiftings.length > 0 && (
-                  <div className="mt-2 p-2.5 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-xs animate-fade">
-                    <div className="flex items-center gap-1.5 text-emerald-400 font-bold mb-1.5">
-                      <CheckCircle2 size={13} />
-                      <span>
-                        {language === 'te' ? 'ఇప్పటికే పూర్తయిన నెలలు:' : 'Already Completed Months:'}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {groupLiftings.map(l => (
-                        <div
-                          key={l.id || l.month}
-                          className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-emerald-500/15 border border-emerald-500/40 text-emerald-200 text-xs"
-                        >
-                          <span className="font-bold text-emerald-300">
-                            {language === 'te' ? `నెల ${l.month}` : `Month ${l.month}`}:
-                          </span>
-                          <span className="font-medium">{language === 'te' ? (l.memberNameTe || l.memberName) : l.memberName}</span>
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/30 text-[10px] font-bold text-emerald-100 border border-emerald-400/50">
-                            <Check size={10} className="text-emerald-300" />
-                            <span>{language === 'te' ? 'పూర్తయింది' : 'Completed'}</span>
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Member Selector (Eligible participants only - excludes already lifted members!) */}
