@@ -38,7 +38,8 @@ import {
   ChevronDown,
   ChevronUp,
   LayoutGrid,
-  Table as TableIcon
+  Table as TableIcon,
+  Edit2
 } from 'lucide-react';
 import {
   openDeviceSms,
@@ -68,6 +69,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
     switchUser,
     addMember,
     deleteMember,
+    updateMember,
+    resequenceGroupMembers,
     groups,
     dbStatus,
     language,
@@ -107,6 +110,91 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
     member: Member | null;
   } | null>(null);
   const [isPinCopied, setIsPinCopied] = useState(false);
+
+  // Edit Member State
+  const [editingMember, setEditingMember] = useState<Member | null>(null);
+  const [editMemberNo, setEditMemberNo] = useState<number>(1);
+  const [editName, setEditName] = useState('');
+  const [editNameTe, setEditNameTe] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [editPin, setEditPin] = useState('');
+  const [editError, setEditError] = useState('');
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+
+  const handleOpenEditMember = (m: Member) => {
+    setEditingMember(m);
+    setEditMemberNo(m.memberNo);
+    setEditName(m.name);
+    setEditNameTe(m.nameTe || m.name);
+    setEditPhone(m.phone);
+    setEditPin(m.pin);
+    setEditError('');
+  };
+
+  const handleSaveEditMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingMember) return;
+    setEditError('');
+
+    if (!editName.trim()) {
+      setEditError(language === 'te' ? 'దయచేసి సభ్యుని పేరు నమోదు చేయండి' : 'Enter member name');
+      return;
+    }
+
+    let cleanPhone = editPhone.trim().replace(/\D/g, '');
+    if (cleanPhone.startsWith('91') && cleanPhone.length > 10) cleanPhone = cleanPhone.slice(2);
+    if (cleanPhone.startsWith('0') && cleanPhone.length > 10) cleanPhone = cleanPhone.slice(1);
+    if (cleanPhone.length !== 10) {
+      setEditError(language === 'te' ? 'దయచేసి సరైన 10 అంకెల మొబైల్ నంబర్ నమోదు చేయండి' : 'Enter 10-digit mobile');
+      return;
+    }
+
+    const targetGroupMembers = members.filter(m => m.groupId === (editingMember.groupId || currentGroup.id) && m.id !== editingMember.id && m.role !== 'organizer');
+    if (targetGroupMembers.some(m => m.memberNo === Number(editMemberNo))) {
+      setEditError(
+        language === 'te'
+          ? `మెంబర్ నంబర్ #${editMemberNo} ఇప్పటికే వేరొక సభ్యునికి కేటాయించబడింది!`
+          : `Member #${editMemberNo} is already assigned to another member in this group!`
+      );
+      return;
+    }
+
+    setIsSavingEdit(true);
+    try {
+      await updateMember(editingMember.id, {
+        memberNo: Number(editMemberNo),
+        name: editName.trim(),
+        nameTe: editNameTe.trim() || editName.trim(),
+        phone: cleanPhone,
+        pin: editPin.trim() || '1234'
+      });
+      showToast(
+        language === 'te' ? '✅ సభ్యుని వివరాలు అప్‌డేట్ అయ్యాయి!' : '✅ Member Updated!',
+        language === 'te' ? `#${editMemberNo} ${editName} వివరాలు సేవ్ చేయబడ్డాయి.` : `Member #${editMemberNo} saved successfully.`,
+        'info'
+      );
+      setEditingMember(null);
+    } catch {
+      setEditError(language === 'te' ? 'సేవ్ చేయడంలో లోపం' : 'Error updating member');
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
+
+  const handleAutoResequence = async () => {
+    const ok = window.confirm(
+      language === 'te'
+        ? 'ఈ గ్రూప్‌లోని సభ్యులందరినీ క్రమపద్ధతిలో #1 నుండి #20 వరకు వరుస క్రమంలో రీ-నంబర్ చేయమంటారా?'
+        : 'Auto-sequence all members sequentially from #1 to #20 in this group?'
+    );
+    if (!ok) return;
+    await resequenceGroupMembers(currentGroup.id);
+    showToast(
+      language === 'te' ? '✅ సభ్యుల నంబర్లు సరిచేయబడ్డాయి!' : '✅ Members Re-sequenced!',
+      language === 'te' ? 'అందరు సభ్యులకు #1 నుండి #20 వరకు వరుస క్రమంలో కేటాయించబడ్డాయి.' : 'Members numbered sequentially from #1 to #20.',
+      'info'
+    );
+  };
 
   const handleAddMemberSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -742,7 +830,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             </div>
           </div>
 
-          {/* Quick Header Actions: + Add Member */}
+          {/* Quick Header Actions: + Add Member & Resequence */}
           <div className="flex items-center gap-2 flex-wrap">
             <button
               type="button"
@@ -752,6 +840,15 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             >
               <UserPlus size={15} />
               <span>{language === 'te' ? '+ సభ్యుని చేర్చండి' : '+ Add Member'}</span>
+            </button>
+            <button
+              type="button"
+              className="btn-tool-whatsapp py-1.5 px-3 text-xs"
+              onClick={handleAutoResequence}
+              title={language === 'te' ? 'సభ్యుల నంబర్లను 1-20 వరుస క్రమంలో సరిచేయండి' : 'Re-sequence member numbers 1 to 20'}
+            >
+              <RefreshCw size={13} className="text-amber-400" />
+              <span>{language === 'te' ? '1-20 సరిచేయి' : '1-20 Re-order'}</span>
             </button>
           </div>
         </div>
@@ -1080,6 +1177,19 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
 
                         <button
                           type="button"
+                          className="btn-drawer-action btn-drawer-edit"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenEditMember(m);
+                          }}
+                          title={language === 'te' ? 'సభ్యుని వివరాలు సవరించండి' : 'Edit Member Details'}
+                        >
+                          <Edit2 size={14} />
+                          <span>{language === 'te' ? 'సవరించు' : 'Edit'}</span>
+                        </button>
+
+                        <button
+                          type="button"
                           className="btn-drawer-action btn-drawer-delete"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -1249,6 +1359,16 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                                 {language === 'te' ? 'పాస్‌బుక్' : 'Passbook'}
                               </button>
                             )}
+
+                            <button
+                              type="button"
+                              className="btn-cell-edit text-xs py-1 px-2 flex items-center gap-1 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 hover:bg-amber-500/20"
+                              onClick={() => handleOpenEditMember(m)}
+                              title={language === 'te' ? 'సభ్యుని వివరాలు సవరించండి' : 'Edit Member Details'}
+                            >
+                              <Edit2 size={13} />
+                              <span className="text-[11px]">{language === 'te' ? 'సవరించు' : 'Edit'}</span>
+                            </button>
 
                             <button
                               type="button"
@@ -2015,6 +2135,125 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                 <span>{language === 'te' ? 'ముగించు (Done)' : 'Done / Close'}</span>
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Member Details Modal */}
+      {editingMember && (
+        <div className="modal-backdrop animate-fade" onClick={() => setEditingMember(null)}>
+          <div className="modal-content login-mobile-frame animate-scale-up" onClick={e => e.stopPropagation()}>
+            <div className="modal-header flex items-center justify-between pb-3 border-b border-gray-800">
+              <h3 className="font-bold text-white text-base">
+                {language === 'te' ? `సభ్యుని వివరాలు సవరించండి (#${editingMember.memberNo})` : `Edit Member Details (#${editingMember.memberNo})`}
+              </h3>
+              <button
+                type="button"
+                className="text-gray-400 hover:text-white"
+                onClick={() => setEditingMember(null)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {editError && (
+              <div className="alert-box error mt-3 text-xs p-2.5 rounded-lg bg-red-950/40 border border-red-800/40 text-red-300">
+                {editError}
+              </div>
+            )}
+
+            <form onSubmit={handleSaveEditMember} className="login-form mt-3 space-y-3">
+              <div className="form-field">
+                <label className="field-label text-xs font-semibold text-gray-300">
+                  {language === 'te' ? 'మెంబర్ నంబర్ / టికెట్ (#1 నుండి #20):' : 'Member / Ticket No (#1 to #20):'}
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={20}
+                  className="form-input font-bold text-amber-400"
+                  value={editMemberNo}
+                  onChange={e => setEditMemberNo(Number(e.target.value))}
+                  required
+                />
+              </div>
+
+              <div className="form-field">
+                <label className="field-label text-xs font-semibold text-gray-300">
+                  {language === 'te' ? 'సభ్యుని పేరు (ఇంగ్లీష్):' : 'Member Name:'}
+                </label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={editName}
+                  onChange={e => setEditName(e.target.value)}
+                  placeholder="e.g. Rajesh"
+                  required
+                />
+              </div>
+
+              <div className="form-field">
+                <label className="field-label text-xs font-semibold text-gray-300">
+                  {language === 'te' ? 'సభ్యుని పేరు (తెలుగు):' : 'Telugu Name (Optional):'}
+                </label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={editNameTe}
+                  onChange={e => setEditNameTe(e.target.value)}
+                  placeholder="e.g. రాజేష్"
+                />
+              </div>
+
+              <div className="form-field">
+                <label className="field-label text-xs font-semibold text-gray-300">
+                  {language === 'te' ? '10-అంకెల మొబైల్ నంబర్:' : 'Mobile Number:'}
+                </label>
+                <input
+                  type="tel"
+                  maxLength={10}
+                  className="form-input font-mono"
+                  value={editPhone}
+                  onChange={e => setEditPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                  placeholder="10 digit mobile"
+                  required
+                />
+              </div>
+
+              <div className="form-field">
+                <label className="field-label text-xs font-semibold text-gray-300">
+                  {language === 'te' ? '4-అంకెల సెక్యూరిటీ పిన్:' : 'Security PIN (4 digits):'}
+                </label>
+                <input
+                  type="text"
+                  maxLength={4}
+                  className="form-input text-center font-bold tracking-widest font-mono"
+                  value={editPin}
+                  onChange={e => setEditPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                  placeholder="1234"
+                  required
+                />
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="button"
+                  className="btn-secondary flex-1 py-2.5 text-xs"
+                  onClick={() => setEditingMember(null)}
+                >
+                  {language === 'te' ? 'రద్దు చేయి' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary flex-1 py-2.5 text-xs font-bold"
+                  disabled={isSavingEdit}
+                >
+                  {isSavingEdit
+                    ? (language === 'te' ? 'సేవ్ అవుతోంది...' : 'Saving...')
+                    : (language === 'te' ? 'సేవ్ చేయి' : 'Save Changes')}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

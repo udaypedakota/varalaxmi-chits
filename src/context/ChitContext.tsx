@@ -34,7 +34,9 @@ interface ChitContextType {
   switchUser: (memberId: string) => void;
   addMember: (memberData: { name: string; nameTe?: string; phone: string; pin?: string; groupId?: string }) => Promise<Member>;
   deleteMember: (memberId: string) => void;
+  updateMember: (memberId: string, updates: Partial<Member>) => Promise<boolean>;
   updateMemberPin: (memberId: string, newPin: string) => void;
+  resequenceGroupMembers: (targetGroupId?: string) => Promise<void>;
 
   // Payments
   payments: PaymentRecord[];
@@ -661,7 +663,12 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const cleanPin = memberData.pin?.trim() || '1234';
 
     const realMembersInGroup = members.filter(m => m.groupId === targetGroupId && m.role !== 'organizer');
-    const nextNo = realMembersInGroup.length + 1;
+    // Assign first available unused member number (#1 to #20)
+    const usedNos = new Set(realMembersInGroup.map(m => Number(m.memberNo)));
+    let nextNo = 1;
+    while (usedNos.has(nextNo)) {
+      nextNo++;
+    }
 
     const newMember: Member = {
       id: `m-${Date.now()}`,
@@ -713,6 +720,40 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     fetch(`/api/members/${memberId}`, { method: 'DELETE' }).catch(() => {});
   };
 
+  const updateMember = async (memberId: string, updates: Partial<Member>): Promise<boolean> => {
+    setMembers(prev => prev.map(m => m.id === memberId ? { ...m, ...updates } : m));
+    try {
+      const res = await fetch(`/api/members/${memberId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+      return res.ok;
+    } catch {
+      return false;
+    }
+  };
+
+  const resequenceGroupMembers = async (targetGroupId?: string) => {
+    const gId = targetGroupId || activeGroupId;
+    const groupMems = members
+      .filter(m => m.groupId === gId && m.role !== 'organizer')
+      .sort((a, b) => (Number(a.memberNo) || 0) - (Number(b.memberNo) || 0));
+
+    for (let i = 0; i < groupMems.length; i++) {
+      const targetNo = i + 1;
+      const mem = groupMems[i];
+      if (mem.memberNo !== targetNo) {
+        setMembers(prev => prev.map(m => m.id === mem.id ? { ...m, memberNo: targetNo } : m));
+        fetch(`/api/members/${mem.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ memberNo: targetNo })
+        }).catch(() => {});
+      }
+    }
+  };
+
   const updateMemberPin = (memberId: string, newPin: string) => {
     setMembers(prev => prev.map(m => m.id === memberId ? { ...m, pin: newPin } : m));
     fetch(`/api/members/${memberId}`, {
@@ -747,7 +788,11 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
     }
 
-    const nextNo = realMembersInGroup.length + 1;
+    const usedNos = new Set(realMembersInGroup.map(m => Number(m.memberNo)));
+    let nextNo = 1;
+    while (usedNos.has(nextNo)) {
+      nextNo++;
+    }
     const newMember: Member = {
       id: `m-${Date.now()}`,
       groupId: targetGroupId,
@@ -1314,7 +1359,9 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
         switchUser,
         addMember,
         deleteMember,
+        updateMember,
         updateMemberPin,
+        resequenceGroupMembers,
         payments,
         groupPayments,
         submitPayment,

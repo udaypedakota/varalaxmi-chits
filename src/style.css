@@ -6596,6 +6596,16 @@ select.form-input option,
   color: #FBBF24;
 }
 
+.btn-drawer-edit {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #FBBF24;
+}
+.btn-drawer-edit:hover {
+  background: #F59E0B;
+  color: #0F172A;
+}
+
 .btn-drawer-delete {
   background: rgba(239, 68, 68, 0.1);
   border-color: rgba(239, 68, 68, 0.3);
