@@ -320,7 +320,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
 
   const calcChitVal = currentGroup.totalValue || 200000;
   const calcComm = (calcChitVal * (currentGroup.commissionPercent || 5)) / 100;
-  const calcNetDistributed = 180000;
+  const calcNetDistributed = calcChitVal; // Full ₹2,00,000 received by winning member
   const fixedTakenInstallment = currentGroup.fixedTakenInstallment || 11500;
 
   const handleSaveLiftingSubmit = async (e: React.FormEvent) => {
@@ -343,7 +343,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
       memberNo: selectedMember.memberNo,
       liftType: 'auction',
       chitValue: calcChitVal,
-      bidDiscount: 20000,
+      bidDiscount: 0,
       organizerCommission: calcComm,
       netDistributedAmount: calcNetDistributed,
       dividendPerMember: 0,
@@ -1954,6 +1954,12 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                 <div className="summary-metric-row">
                   <span className="summary-metric-label">{language === 'te' ? 'మొత్తం చిట్ విలువ:' : 'Total Chit Value:'}</span>
                   <span className="summary-metric-value text-amber-300">₹{calcChitVal.toLocaleString('en-IN')}</span>
+                </div>
+
+                {/* Prize Money Received by Winner */}
+                <div className="summary-metric-row">
+                  <span className="summary-metric-label">{language === 'te' ? 'విజేతకు చేతికి అందే మొత్తం:' : 'Prize Money to Winner:'}</span>
+                  <span className="summary-metric-value text-emerald-400 font-bold">₹{calcNetDistributed.toLocaleString('en-IN')}</span>
                 </div>
 
                 {/* 2. Chit Taken Month */}

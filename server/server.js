@@ -982,7 +982,7 @@ app.post('/api/groups/:groupId/liftings', async (req, res) => {
     chitValue: Number(chitValue) || 200000,
     bidDiscount: Number(bidDiscount) || 0,
     organizerCommission: Number(organizerCommission) || 10000,
-    netDistributedAmount: Number(netDistributedAmount) || (200000 - (Number(bidDiscount) || 0)),
+    netDistributedAmount: Number(netDistributedAmount) || Number(chitValue) || 200000,
     dividendPerMember: Number(dividendPerMember) || 0,
     date: new Date().toISOString().split('T')[0],
     status: 'distributed',

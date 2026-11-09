@@ -952,7 +952,7 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const chitValue = activeGroup.totalValue || 200000;
     const bidDiscount = Number(liftingData.bidDiscount) || 0;
     const organizerCommission = (chitValue * (activeGroup.commissionPercent || 5)) / 100;
-    const netDistributed = chitValue - bidDiscount;
+    const netDistributed = Number(liftingData.netDistributedAmount) || (chitValue - bidDiscount) || 200000;
     const targetMember = members.find(m => m.id === liftingData.memberId);
     
     // Remaining members dividend
