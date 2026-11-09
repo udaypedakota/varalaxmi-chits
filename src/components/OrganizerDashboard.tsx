@@ -18,7 +18,6 @@ import {
   FileCheck,
   Send,
   Trash2,
-  RefreshCw,
   Database,
   Image as ImageIcon,
   X,
@@ -70,7 +69,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
     addMember,
     deleteMember,
     updateMember,
-    resequenceGroupMembers,
     groups,
     dbStatus,
     language,
@@ -179,21 +177,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
     } finally {
       setIsSavingEdit(false);
     }
-  };
-
-  const handleAutoResequence = async () => {
-    const ok = window.confirm(
-      language === 'te'
-        ? 'ఈ గ్రూప్‌లోని సభ్యులందరినీ క్రమపద్ధతిలో #1 నుండి #20 వరకు వరుస క్రమంలో రీ-నంబర్ చేయమంటారా?'
-        : 'Auto-sequence all members sequentially from #1 to #20 in this group?'
-    );
-    if (!ok) return;
-    await resequenceGroupMembers(currentGroup.id);
-    showToast(
-      language === 'te' ? '✅ సభ్యుల నంబర్లు సరిచేయబడ్డాయి!' : '✅ Members Re-sequenced!',
-      language === 'te' ? 'అందరు సభ్యులకు #1 నుండి #20 వరకు వరుస క్రమంలో కేటాయించబడ్డాయి.' : 'Members numbered sequentially from #1 to #20.',
-      'info'
-    );
   };
 
   const handleAddMemberSubmit = async (e: React.FormEvent) => {
@@ -830,7 +813,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             </div>
           </div>
 
-          {/* Quick Header Actions: + Add Member & Resequence */}
+          {/* Quick Header Actions: + Add Member */}
           <div className="flex items-center gap-2 flex-wrap">
             <button
               type="button"
@@ -840,15 +823,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             >
               <UserPlus size={15} />
               <span>{language === 'te' ? '+ సభ్యుని చేర్చండి' : '+ Add Member'}</span>
-            </button>
-            <button
-              type="button"
-              className="btn-tool-whatsapp py-1.5 px-3 text-xs"
-              onClick={handleAutoResequence}
-              title={language === 'te' ? 'సభ్యుల నంబర్లను 1-20 వరుస క్రమంలో సరిచేయండి' : 'Re-sequence member numbers 1 to 20'}
-            >
-              <RefreshCw size={13} className="text-amber-400" />
-              <span>{language === 'te' ? '1-20 సరిచేయి' : '1-20 Re-order'}</span>
             </button>
           </div>
         </div>
