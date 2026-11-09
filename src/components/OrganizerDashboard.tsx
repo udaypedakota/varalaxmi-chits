@@ -821,9 +821,15 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                             : `M${item.month}`}
                         </span>
                         {winnerName && (
-                          <span className="sched-winner-pill" title={language === 'te' ? `చిట్ తీసుకున్నవారు: ${winnerName}` : `Lifted by: ${winnerName}`}>
-                            👑 {winnerName} {monthLifting?.memberNo ? `(#${monthLifting.memberNo})` : ''}
-                          </span>
+                          <div className="flex items-center gap-1 mt-1 flex-wrap">
+                            <span className="sched-winner-pill" title={language === 'te' ? `చిట్ తీసుకున్నవారు: ${winnerName}` : `Lifted by: ${winnerName}`}>
+                              👑 {winnerName} {monthLifting?.memberNo ? `(#${monthLifting.memberNo})` : ''}
+                            </span>
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                              <Check size={10} className="text-emerald-400 font-bold" />
+                              <span>{language === 'te' ? 'పూర్తయింది' : 'Completed'}</span>
+                            </span>
+                          </div>
                         )}
                       </div>
                     </td>
@@ -1971,18 +1977,54 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                   value={liftMonth}
                   onChange={e => setLiftMonth(Number(e.target.value))}
                 >
-                  {unliftedMonths.length === 0 ? (
-                    <option disabled value="">
-                      {language === 'te' ? 'అన్ని 20 నెలల చిట్స్ పూర్తయ్యాయి' : 'All 20 months completed'}
-                    </option>
-                  ) : (
-                    unliftedMonths.map(m => (
-                      <option key={m} value={m}>
-                        {getMonthDisplayName(m, language)} {m === currentGroup.currentMonth ? (language === 'te' ? '(ప్రస్తుత నెల)' : '(Current)') : ''}
+                  {Array.from({ length: currentGroup.totalMonths || 20 }, (_, i) => i + 1).map(m => {
+                    const isCompleted = completedMonthSet.has(m);
+                    const lift = groupLiftings.find(l => Number(l.month) === m);
+                    const winnerText = lift ? (language === 'te' ? (lift.memberNameTe || lift.memberName) : lift.memberName) : '';
+                    return (
+                      <option
+                        key={m}
+                        value={m}
+                        disabled={isCompleted}
+                        className={isCompleted ? 'text-gray-500 bg-gray-900 font-normal' : 'text-white font-bold'}
+                      >
+                        {isCompleted ? '✓ ' : ''}{getMonthDisplayName(m, language)}
+                        {isCompleted
+                          ? (language === 'te' ? ` [✓ పూర్తయింది - ${winnerText}]` : ` [✓ Completed: ${winnerText}]`)
+                          : (m === currentGroup.currentMonth ? (language === 'te' ? ' (ప్రస్తుత నెల)' : ' (Current)') : '')}
                       </option>
-                    ))
-                  )}
+                    );
+                  })}
                 </select>
+
+                {/* Small Box with Tick Mark showing Completed Months */}
+                {groupLiftings.length > 0 && (
+                  <div className="mt-2 p-2.5 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-xs animate-fade">
+                    <div className="flex items-center gap-1.5 text-emerald-400 font-bold mb-1.5">
+                      <CheckCircle2 size={13} />
+                      <span>
+                        {language === 'te' ? 'ఇప్పటికే పూర్తయిన నెలలు:' : 'Already Completed Months:'}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {groupLiftings.map(l => (
+                        <div
+                          key={l.id || l.month}
+                          className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-emerald-500/15 border border-emerald-500/40 text-emerald-200 text-xs"
+                        >
+                          <span className="font-bold text-emerald-300">
+                            {language === 'te' ? `నెల ${l.month}` : `Month ${l.month}`}:
+                          </span>
+                          <span className="font-medium">{language === 'te' ? (l.memberNameTe || l.memberName) : l.memberName}</span>
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/30 text-[10px] font-bold text-emerald-100 border border-emerald-400/50">
+                            <Check size={10} className="text-emerald-300" />
+                            <span>{language === 'te' ? 'పూర్తయింది' : 'Completed'}</span>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Member Selector (Eligible participants only - excludes already lifted members!) */}
