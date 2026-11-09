@@ -1001,10 +1001,10 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const notif: ChitNotification = {
       id: `notif-${Date.now()}`,
       groupId: activeGroupId,
-      title: `Month ${month} Chit Winner: ${newRecord.memberName}`,
-      titleTe: `🏆 నెల ${month} చిట్ పాట విజేత: ${newRecord.memberNameTe}`,
-      message: `${newRecord.memberName} (#${newRecord.memberNo || ''}) lifted Month ${month} chit for ₹${netDistributed.toLocaleString('en-IN')} (${newRecord.liftType === 'auction' ? 'Auction Bid' : 'Lucky Draw'}).`,
-      messageTe: `${newRecord.memberNameTe} (#${newRecord.memberNo || ''}) గారు నెల ${month} చిట్ ను ₹${netDistributed.toLocaleString('en-IN')} చేతికి తీసుకున్నారు (${newRecord.liftType === 'auction' ? 'వేలం పాట' : 'లక్కీ డ్రా'}).`,
+      title: `Winner: Month ${month} Chit Taken - ${newRecord.memberName}`,
+      titleTe: `🏆 విజేత: నెల ${month} చిట్ తీసుకున్నారు - ${newRecord.memberNameTe}`,
+      message: `${newRecord.memberName} (#${newRecord.memberNo || ''}) lifted Month ${month} chit for ₹${netDistributed.toLocaleString('en-IN')}.`,
+      messageTe: `${newRecord.memberNameTe} (#${newRecord.memberNo || ''}) గారు నెల ${month} చిట్ ను ₹${netDistributed.toLocaleString('en-IN')} చేతికి తీసుకున్నారు.`,
       type: 'lottery',
       date: new Date().toISOString().split('T')[0],
       isRead: false

@@ -993,10 +993,10 @@ app.post('/api/groups/:groupId/liftings', async (req, res) => {
   const notif = {
     id: `notif-${Date.now()}`,
     groupId,
-    title: `Month ${month} Chit Winner: ${newLifting.memberName}`,
-    titleTe: `🏆 నెల ${month} చిట్ పాట విజేత: ${newLifting.memberNameTe}`,
-    message: `${newLifting.memberName} lifted Month ${month} chit for ₹${newLifting.netDistributedAmount.toLocaleString('en-IN')} (${newLifting.liftType === 'auction' ? 'Auction Bid' : 'Lucky Draw'}).`,
-    messageTe: `${newLifting.memberNameTe} గారు నెల ${month} చిట్ ను ₹${newLifting.netDistributedAmount.toLocaleString('en-IN')} చేతికి తీసుకున్నారు (${newLifting.liftType === 'auction' ? 'వేలం పాట' : 'లక్కీ డ్రా'}).`,
+    title: `Winner: Month ${month} Chit Taken - ${newLifting.memberName}`,
+    titleTe: `🏆 విజేత: నెల ${month} చిట్ తీసుకున్నారు - ${newLifting.memberNameTe}`,
+    message: `${newLifting.memberName} lifted Month ${month} chit for ₹${newLifting.netDistributedAmount.toLocaleString('en-IN')}.`,
+    messageTe: `${newLifting.memberNameTe} గారు నెల ${month} చిట్ ను ₹${newLifting.netDistributedAmount.toLocaleString('en-IN')} చేతికి తీసుకున్నారు.`,
     type: 'lottery',
     date: new Date().toISOString().split('T')[0],
     targetRole: 'all'
@@ -1011,8 +1011,8 @@ app.post('/api/groups/:groupId/liftings', async (req, res) => {
       { hasLiftedChit: true, liftedMonth: Number(month) }
     );
     sendPushNotification({}, {
-      title: `🏆 నెల ${month} చిట్ పాట విజేత: ${newLifting.memberNameTe || newLifting.memberName}`,
-      body: `${newLifting.memberNameTe || newLifting.memberName} గారు ₹${newLifting.netDistributedAmount.toLocaleString('en-IN')} చిట్ తీసుకున్నారు (${newLifting.liftType === 'auction' ? 'వేలం పాట' : 'లక్కీ డ్రా'}).`
+      title: `🏆 విజేత: నెల ${month} చిట్ తీసుకున్నారు - ${newLifting.memberNameTe || newLifting.memberName}`,
+      body: `${newLifting.memberNameTe || newLifting.memberName} గారు ₹${newLifting.netDistributedAmount.toLocaleString('en-IN')} చిట్ తీసుకున్నారు.`
     }).catch(() => {});
     return res.json(saved);
   }
@@ -1029,8 +1029,8 @@ app.post('/api/groups/:groupId/liftings', async (req, res) => {
   }
 
   sendPushNotification({}, {
-    title: `🏆 నెల ${month} చిట్ పాట విజేత: ${newLifting.memberNameTe || newLifting.memberName}`,
-    body: `${newLifting.memberNameTe || newLifting.memberName} గారు ₹${newLifting.netDistributedAmount.toLocaleString('en-IN')} చిట్ తీసుకున్నారు (${newLifting.liftType === 'auction' ? 'వేలం పాట' : 'లక్కీ డ్రా'}).`
+    title: `🏆 విజేత: నెల ${month} చిట్ తీసుకున్నారు - ${newLifting.memberNameTe || newLifting.memberName}`,
+    body: `${newLifting.memberNameTe || newLifting.memberName} గారు ₹${newLifting.netDistributedAmount.toLocaleString('en-IN')} చిట్ తీసుకున్నారు.`
   }).catch(() => {});
 
   res.json(newLifting);
