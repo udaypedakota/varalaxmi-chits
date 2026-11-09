@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { ChitGroup, Member, PaymentRecord, LotteryRecord, ChitNotification, ChitLiftingRecord } from '../types/chit';
 import { DEFAULT_GROUPS } from '../data/defaultGroups';
-import { DEFAULT_MEMBERS } from '../data/defaultMembers';
 import { DEFAULT_PAYMENTS, DEFAULT_LOTTERY_HISTORY } from '../data/defaultPayments';
 import { DEFAULT_NOTIFICATIONS } from '../data/defaultNotifications';
 
@@ -148,10 +147,10 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const activeGroup = groups.find(g => g.id === activeGroupId) || groups[0] || DEFAULT_GROUPS[0];
 
-  // 2. Members State (Pure 20 participants - Organizer is separate)
+  // 2. Members State (Pure dynamic members loaded 100% from MongoDB Atlas)
   const [members, setMembers] = useState<Member[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.MEMBERS) || localStorage.getItem('sv_chits_members_v5');
-    const parsed = saved ? JSON.parse(saved) : DEFAULT_MEMBERS;
+    const parsed = saved ? JSON.parse(saved) : [];
     return (parsed || []).filter((m: Member) => m.role !== 'organizer' && m.phone !== '8790859546');
   });
 
@@ -1292,7 +1291,7 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLotteryHistory([]);
     setLiftings([]);
 
-    const cleanMembers = DEFAULT_MEMBERS.map(m => ({
+    const cleanMembers = members.map(m => ({
       ...m,
       hasLiftedChit: false,
       liftedMonth: undefined,
@@ -1322,7 +1321,8 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.clear();
     setGroups(DEFAULT_GROUPS);
     setActiveGroupId('grp-1');
-    setMembers(DEFAULT_MEMBERS);
+    // Preserve enrolled members in state, only reset payments/lottery/liftings
+    setMembers(prev => prev.map(m => ({ ...m, hasLiftedChit: false, liftedMonth: undefined, totalPaidSoFar: 0 })));
     setPayments([]);
     setLotteryHistory([]);
     setLiftings([]);
