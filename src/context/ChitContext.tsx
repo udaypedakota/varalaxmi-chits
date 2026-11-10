@@ -85,28 +85,32 @@ interface ChitContextType {
 const ChitContext = createContext<ChitContextType | undefined>(undefined);
 
 const STORAGE_KEYS = {
-  GROUPS: 'sv_chits_groups_v8',
-  ACTIVE_GROUP: 'sv_chits_active_group_v8',
-  MEMBERS: 'sv_chits_members_v8',
-  PAYMENTS: 'sv_chits_payments_v8',
-  LOTTERY: 'sv_chits_lottery_v8',
-  LIFTINGS: 'sv_chits_liftings_v8',
-  NOTIFICATIONS: 'sv_chits_notifs_v8',
-  CURRENT_USER: 'sv_chits_user_v8',
-  LANGUAGE: 'sv_chits_lang_v8'
+  GROUPS: 'sv_chits_groups_v9',
+  ACTIVE_GROUP: 'sv_chits_active_group_v9',
+  MEMBERS: 'sv_chits_members_v9',
+  PAYMENTS: 'sv_chits_payments_v9',
+  LOTTERY: 'sv_chits_lottery_v9',
+  LIFTINGS: 'sv_chits_liftings_v9',
+  NOTIFICATIONS: 'sv_chits_notifs_v9',
+  CURRENT_USER: 'sv_chits_user_v9',
+  LANGUAGE: 'sv_chits_lang_v9'
 };
 
 // Purge any stale legacy localStorage items so old cached data never corrupts state
 try {
   const legacyPrefixes = [
-    'sv_chits_groups_v1', 'sv_chits_groups_v2', 'sv_chits_groups_v3', 'sv_chits_groups_v4', 'sv_chits_groups_v5', 'sv_chits_groups_v6', 'sv_chits_groups_v7',
-    'sv_chits_notifs_v1', 'sv_chits_notifs_v2', 'sv_chits_notifs_v3', 'sv_chits_notifs_v4', 'sv_chits_notifs_v5', 'sv_chits_notifs_v6', 'sv_chits_notifs_v7',
-    'sv_chits_members_v1', 'sv_chits_members_v2', 'sv_chits_members_v3', 'sv_chits_members_v4', 'sv_chits_members_v5', 'sv_chits_members_v6', 'sv_chits_members_v7',
-    'sv_chits_payments_v5', 'sv_chits_payments_v6', 'sv_chits_payments_v7',
-    'sv_chits_lottery_v5', 'sv_chits_lottery_v6', 'sv_chits_lottery_v7',
-    'sv_chits_liftings_v5', 'sv_chits_liftings_v6', 'sv_chits_liftings_v7',
+    'sv_chits_groups_v1', 'sv_chits_groups_v2', 'sv_chits_groups_v3', 'sv_chits_groups_v4', 'sv_chits_groups_v5', 'sv_chits_groups_v6', 'sv_chits_groups_v7', 'sv_chits_groups_v8',
+    'sv_chits_notifs_v1', 'sv_chits_notifs_v2', 'sv_chits_notifs_v3', 'sv_chits_notifs_v4', 'sv_chits_notifs_v5', 'sv_chits_notifs_v6', 'sv_chits_notifs_v7', 'sv_chits_notifs_v8',
+    'sv_chits_members_v1', 'sv_chits_members_v2', 'sv_chits_members_v3', 'sv_chits_members_v4', 'sv_chits_members_v5', 'sv_chits_members_v6', 'sv_chits_members_v7', 'sv_chits_members_v8',
+    'sv_chits_payments_v5', 'sv_chits_payments_v6', 'sv_chits_payments_v7', 'sv_chits_payments_v8',
+    'sv_chits_lottery_v5', 'sv_chits_lottery_v6', 'sv_chits_lottery_v7', 'sv_chits_lottery_v8',
+    'sv_chits_liftings_v5', 'sv_chits_liftings_v6', 'sv_chits_liftings_v7', 'sv_chits_liftings_v8',
+    'sv_chits_user_v1', 'sv_chits_user_v2', 'sv_chits_user_v3', 'sv_chits_user_v4', 'sv_chits_user_v5', 'sv_chits_user_v6', 'sv_chits_user_v7', 'sv_chits_user_v8'
   ];
-  legacyPrefixes.forEach(k => localStorage.removeItem(k));
+  legacyPrefixes.forEach(k => {
+    localStorage.removeItem(k);
+    sessionStorage.removeItem(k);
+  });
 } catch {}
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
@@ -462,7 +466,7 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const memRes = await fetch('/api/members');
           if (memRes.ok) {
             const apiMembers = await memRes.json();
-            if (apiMembers && apiMembers.length > 0) {
+            if (Array.isArray(apiMembers)) {
               const validMembers = apiMembers.filter((m: Member) => m.role !== 'organizer' && m.phone !== '8790859546');
               // Retain any newly created local members that Atlas might still be writing
               setMembers(prev => {
@@ -481,7 +485,7 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 // STRICT CHECK: Always match by ID first! If a member has 2 chits with the same phone, matching by phone flips ticket 2 back to ticket 1 every 2.5s!
                 const refreshed = validMembers.find((m: Member) => m.id === prev.id)
                   || validMembers.find((m: Member) => (m.phone || '').replace(/\D/g, '') === (prev.phone || '').replace(/\D/g, ''));
-                return refreshed ? { ...prev, ...refreshed } : prev;
+                return refreshed ? { ...prev, ...refreshed } : null;
               });
             }
           }
@@ -1299,18 +1303,13 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem(STORAGE_KEYS.PAYMENTS);
     localStorage.removeItem(STORAGE_KEYS.LOTTERY);
     localStorage.removeItem(STORAGE_KEYS.LIFTINGS);
+    localStorage.removeItem(STORAGE_KEYS.MEMBERS);
+    localStorage.removeItem(STORAGE_KEYS.NOTIFICATIONS);
     setPayments([]);
     setLotteryHistory([]);
     setLiftings([]);
-
-    const cleanMembers = members.map(m => ({
-      ...m,
-      hasLiftedChit: false,
-      liftedMonth: undefined,
-      totalPaidSoFar: 0
-    }));
-    setMembers(cleanMembers);
-    localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(cleanMembers));
+    setMembers([]);
+    setNotifications([]);
 
     const cleanGroups = DEFAULT_GROUPS.map(g => ({
       ...g,
@@ -1333,12 +1332,11 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.clear();
     setGroups(DEFAULT_GROUPS);
     setActiveGroupId('grp-1');
-    // Preserve enrolled members in state, only reset payments/lottery/liftings
-    setMembers(prev => prev.map(m => ({ ...m, hasLiftedChit: false, liftedMonth: undefined, totalPaidSoFar: 0 })));
+    setMembers([]);
     setPayments([]);
     setLotteryHistory([]);
     setLiftings([]);
-    setNotifications(DEFAULT_NOTIFICATIONS);
+    setNotifications([]);
 
     // Never auto-login on seed
     setCurrentUser(null);

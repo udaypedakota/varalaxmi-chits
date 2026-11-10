@@ -339,18 +339,17 @@ async function connectDB() {
 
 async function seedDatabase() {
   if (isMongoConnected) {
-    // Preserve enrolled members in MongoDB! Only reset payments, lottery, liftings, notifications
     await PaymentModel.deleteMany({});
     await LotteryModel.deleteMany({});
     await LiftingModel.deleteMany({});
     await NotificationModel.deleteMany({});
     await AuditLogModel.deleteMany({});
-    await MemberModel.updateMany({}, { $set: { hasLiftedChit: false, liftedMonth: null, totalPaidSoFar: 0 } });
+    await MemberModel.deleteMany({});
     await GroupModel.updateMany({}, { currentMonth: 1 });
   } else {
     memoryStore = {
       groups: JSON.parse(JSON.stringify(INITIAL_GROUPS)),
-      members: memoryStore.members,
+      members: [],
       payments: [],
       lottery: [],
       liftings: [],
@@ -362,8 +361,7 @@ async function seedDatabase() {
 
 async function truncateDatabase() {
   if (isMongoConnected) {
-    // Reset member transaction status, but PRESERVE enrolled members!
-    await MemberModel.updateMany({}, { $set: { hasLiftedChit: false, liftedMonth: null, totalPaidSoFar: 0 } });
+    await MemberModel.deleteMany({});
     await PaymentModel.deleteMany({});
     await LotteryModel.deleteMany({});
     await LiftingModel.deleteMany({});
@@ -372,14 +370,11 @@ async function truncateDatabase() {
     // Reset groups to Month 1
     await GroupModel.updateMany({}, { currentMonth: 1 });
   } else {
-    memoryStore.members.forEach(m => {
-      m.hasLiftedChit = false;
-      m.liftedMonth = null;
-      m.totalPaidSoFar = 0;
-    });
+    memoryStore.members = [];
     memoryStore.payments = [];
     memoryStore.lottery = [];
     memoryStore.liftings = [];
+    memoryStore.notifications = [];
     memoryStore.audit = [];
     memoryStore.groups.forEach(g => {
       g.currentMonth = 1;
