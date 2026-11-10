@@ -6859,6 +6859,196 @@ select.form-input option,
 }
 
 /* ==========================================================================
+   SIVA ORGANIZER <-> PERSONAL CHITS MODE SWITCHER BANNERS
+   ========================================================================== */
+.siva-org-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  padding: 0.85rem 1.1rem;
+  margin-bottom: 1.15rem;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(15, 23, 42, 0.95) 60%, rgba(10, 16, 36, 0.98) 100%);
+  border: 1.5px solid rgba(245, 158, 11, 0.45);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 16px rgba(245, 158, 11, 0.12);
+}
+
+.siva-org-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.siva-org-banner-crown {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  color: #050914;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+  flex-shrink: 0;
+}
+
+.siva-org-banner-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.siva-org-banner-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #FBBF24;
+  line-height: 1.25;
+}
+
+.siva-org-banner-sub {
+  font-size: 0.75rem;
+  color: #94A3B8;
+  margin-top: 2px;
+}
+
+.btn-siva-return-org {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1.05rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  border: 1px solid #FCD34D;
+  color: #0A0F1D;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+  flex-shrink: 0;
+}
+
+.btn-siva-return-org:hover {
+  background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.5);
+}
+
+.btn-siva-return-org:active {
+  transform: scale(0.97);
+}
+
+.siva-org-switch-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  padding: 0.85rem 1.1rem;
+  margin-bottom: 1.15rem;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%);
+  border: 1.5px solid rgba(245, 158, 11, 0.4);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 16px rgba(245, 158, 11, 0.1);
+}
+
+.siva-org-switch-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.siva-org-switch-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.18);
+  border: 1.5px solid rgba(245, 158, 11, 0.4);
+  color: #FBBF24;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.siva-org-switch-details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.siva-org-switch-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #F8FAFC;
+  line-height: 1.25;
+}
+
+.siva-org-switch-sub {
+  font-size: 0.75rem;
+  color: #94A3B8;
+  margin-top: 2px;
+}
+
+.btn-siva-view-chits {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1.05rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.22) 0%, rgba(217, 119, 6, 0.15) 100%);
+  border: 1.5px solid rgba(245, 158, 11, 0.45);
+  color: #FCD34D;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-siva-view-chits:hover {
+  background: rgba(245, 158, 11, 0.3);
+  border-color: #F59E0B;
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.btn-siva-view-chits:active {
+  transform: scale(0.97);
+}
+
+@media (max-width: 640px) {
+  .siva-org-banner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+    padding: 0.75rem 0.85rem;
+  }
+  .btn-siva-return-org {
+    justify-content: center;
+    width: 100%;
+    padding: 0.55rem;
+  }
+  .siva-org-switch-banner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+    padding: 0.75rem 0.85rem;
+  }
+  .btn-siva-view-chits {
+    justify-content: center;
+    width: 100%;
+    padding: 0.55rem;
+  }
+}
+
+/* ==========================================================================
    DIGITAL LUXURY MEMBERSHIP SLIP (Post-Enrollment Credential Pass)
    ========================================================================== */
 .enroll-success-stage {

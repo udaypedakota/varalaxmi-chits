@@ -482,24 +482,38 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               <ChevronDown size={14} className="month-select-chevron" />
             </div>
           </div>
+        </div>
 
-          {userChits && userChits.length > 0 && (
+        {/* Siva's Personal Chits Switch Banner (When Organizer holds personal chits) */}
+        {userChits && userChits.length > 0 && (
+          <div className="siva-org-switch-banner animate-fade">
+            <div className="siva-org-switch-left">
+              <div className="siva-org-switch-badge">🎟️</div>
+              <div className="siva-org-switch-details">
+                <strong className="siva-org-switch-title">
+                  {language === 'te'
+                    ? `మీ వ్యక్తిగత చిట్టీలు (${userChits.map(c => `#${c.memberNo}`).join(', ')})`
+                    : `Your Personal Chits (${userChits.map(c => `#${c.memberNo}`).join(', ')})`}
+                </strong>
+                <span className="siva-org-switch-sub">
+                  {language === 'te'
+                    ? `మీ ${userChits.length} చిట్టీల పాస్‌బుక్ & వాయిదా చెల్లింపులు చూడండి`
+                    : `View passbook & installment records for your ${userChits.length} chits`}
+                </span>
+              </div>
+            </div>
             <button
               type="button"
               onClick={() => switchToMemberChit()}
-              className="org-my-chits-pill flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-400/50 hover:border-amber-400 text-amber-300 hover:text-white font-bold text-xs transition-all shadow-sm cursor-pointer ml-auto"
-              title={language === 'te' ? 'మీ చిట్టీల పాస్‌బుక్ & చెల్లింపులు' : 'My Chits Passbook & Payments'}
+              className="btn-siva-view-chits"
+              title={language === 'te' ? 'మీ చిట్టీల పాస్‌బుక్ చూడండి' : 'View Your Chits Passbook'}
             >
               <span>🎟️</span>
-              <span>
-                {language === 'te' 
-                  ? `నా ${userChits.length} చిట్టీల పాస్‌బుక్` 
-                  : `My ${userChits.length} Chits Passbook`}
-              </span>
-              <ChevronRight size={13} />
+              <span>{language === 'te' ? 'నా చిట్టీల పాస్‌బుక్' : 'My Chits Passbook'}</span>
+              <ChevronRight size={14} />
             </button>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* 4 Metric Cards */}
         <div className="org-metrics-grid">

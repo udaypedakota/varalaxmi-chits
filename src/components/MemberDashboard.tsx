@@ -156,27 +156,28 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
     <div className="dashboard-content">
       {/* ORGANIZER BANNER: When Siva is viewing his member chits, quick 1-click return to Organizer Portal */}
       {currentUser.phone === '8790859546' && (
-        <section className="siva-org-banner animate-fade mb-3 p-3 rounded-2xl bg-gradient-to-r from-amber-500/15 via-yellow-500/10 to-transparent border border-amber-500/40 flex items-center justify-between shadow-sm">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-yellow-600 flex items-center justify-center text-slate-950 font-black text-base shadow-sm">
+        <section className="siva-org-banner animate-fade">
+          <div className="siva-org-banner-left">
+            <div className="siva-org-banner-crown">
               👑
             </div>
-            <div>
-              <div className="text-xs sm:text-sm font-black text-amber-300">
-                {language === 'te' ? 'నిర్వాహకుడు శివ (ఆర్గనైజర్ ఖాతా)' : 'Organizer Siva (Organizer Mode)'}
-              </div>
-              <div className="text-[11px] text-slate-400 font-medium">
+            <div className="siva-org-banner-text">
+              <strong className="siva-org-banner-title">
+                {language === 'te' ? 'నిర్వాహకుడు శివ (వ్యక్తిగత ఖాతా)' : 'Organizer Siva (Personal Chits)'}
+              </strong>
+              <span className="siva-org-banner-sub">
                 {language === 'te' ? 'మీరు మీ వ్యక్తిగత చిట్టీల పాస్‌బుక్‌ని చూస్తున్నారు' : 'Currently viewing your personal chits passbook'}
-              </div>
+              </span>
             </div>
           </div>
           <button
             type="button"
             onClick={switchToOrganizer}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition-all shadow-md shrink-0 cursor-pointer"
+            className="btn-siva-return-org"
           >
+            <span>👑</span>
             <span>{language === 'te' ? 'ఆర్గనైజర్ సెంటర్' : 'Organizer Center'}</span>
-            <ChevronRight size={13} />
+            <ChevronRight size={14} />
           </button>
         </section>
       )}
@@ -241,13 +242,6 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
           </div>
           <div className="hero-member-id">
             #{currentUser.memberNo} {language === 'te' ? currentUser.nameTe : currentUser.name}
-            {userChits && userChits.length > 1 && (
-              <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                {language === 'te' 
-                  ? `${userChits.findIndex(c => c.id === currentUser.id) + 1}వ చిట్టీ` 
-                  : `Chit ${userChits.findIndex(c => c.id === currentUser.id) + 1} of ${userChits.length}`}
-              </span>
-            )}
           </div>
         </div>
 
