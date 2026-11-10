@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
+import html2canvas from 'html2canvas';
 import { useChit } from '../context/ChitContext';
 import { PaymentRecord, Member } from '../types/chit';
-import { X, Printer, Share2, CheckCircle2, MessageSquare } from 'lucide-react';
+import { X, Printer, Share2, CheckCircle2, MessageSquare, Download, Loader2 } from 'lucide-react';
 import { LanguageToggle } from './LanguageToggle';
 import { openDeviceSms, getPaymentReceiptSmsText } from '../utils/smsHelper';
 
@@ -13,7 +14,9 @@ interface ReceiptModalProps {
 }
 
 export const ReceiptModal: React.FC<ReceiptModalProps> = ({ payment, member, isOpen, onClose }) => {
-  const { scheme, language } = useChit();
+  const { scheme, language, showToast } = useChit();
+  const receiptRef = useRef<HTMLDivElement>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   if (!isOpen || !payment) return null;
 
@@ -21,35 +24,129 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ payment, member, isO
     window.print();
   };
 
-  const handleShareWhatsApp = () => {
-    const text = language === 'te'
-      ? encodeURIComponent(
-          `🧾 *శ్రీ వరలక్ష్మి చిట్స్ - అధికారిక డిజిటల్ రసీదు*\n` +
-          `-----------------------------------------\n` +
-          `రసీదు నం: ${payment.receiptNo}\n` +
-          `సభ్యుని పేరు: ${member?.nameTe || payment.memberName}\n` +
-          `వాయిదా నెల: నెల ${payment.month} / 20\n` +
-          `చెల్లించిన మొత్తం: ₹${payment.amount.toLocaleString('en-IN')}\n` +
-          `చెల్లింపు తేదీ: ${payment.date}\n` +
-          `UTR / ట్రాన్సాక్షన్ ID: ${payment.utr || 'Cash'}\n` +
-          `స్థితి: ఆమోదించబడింది (Approved)\n` +
-          `-----------------------------------------\n` +
-          `నిర్వాహకుడు: ${scheme.organizerName} (${scheme.organizerPhone})`
-        )
-      : encodeURIComponent(
-          `🧾 *Sri Varalaxmi Chits - Official Digital Receipt*\n` +
-          `-----------------------------------------\n` +
-          `Receipt No: ${payment.receiptNo}\n` +
-          `Member Name: ${member?.name || payment.memberName}\n` +
-          `Installment: Month ${payment.month} of 20\n` +
-          `Amount Paid: ₹${payment.amount.toLocaleString('en-IN')}\n` +
-          `Payment Date: ${payment.date}\n` +
-          `UTR / Ref ID: ${payment.utr || 'Cash'}\n` +
-          `Status: Verified & Approved\n` +
-          `-----------------------------------------\n` +
-          `Organizer: ${scheme.organizerName} (${scheme.organizerPhone})`
+  const generateReceiptBlob = async (): Promise<Blob | null> => {
+    if (!receiptRef.current) return null;
+    try {
+      const canvas = await html2canvas(receiptRef.current, {
+        scale: 2.5,
+        useCORS: true,
+        backgroundColor: '#FFFFFF',
+        logging: false
+      });
+      return await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png', 0.95));
+    } catch (err) {
+      console.error('Failed to generate receipt image:', err);
+      return null;
+    }
+  };
+
+  const handleShareWhatsApp = async () => {
+    if (isGenerating) return;
+    setIsGenerating(true);
+
+    const shareCaption = language === 'te'
+      ? `🧾 *శ్రీ వరలక్ష్మి చిట్స్ - అధికారిక డిజిటల్ రసీదు*\n` +
+        `-----------------------------------------\n` +
+        `రసీదు నం: ${payment.receiptNo}\n` +
+        `సభ్యుని పేరు: ${member?.nameTe || payment.memberName}\n` +
+        `వాయిదా నెల: నెల ${payment.month} / 20\n` +
+        `చెల్లించిన మొత్తం: ₹${payment.amount.toLocaleString('en-IN')}\n` +
+        `చెల్లింపు తేదీ: ${payment.date}\n` +
+        `UTR / ట్రాన్సాక్షన్ ID: ${payment.utr || 'Cash'}\n` +
+        `స్థితి: ఆమోదించబడింది (Approved)\n` +
+        `-----------------------------------------\n` +
+        `నిర్వాహకుడు: ${scheme.organizerName} (${scheme.organizerPhone})`
+      : `🧾 *Sri Varalaxmi Chits - Official Digital Receipt*\n` +
+        `-----------------------------------------\n` +
+        `Receipt No: ${payment.receiptNo}\n` +
+        `Member Name: ${member?.name || payment.memberName}\n` +
+        `Installment: Month ${payment.month} of 20\n` +
+        `Amount Paid: ₹${payment.amount.toLocaleString('en-IN')}\n` +
+        `Payment Date: ${payment.date}\n` +
+        `UTR / Ref ID: ${payment.utr || 'Cash'}\n` +
+        `Status: Verified & Approved\n` +
+        `-----------------------------------------\n` +
+        `Organizer: ${scheme.organizerName} (${scheme.organizerPhone})`;
+
+    try {
+      const blob = await generateReceiptBlob();
+      const fileName = `Sri-Varalaxmi-Chits-Receipt-${payment.receiptNo}.png`;
+
+      if (blob) {
+        const file = new File([blob], fileName, { type: 'image/png' });
+
+        // 1. Mobile Native Web Share API with Image File (iOS Safari & Android Chrome -> WhatsApp)
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: `Receipt #${payment.receiptNo}`,
+            text: shareCaption
+          });
+          setIsGenerating(false);
+          return;
+        }
+
+        // 2. Desktop Fallback: Download image automatically + copy to clipboard if supported
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        try {
+          if (navigator.clipboard && window.ClipboardItem) {
+            await navigator.clipboard.write([
+              new ClipboardItem({ 'image/png': blob })
+            ]);
+          }
+        } catch {}
+
+        showToast(
+          language === 'te' ? 'రసీదు ఫోటో డౌన్‌లోడ్ అయ్యింది!' : 'Receipt Image Downloaded!',
+          language === 'te' ? 'రసీదు ఫోటో సేవ్ చేయబడింది. వాట్సాప్‌లో ఫోటోను అటాచ్ చేసి పంపండి.' : 'Receipt image downloaded. You can attach it in WhatsApp.',
+          'info'
         );
-    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+      }
+    } catch (e) {
+      console.log('Share error:', e);
+    } finally {
+      setIsGenerating(false);
+    }
+
+    // Open WhatsApp Web with caption if native file share didn't open
+    const encodedText = encodeURIComponent(shareCaption);
+    window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
+  };
+
+  const handleDownloadImage = async () => {
+    if (isGenerating) return;
+    setIsGenerating(true);
+    try {
+      const blob = await generateReceiptBlob();
+      if (blob) {
+        const fileName = `Sri-Varalaxmi-Chits-Receipt-${payment.receiptNo}.png`;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast(
+          language === 'te' ? 'రసీదు సేవ్ అయింది!' : 'Receipt Image Saved!',
+          language === 'te' ? 'రసీదు చిత్రం విజయవంతంగా డౌన్‌లోడ్ చేయబడింది.' : 'Receipt image downloaded successfully.',
+          'info'
+        );
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleSendSms = () => {
@@ -77,7 +174,7 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ payment, member, isO
         </div>
 
         {/* Printable Official Receipt Body */}
-        <div className="official-receipt-card print-target">
+        <div className="official-receipt-card print-target" ref={receiptRef}>
           {/* Header */}
           <div className="receipt-header-banner">
             <div className="receipt-logo-wrap">
@@ -172,17 +269,21 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ payment, member, isO
 
         {/* Action Buttons (Hidden when printing) */}
         <div className="receipt-action-bar no-print">
-          <button type="button" className="btn-secondary" onClick={handlePrint}>
+          <button type="button" className="btn-secondary" onClick={handlePrint} disabled={isGenerating}>
             <Printer size={18} />
             <span>{language === 'te' ? 'ప్రింట్ (PDF)' : 'Print (PDF)'}</span>
           </button>
-          <button type="button" className="btn-sms-share" onClick={handleSendSms}>
+          <button type="button" className="btn-sms-share" onClick={handleSendSms} disabled={isGenerating}>
             <MessageSquare size={18} />
             <span>{language === 'te' ? 'SMS రసీదు' : 'Send SMS'}</span>
           </button>
-          <button type="button" className="btn-whatsapp-share" onClick={handleShareWhatsApp}>
-            <Share2 size={18} />
-            <span>WhatsApp</span>
+          <button type="button" className="btn-download-image" onClick={handleDownloadImage} disabled={isGenerating} title={language === 'te' ? 'రసీదు ఫోటోను సేవ్ చేసుకోండి' : 'Save receipt image'}>
+            <Download size={18} />
+            <span>{language === 'te' ? 'ఫోటో సేవ్' : 'Save Image'}</span>
+          </button>
+          <button type="button" className="btn-whatsapp-share" onClick={handleShareWhatsApp} disabled={isGenerating}>
+            {isGenerating ? <Loader2 size={18} className="animate-spin" /> : <Share2 size={18} />}
+            <span>{isGenerating ? (language === 'te' ? 'తయారవుతోంది...' : 'Generating...') : (language === 'te' ? 'WhatsApp (ఫోటో)' : 'WhatsApp (Image)')}</span>
           </button>
         </div>
       </div>

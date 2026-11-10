@@ -3110,67 +3110,109 @@ select.form-input option,
 }
 
 .receipt-action-bar {
-  display: flex;
-  gap: 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.65rem;
   margin-top: 1rem;
 }
 
+@media (min-width: 640px) {
+  .receipt-action-bar {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 .btn-secondary {
-  flex: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
   background: var(--navy-card);
   border: 1px solid var(--navy-border);
   color: #FFFFFF;
-  padding: 0.75rem;
+  padding: 0.75rem 0.5rem;
   border-radius: var(--radius-md);
   font-weight: 700;
-  cursor: pointer;
-}
-
-.btn-whatsapp-share {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  background: #25D366;
-  border: none;
-  color: #FFFFFF;
-  padding: 0.75rem 0.6rem;
-  border-radius: var(--radius-md);
-  font-weight: 800;
+  font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.btn-whatsapp-share:hover {
+.btn-secondary:hover:not(:disabled) {
+  background: var(--navy-card-hover);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.btn-download-image {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  border: none;
+  color: #070B19;
+  padding: 0.75rem 0.5rem;
+  border-radius: var(--radius-md);
+  font-weight: 800;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
+}
+
+.btn-download-image:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-whatsapp-share {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  background: #25D366;
+  border: none;
+  color: #FFFFFF;
+  padding: 0.75rem 0.5rem;
+  border-radius: var(--radius-md);
+  font-weight: 800;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.35);
+}
+
+.btn-whatsapp-share:hover:not(:disabled) {
   background: #22c35e;
   transform: translateY(-1px);
 }
 
 .btn-sms-share {
-  flex: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
   background: linear-gradient(135deg, #0284C7, #0369A1);
   border: 1px solid rgba(56, 189, 248, 0.45);
   color: #FFFFFF;
-  padding: 0.75rem 0.6rem;
+  padding: 0.75rem 0.5rem;
   border-radius: var(--radius-md);
   font-weight: 800;
+  font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
 }
 
-.btn-sms-share:hover {
+.btn-sms-share:hover:not(:disabled) {
   background: linear-gradient(135deg, #0369A1, #075985);
   transform: translateY(-1px);
+}
+
+.receipt-action-bar button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
 }
 
 /* ==========================================================================
