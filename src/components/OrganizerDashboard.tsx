@@ -65,7 +65,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
     approvePayment,
     rejectPayment,
     setCurrentMonth,
-    switchUser,
     addMember,
     deleteMember,
     updateMember,
@@ -1240,19 +1239,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                           <span>{language === 'te' ? 'వాట్సాప్' : 'WhatsApp'}</span>
                         </button>
 
-                        <button
-                          type="button"
-                          className="btn-drawer-action btn-drawer-passbook"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            switchUser(m.id);
-                          }}
-                          title={language === 'te' ? 'ఈ సభ్యుని పాస్‌బుక్ చూడండి' : 'Open Passbook as Member'}
-                        >
-                          <UserCheck size={14} />
-                          <span>{language === 'te' ? 'పాస్‌బుక్' : 'Passbook'}</span>
-                        </button>
-
                         {isPaid && curPay ? (
                           <>
                             <button
@@ -1472,11 +1458,12 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                             ) : (
                               <button
                                 type="button"
-                                className="btn-cell-switch text-xs py-1 px-2"
-                                onClick={() => switchUser(m.id)}
-                                title={language === 'te' ? 'ఈ సభ్యుని పాస్‌బుక్ చూడండి' : 'Open Passbook as Member'}
+                                className="btn-cell-reminder text-xs py-1 px-2 flex items-center gap-1 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 hover:bg-amber-500/20"
+                                onClick={() => handleSendReminder(m)}
+                                title={language === 'te' ? 'రిమైండర్ పంపండి' : 'Send Due Reminder'}
                               >
-                                {language === 'te' ? 'పాస్‌బుక్' : 'Passbook'}
+                                <Send size={13} />
+                                <span className="text-[11px]">{language === 'te' ? 'రిమైండర్' : 'Remind'}</span>
                               </button>
                             )}
 
@@ -2281,30 +2268,36 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
       {/* Edit Member Details Modal */}
       {editingMember && (
         <div className="modal-backdrop animate-fade" onClick={() => setEditingMember(null)}>
-          <div className="modal-content login-mobile-frame animate-scale-up" onClick={e => e.stopPropagation()}>
-            <div className="modal-header flex items-center justify-between pb-3 border-b border-gray-800">
-              <h3 className="font-bold text-white text-base">
-                {language === 'te' ? `సభ్యుని వివరాలు సవరించండి (#${editingMember.memberNo})` : `Edit Member Details (#${editingMember.memberNo})`}
+          <div className="login-modal-card luxury-card animate-scale-up" onClick={e => e.stopPropagation()}>
+            <div className="login-modal-top-bar pb-2 border-b border-gray-800/80">
+              <h3 className="text-base font-bold text-amber-300 flex items-center gap-2 m-0">
+                <Edit2 size={18} className="text-amber-400 shrink-0" />
+                <span>
+                  {language === 'te'
+                    ? `సభ్యుని వివరాలు సవరించండి (#${editingMember.memberNo})`
+                    : `Edit Member Details (#${editingMember.memberNo})`}
+                </span>
               </h3>
               <button
                 type="button"
-                className="text-gray-400 hover:text-white"
+                className="btn-modal-close static"
                 onClick={() => setEditingMember(null)}
+                aria-label="Close modal"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
             {editError && (
-              <div className="alert-box error mt-3 text-xs p-2.5 rounded-lg bg-red-950/40 border border-red-800/40 text-red-300">
-                {editError}
+              <div className="login-error-alert my-2.5">
+                <span>{editError}</span>
               </div>
             )}
 
-            <form onSubmit={handleSaveEditMember} className="login-form mt-3 space-y-3">
+            <form onSubmit={handleSaveEditMember} className="login-form mt-3 space-y-3.5">
               <div className="form-field">
                 <label className="field-label text-xs font-semibold text-gray-300">
-                  {language === 'te' ? 'మెంబర్ నంబర్ / టికెట్ (#1 నుండి #20):' : 'Member / Ticket No (#1 to #20):'}
+                  <span>{language === 'te' ? 'మెంబర్ నంబర్ / టికెట్ (#1 నుండి #20):' : 'Member / Ticket No (#1 to #20):'}</span>
                 </label>
                 <input
                   type="number"
@@ -2319,7 +2312,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
 
               <div className="form-field">
                 <label className="field-label text-xs font-semibold text-gray-300">
-                  {language === 'te' ? 'సభ్యుని పేరు (ఇంగ్లీష్):' : 'Member Name:'}
+                  <span>{language === 'te' ? 'సభ్యుని పేరు (ఇంగ్లీష్):' : 'Member Name:'}</span>
                 </label>
                 <input
                   type="text"
@@ -2333,7 +2326,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
 
               <div className="form-field">
                 <label className="field-label text-xs font-semibold text-gray-300">
-                  {language === 'te' ? 'సభ్యుని పేరు (తెలుగు):' : 'Telugu Name (Optional):'}
+                  <span>{language === 'te' ? 'సభ్యుని పేరు (తెలుగు - ఐచ్ఛికం):' : 'Telugu Name (Optional):'}</span>
                 </label>
                 <input
                   type="text"
@@ -2346,27 +2339,30 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
 
               <div className="form-field">
                 <label className="field-label text-xs font-semibold text-gray-300">
-                  {language === 'te' ? '10-అంకెల మొబైల్ నంబర్:' : 'Mobile Number:'}
+                  <span>{language === 'te' ? '10-అంకెల మొబైల్ నంబర్:' : 'Mobile Number:'}</span>
                 </label>
-                <input
-                  type="tel"
-                  maxLength={10}
-                  className="form-input font-mono"
-                  value={editPhone}
-                  onChange={e => setEditPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                  placeholder="10 digit mobile"
-                  required
-                />
+                <div className="input-group">
+                  <span className="input-prefix">+91</span>
+                  <input
+                    type="tel"
+                    maxLength={10}
+                    className="form-input font-mono"
+                    value={editPhone}
+                    onChange={e => setEditPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                    placeholder="10 digit mobile"
+                    required
+                  />
+                </div>
               </div>
 
               <div className="form-field">
                 <label className="field-label text-xs font-semibold text-gray-300">
-                  {language === 'te' ? '4-అంకెల సెక్యూరిటీ పిన్:' : 'Security PIN (4 digits):'}
+                  <span>{language === 'te' ? 'సెక్యూరిటీ పిన్ (4-Digits PIN):' : 'Security PIN (4 digits):'}</span>
                 </label>
                 <input
                   type="text"
                   maxLength={4}
-                  className="form-input text-center font-bold tracking-widest font-mono"
+                  className="form-input text-center font-bold tracking-widest font-mono text-amber-300"
                   value={editPin}
                   onChange={e => setEditPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
                   placeholder="1234"
@@ -2374,17 +2370,17 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                 />
               </div>
 
-              <div className="flex gap-2 pt-2">
+              <div className="flex gap-2.5 pt-3">
                 <button
                   type="button"
-                  className="btn-secondary flex-1 py-2.5 text-xs"
+                  className="btn-secondary flex-1 py-2.5 text-xs font-semibold rounded-xl"
                   onClick={() => setEditingMember(null)}
                 >
                   {language === 'te' ? 'రద్దు చేయి' : 'Cancel'}
                 </button>
                 <button
                   type="submit"
-                  className="btn-primary flex-1 py-2.5 text-xs font-bold"
+                  className="btn-primary flex-1 py-2.5 text-xs font-bold rounded-xl"
                   disabled={isSavingEdit}
                 >
                   {isSavingEdit
