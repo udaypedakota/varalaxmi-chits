@@ -64,6 +64,7 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
     currentUser, 
     userChits, 
     switchActiveChit, 
+    switchToOrganizer,
     groupPayments, 
     groupLotteryHistory, 
     groupLiftings, 
@@ -153,6 +154,33 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
 
   return (
     <div className="dashboard-content">
+      {/* ORGANIZER BANNER: When Siva is viewing his member chits, quick 1-click return to Organizer Portal */}
+      {currentUser.phone === '8790859546' && (
+        <section className="siva-org-banner animate-fade mb-3 p-3 rounded-2xl bg-gradient-to-r from-amber-500/15 via-yellow-500/10 to-transparent border border-amber-500/40 flex items-center justify-between shadow-sm">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-yellow-600 flex items-center justify-center text-slate-950 font-black text-base shadow-sm">
+              👑
+            </div>
+            <div>
+              <div className="text-xs sm:text-sm font-black text-amber-300">
+                {language === 'te' ? 'నిర్వాహకుడు శివ (ఆర్గనైజర్ ఖాతా)' : 'Organizer Siva (Organizer Mode)'}
+              </div>
+              <div className="text-[11px] text-slate-400 font-medium">
+                {language === 'te' ? 'మీరు మీ వ్యక్తిగత చిట్టీల పాస్‌బుక్‌ని చూస్తున్నారు' : 'Currently viewing your personal chits passbook'}
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={switchToOrganizer}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition-all shadow-md shrink-0 cursor-pointer"
+          >
+            <span>{language === 'te' ? 'ఆర్గనైజర్ సెంటర్' : 'Organizer Center'}</span>
+            <ChevronRight size={13} />
+          </button>
+        </section>
+      )}
+
       {/* MULTI-CHIT SELECTOR: When member holds 2 or more chits */}
       {userChits && userChits.length > 1 && (
         <section className="multi-chit-banner animate-fade">

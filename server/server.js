@@ -316,8 +316,8 @@ async function connectDB() {
           } 
         }
       );
-      // Purge organizer from members collection if present
-      await MemberModel.deleteMany({ $or: [{ role: 'organizer' }, { phone: '8790859546' }] });
+      // Purge any stale organizer dummy record from members collection if present (preserve member chits)
+      await MemberModel.deleteMany({ role: 'organizer' });
 
       // Check if empty, if so, seed automatically with clean slate Month 1
       const groupCount = await GroupModel.countDocuments();

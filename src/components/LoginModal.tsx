@@ -61,7 +61,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, initial
       return;
     }
 
-    const res = await login(cleanPhone, pin.trim());
+    const res = await login(cleanPhone, pin.trim(), 'member');
     if (res.success) {
       setSuccessMsg(language === 'te' ? 'లాగిన్ విజయవంతమైంది!' : 'Login successful!');
       setTimeout(() => {
@@ -95,7 +95,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, initial
       return;
     }
 
-    const res = await login(cleanPhone, pin.trim());
+    const res = await login(cleanPhone, pin.trim(), 'organizer');
     if (res.success) {
       setSuccessMsg(language === 'te' ? 'ఆర్గనైజర్ పోర్టల్ లోకి స్వాగతం!' : 'Welcome to Organizer Portal!');
       setTimeout(() => {

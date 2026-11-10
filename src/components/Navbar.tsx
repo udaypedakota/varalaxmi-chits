@@ -12,7 +12,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenLogin, onOpenInstall, isStandalone }) => {
-  const { activeGroup, scheme, currentUser, language, logout, dbStatus } = useChit();
+  const { activeGroup, scheme, currentUser, userChits, switchToOrganizer, switchToMemberChit, language, logout, dbStatus } = useChit();
 
   const currentGroup = activeGroup || scheme;
 
@@ -68,6 +68,31 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenLogin, onOpenInstall, isSt
                       ? (language === 'te' ? 'ఆర్గనైజర్' : 'Admin')
                       : (language === 'te' ? `#${currentUser.memberNo}` : `#${currentUser.memberNo}`)}
                   </span>
+                  {(currentUser.phone === '8790859546' || currentUser.role === 'organizer') && (
+                    currentUser.role === 'organizer' ? (
+                      userChits && userChits.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => switchToMemberChit()}
+                          className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 transition-all cursor-pointer flex items-center gap-1 shrink-0 ml-1"
+                          title={language === 'te' ? 'మీ చిట్టీల పాస్‌బుక్' : 'View My Chits'}
+                        >
+                          <span>🎟️</span>
+                          <span>{language === 'te' ? 'నా చిట్టీలు' : 'My Chits'}</span>
+                        </button>
+                      )
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={switchToOrganizer}
+                        className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 transition-all cursor-pointer flex items-center gap-1 shrink-0 ml-1"
+                        title={language === 'te' ? 'ఆర్గనైజర్ పోర్టల్' : 'Organizer Portal'}
+                      >
+                        <span>👑</span>
+                        <span>{language === 'te' ? 'ఆర్గనైజర్' : 'Admin'}</span>
+                      </button>
+                    )
+                  )}
                 </div>
                 <button 
                   type="button" 

@@ -25,9 +25,11 @@ interface ChitContextType {
   currentUser: Member | null;
   userChits: Member[];
   switchActiveChit: (memberId: string) => void;
+  switchToOrganizer: () => void;
+  switchToMemberChit: (memberId?: string) => void;
   language: 'te' | 'en';
   setLanguage: (lang: 'te' | 'en') => void;
-  login: (phone: string, pin: string, groupId?: string) => Promise<{ success: boolean; error?: string }>;
+  login: (phone: string, pin: string, targetRole?: 'member' | 'organizer', groupId?: string) => Promise<{ success: boolean; error?: string }>;
   registerMember: (memberData: { name: string; phone: string; pin: string; groupId?: string }) => { success: boolean; error?: string; member?: Member };
   logout: () => void;
   switchUser: (memberId: string) => void;
@@ -155,7 +157,7 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [members, setMembers] = useState<Member[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.MEMBERS) || localStorage.getItem('sv_chits_members_v5');
     const parsed = saved ? JSON.parse(saved) : [];
-    return (parsed || []).filter((m: Member) => m.role !== 'organizer' && m.phone !== '8790859546');
+    return (parsed || []).filter((m: Member) => m.role !== 'organizer');
   });
 
   // 3. Payments State (Clean Slate: Empty for live entry)
@@ -462,19 +464,17 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
           }
 
-          // Fetch Live Members across ALL groups from Atlas (strictly exclude organizer)
+          // Fetch Live Members across ALL groups from Atlas (strictly exclude organizer role dummy records)
           const memRes = await fetch('/api/members');
           if (memRes.ok) {
             const apiMembers = await memRes.json();
             if (Array.isArray(apiMembers)) {
-              const validMembers = apiMembers.filter((m: Member) => m.role !== 'organizer' && m.phone !== '8790859546');
+              const validMembers = apiMembers.filter((m: Member) => m.role !== 'organizer');
               // Retain any newly created local members that Atlas might still be writing
               setMembers(prev => {
                 const apiIds = new Set(validMembers.map((m: Member) => m.id));
-                const apiPhones = new Set(validMembers.map((m: Member) => `${m.groupId}_${m.phone}`));
                 const recentLocal = prev.filter(m => 
                   !apiIds.has(m.id) && 
-                  !apiPhones.has(`${m.groupId}_${m.phone}`) &&
                   m.id.startsWith('m-') && 
                   (Date.now() - Number(m.id.replace('m-', '')) < 25000)
                 );
@@ -594,13 +594,13 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const groupLotteryHistory = lotteryHistory.filter(l => !l.groupId || l.groupId === activeGroupId);
   const groupLiftings = liftings.filter(l => !l.groupId || l.groupId === activeGroupId);
 
-  // All chits belonging to the current logged-in member's phone number
+  // All chits belonging to the current logged-in member or organizer's phone number
   const userChits = useMemo(() => {
-    if (!currentUser || currentUser.role === 'organizer') return [];
+    if (!currentUser) return [];
     const cleanPhone = (currentUser.phone || '').trim().replace(/\D/g, '');
-    if (!cleanPhone) return [currentUser];
+    if (!cleanPhone) return currentUser.role === 'organizer' ? [] : [currentUser];
     const matching = members.filter(m => m.role !== 'organizer' && (m.phone || '').trim().replace(/\D/g, '') === cleanPhone);
-    return matching.length > 0 ? matching : [currentUser];
+    return matching.length > 0 ? matching : (currentUser.role === 'organizer' ? [] : [currentUser]);
   }, [currentUser, members]);
 
   const switchActiveChit = (memberId: string) => {
@@ -619,6 +619,53 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
       showToast(
         language === 'te' ? `🎟️ చిట్టీ #${target.memberNo} కి మారారు` : `🎟️ Switched to Chit #${target.memberNo}`,
         language === 'te' ? `${target.nameTe || target.name} • ${groupName}` : `${target.name} • ${groupName}`,
+        'info'
+      );
+      registerPushForUser(target);
+    }
+  };
+
+  const switchToOrganizer = () => {
+    const orgUser: Member = {
+      id: 'm-org-siva',
+      groupId: activeGroupId,
+      memberNo: 0,
+      name: 'Siva (Organizer)',
+      nameTe: 'శివ (ఆర్గనైజర్)',
+      phone: '8790859546',
+      pin: '9546',
+      role: 'organizer',
+      hasLiftedChit: false,
+      totalPaidSoFar: 0
+    };
+    setCurrentUser(orgUser);
+    try {
+      localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(orgUser));
+      sessionStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(orgUser));
+    } catch {}
+    showToast(
+      language === 'te' ? '👑 ఆర్గనైజర్ పోర్టల్' : '👑 Organizer Portal',
+      language === 'te' ? 'నిర్వాహకుని నియంత్రణ కేంద్రానికి మారారు' : 'Switched to Organizer Center',
+      'info'
+    );
+    registerPushForUser(orgUser);
+  };
+
+  const switchToMemberChit = (memberId?: string) => {
+    const sivaChits = members.filter(m => m.role !== 'organizer' && (m.phone || '').replace(/\D/g, '') === '8790859546');
+    const target = memberId ? members.find(m => m.id === memberId) : sivaChits[0];
+    if (target) {
+      setCurrentUser(target);
+      if (target.groupId) {
+        setActiveGroupId(target.groupId);
+      }
+      try {
+        localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(target));
+        sessionStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(target));
+      } catch {}
+      showToast(
+        language === 'te' ? `🎟️ చిట్టీ #${target.memberNo} కి మారారు` : `🎟️ Switched to Chit #${target.memberNo}`,
+        language === 'te' ? `${target.nameTe || target.name}` : `${target.name}`,
         'info'
       );
       registerPushForUser(target);
@@ -823,7 +870,12 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { success: true, member: newMember };
   };
 
-  const login = async (phone: string, pin: string): Promise<{ success: boolean; error?: string }> => {
+  const login = async (
+    phone: string, 
+    pin: string, 
+    targetRole?: 'member' | 'organizer',
+    groupId?: string
+  ): Promise<{ success: boolean; error?: string }> => {
     let cleanPhone = phone.trim().replace(/\D/g, '');
     if (cleanPhone.length === 12 && cleanPhone.startsWith('91')) {
       cleanPhone = cleanPhone.slice(2);
@@ -832,8 +884,10 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     const cleanPin = pin.trim();
 
-    // 1. Organizer Login Check (Siva)
-    if (cleanPhone === '8790859546' || cleanPhone === activeGroup.organizerPhone) {
+    const isOrgPhone = cleanPhone === '8790859546' || cleanPhone === activeGroup.organizerPhone;
+
+    // 1. Explicit Organizer Portal Login (or if phone is organizer and target is not explicitly 'member')
+    if (isOrgPhone && targetRole === 'organizer') {
       if (cleanPin !== '9546' && cleanPin !== '8329') {
         return {
           success: false,
@@ -890,6 +944,30 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
 
+    // Fallback: If cleanPhone is Siva's phone and he didn't specify targetRole, and has no member chits, log into organizer
+    if (memberMatches.length === 0 && isOrgPhone) {
+      if (cleanPin === '9546' || cleanPin === '8329') {
+        const orgUser: Member = {
+          id: 'm-org-siva',
+          groupId: activeGroupId,
+          memberNo: 0,
+          name: 'Siva (Organizer)',
+          nameTe: 'శివ (ఆర్గనైజర్)',
+          phone: '8790859546',
+          pin: cleanPin,
+          role: 'organizer',
+          hasLiftedChit: false,
+          totalPaidSoFar: 0
+        };
+        setCurrentUser(orgUser);
+        try {
+          localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(orgUser));
+          sessionStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(orgUser));
+        } catch {}
+        return { success: true };
+      }
+    }
+
     if (memberMatches.length === 0) {
       return {
         success: false,
@@ -899,13 +977,16 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
     }
 
-    const matchedMember = memberMatches.find(m => m.pin === cleanPin) || memberMatches[0];
-    if (matchedMember.pin !== cleanPin) {
+    // Match by PIN; for organizer's phone, accept 9546 as master PIN or the member PIN
+    const matchedMember = memberMatches.find(m => m.pin === cleanPin) 
+      || (isOrgPhone && (cleanPin === '9546' || cleanPin === '8329') ? memberMatches[0] : null);
+
+    if (!matchedMember || (matchedMember.pin !== cleanPin && !(isOrgPhone && (cleanPin === '9546' || cleanPin === '8329')))) {
       return {
         success: false,
         error: language === 'te'
-          ? 'తప్పుడు పిన్! దయచేసి ఆర్గనైజర్ కేటాయించిన 4-అంకెల పిన్ నమోదు చేయండి.'
-          : 'Incorrect PIN! Please enter the 4-digit PIN provided by the organizer.'
+          ? 'తప్పుడు పిన్! దయచేసి సరైన 4-అంకెల పిన్ నమోదు చేయండి.'
+          : 'Incorrect PIN! Please enter the correct 4-digit PIN.'
       };
     }
 
@@ -924,7 +1005,7 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
       : '';
     showToast(
       language === 'te' ? `✨ స్వాగతం, ${memberDisplayName} గారు!` : `✨ Welcome back, ${memberDisplayName}!`,
-      language === 'te' ? `సభ్యత్వ సంఖ్య #${matchedMember.memberNo}${multiChitMsg}. మీ పాస్‌బుక్ సిద్ధంగా ఉంది.` : `Member #${matchedMember.memberNo}${multiChitMsg}. Passbook is ready.`,
+      language === 'te' ? `చిట్టీ #${matchedMember.memberNo}${multiChitMsg}. మీ పాస్‌బుక్ సిద్ధంగా ఉంది.` : `Member #${matchedMember.memberNo}${multiChitMsg}. Passbook is ready.`,
       'info'
     );
     registerPushForUser(matchedMember);
@@ -1361,6 +1442,8 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
         currentUser,
         userChits,
         switchActiveChit,
+        switchToOrganizer,
+        switchToMemberChit,
         language,
         setLanguage,
         login,

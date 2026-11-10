@@ -69,6 +69,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
     addMember,
     deleteMember,
     updateMember,
+    userChits,
+    switchToMemberChit,
     groups,
     dbStatus,
     language,
@@ -481,6 +483,23 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               <ChevronDown size={14} className="month-select-chevron" />
             </div>
           </div>
+
+          {userChits && userChits.length > 0 && (
+            <button
+              type="button"
+              onClick={() => switchToMemberChit()}
+              className="org-my-chits-pill flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-400/50 hover:border-amber-400 text-amber-300 hover:text-white font-bold text-xs transition-all shadow-sm cursor-pointer ml-auto"
+              title={language === 'te' ? 'మీ చిట్టీల పాస్‌బుక్ & చెల్లింపులు' : 'My Chits Passbook & Payments'}
+            >
+              <span>🎟️</span>
+              <span>
+                {language === 'te' 
+                  ? `నా ${userChits.length} చిట్టీల పాస్‌బుక్` 
+                  : `My ${userChits.length} Chits Passbook`}
+              </span>
+              <ChevronRight size={13} />
+            </button>
+          )}
         </div>
 
         {/* 4 Metric Cards */}
