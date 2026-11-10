@@ -36,8 +36,6 @@ import {
   MessageCircle,
   ChevronDown,
   ChevronUp,
-  LayoutGrid,
-  Table as TableIcon,
   Edit2
 } from 'lucide-react';
 import {
@@ -93,7 +91,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
   const [isScheduleExpanded, setIsScheduleExpanded] = useState(false);
   const [isMembersExpanded, setIsMembersExpanded] = useState(true);
   const [showMemberPins, setShowMemberPins] = useState<{ [id: string]: boolean }>({});
-  const [memberViewMode, setMemberViewMode] = useState<'cards' | 'table'>('cards');
   const [expandedMemberId, setExpandedMemberId] = useState<string | null>(null);
   const [addMemberError, setAddMemberError] = useState('');
   const [isEnrollingMember, setIsEnrollingMember] = useState(false);
@@ -1054,7 +1051,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               </div>
             </div>
 
-        {/* Directory Toolbar: Count on Left, View Mode Switcher on Right */}
+        {/* Directory Toolbar: Member Count */}
         {filteredMembers.length > 0 && (
           <div className="member-directory-toolbar">
             <span className="member-count-badge">
@@ -1062,27 +1059,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                 ? <>మొత్తం సభ్యులు: <strong>{filteredMembers.length} మంది</strong></>
                 : <>Total Members: <strong>{filteredMembers.length}</strong></>}
             </span>
-
-            <div className="member-view-toggle">
-              <button
-                type="button"
-                className={`view-mode-btn ${memberViewMode === 'cards' ? 'active' : ''}`}
-                onClick={() => setMemberViewMode('cards')}
-                title={language === 'te' ? 'కార్డ్స్ వ్యూ (స్మార్ట్ మోడల్)' : 'Smart Cards View (Mobile Friendly)'}
-              >
-                <LayoutGrid size={13} />
-                <span>{language === 'te' ? 'కార్డ్స్' : 'Cards'}</span>
-              </button>
-              <button
-                type="button"
-                className={`view-mode-btn ${memberViewMode === 'table' ? 'active' : ''}`}
-                onClick={() => setMemberViewMode('table')}
-                title={language === 'te' ? 'టేబుల్ వ్యూ (పట్టిక)' : 'Table View'}
-              >
-                <TableIcon size={13} />
-                <span>{language === 'te' ? 'టేబుల్' : 'Table'}</span>
-              </button>
-            </div>
           </div>
         )}
 
@@ -1109,7 +1085,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               <span>{language === 'te' ? '+ సభ్యుని నమోదు చేయండి' : '+ Add Member'}</span>
             </button>
           </div>
-        ) : memberViewMode === 'cards' ? (
+        ) : (
           /* ============================================================
              NEW SMART EXPANDABLE MEMBER CARDS (Click to Expand / Collapse)
              ============================================================ */
@@ -1334,189 +1310,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               );
             })}
           </div>
-        ) : (
-          /* ============================================================
-             TRADITIONAL TABLE VIEW (Optional Toggle for Desktop)
-             ============================================================ */
-          <>
-            <div className="table-scroll-hint-bar">
-              <span className="scroll-hint-text">
-                {language === 'te' ? '👉 పూర్తి 9 కాలమ్స్ వివరాల కోసం పట్టికను పక్కకు జరపండి' : '👉 Swipe horizontally to view all 9 columns'}
-              </span>
-            </div>
-
-            <div className="table-responsive-container ledger-table-wrap">
-              <table className="ledger-table">
-                <thead>
-                  <tr>
-                    <th>{language === 'te' ? 'నెం' : 'No'}</th>
-                    <th>{language === 'te' ? 'సభ్యుని పేరు' : 'Member Name'}</th>
-                    <th>{language === 'te' ? 'మొబైల్' : 'Mobile'}</th>
-                    <th>{language === 'te' ? 'లాగిన్ పిన్' : 'PIN'}</th>
-                    <th>{language === 'te' ? 'చిట్ స్థితి' : 'Chit Status'}</th>
-                    <th>{language === 'te' ? 'ఈ నెల వాయిదా' : 'Month Due'}</th>
-                    <th>{language === 'te' ? 'ఈ నెల స్థితి' : 'Payment Status'}</th>
-                    <th>{language === 'te' ? 'ఇప్పటివరకు చెల్లించిన మొత్తం' : 'Total Paid So Far'}</th>
-                    <th>{language === 'te' ? 'చర్యలు & లాగిన్ షేర్' : 'Actions'}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredMembers.map(m => {
-                    const isAuctionDone = groupLiftings.some(l => l.month === currentGroup.currentMonth);
-                    const monthDue = getInstallmentForMember(currentGroup.currentMonth, m, language);
-                    const curPay = groupPayments.find(p => p.memberId === m.id && p.month === currentGroup.currentMonth && p.status === 'approved')
-                      || groupPayments.find(p => p.memberId === m.id && p.month === currentGroup.currentMonth && p.status === 'pending');
-                    const isPaid = curPay?.status === 'approved';
-                    const isPending = curPay?.status === 'pending';
-                    const isPinVisible = Boolean(showMemberPins[m.id]);
-
-                    return (
-                      <tr key={m.id} className="ledger-row">
-                        <td className="font-bold text-center">{m.memberNo}</td>
-                        <td>
-                          <div className="member-name-cell">
-                            <strong className="name-te">{language === 'te' ? m.nameTe : m.name}</strong>
-                            <span className="name-en">{language === 'te' ? m.name : m.nameTe}</span>
-                          </div>
-                        </td>
-                        <td className="font-mono text-sm">{m.phone}</td>
-                        <td>
-                          <div className="inline-flex items-center gap-1 bg-gray-900/80 px-2 py-1 rounded border border-gray-800 font-mono text-xs">
-                            <span className="text-amber-300 font-bold tracking-wider">
-                              {isPinVisible ? m.pin : '••••'}
-                            </span>
-                            <button
-                              type="button"
-                              className="text-gray-400 hover:text-white p-0.5"
-                              onClick={() => setShowMemberPins(prev => ({ ...prev, [m.id]: !prev[m.id] }))}
-                              title={isPinVisible ? 'Hide PIN' : 'View PIN'}
-                            >
-                              {isPinVisible ? <EyeOff size={12} /> : <Eye size={12} />}
-                            </button>
-                          </div>
-                        </td>
-                        <td>
-                          {m.hasLiftedChit ? (
-                            <span className="badge-status-lifted">
-                              <Award size={14} />
-                              <span>{language === 'te' ? `నెల ${m.liftedMonth} లో ఎత్తారు` : `Lifted Month ${m.liftedMonth}`}</span>
-                            </span>
-                          ) : (
-                            <span className="badge-status-eligible">
-                              <CheckCircle2 size={14} />
-                              <span>{language === 'te' ? 'లక్కీ డ్రాకు అర్హులు' : 'Eligible for Draw'}</span>
-                            </span>
-                          )}
-                        </td>
-                        <td className="font-bold">
-                          ₹{monthDue.toLocaleString('en-IN')}
-                        </td>
-                        <td>
-                          {isPaid ? (
-                            <span className="status-badge-paid">{language === 'te' ? 'చెల్లించారు' : 'Paid'}</span>
-                          ) : isPending ? (
-                            <span className="status-badge-pending">{language === 'te' ? 'పరిశీలనలో ఉంది' : 'Pending'}</span>
-                          ) : !isAuctionDone ? (
-                            <span className="status-badge-pending bg-amber-500/10 border border-amber-500/20 text-amber-300">
-                              {language === 'te' ? 'పాట పెండింగ్' : 'Auction Pending'}
-                            </span>
-                          ) : (
-                            <span className="status-badge-due">{language === 'te' ? 'బాకీ ఉంది' : 'Due'}</span>
-                          )}
-                        </td>
-                        <td className="font-bold text-amber-400">
-                          ₹{m.totalPaidSoFar.toLocaleString('en-IN')}
-                        </td>
-                        <td>
-                          <div className="action-buttons-cell flex items-center gap-1.5 flex-wrap">
-                            <button
-                              type="button"
-                              className="btn-cell-sms text-xs py-1 px-2 flex items-center gap-1"
-                              onClick={() => handleShareLoginSms(m)}
-                              title="Send Login Password/PIN via SMS (English)"
-                            >
-                              <MessageSquare size={13} />
-                              <span className="text-[11px]">SMS PIN</span>
-                            </button>
-
-                            <button
-                              type="button"
-                              className="btn-cell-whatsapp text-xs py-1 px-2 flex items-center gap-1"
-                              onClick={() => handleShareLoginWhatsApp(m)}
-                              title={language === 'te' ? 'లాగిన్ వివరాలు వాట్సాప్‌లో పంపండి' : 'Share Login Details on WhatsApp'}
-                            >
-                              <Send size={13} />
-                              <span className="text-[11px]">{language === 'te' ? 'వాట్సాప్' : 'WhatsApp'}</span>
-                            </button>
-
-                            {isPaid && curPay ? (
-                              <>
-                                <button
-                                  type="button"
-                                  className="btn-cell-receipt"
-                                  onClick={() => onOpenReceipt(curPay, m)}
-                                  title={language === 'te' ? 'రసీదు వీక్షించండి' : 'View Receipt'}
-                                >
-                                  <FileCheck size={15} />
-                                </button>
-                                <button
-                                  type="button"
-                                  className="btn-cell-sms text-xs py-1 px-2 flex items-center gap-1"
-                                  onClick={() => handleSendPaymentReceiptSms(curPay, m)}
-                                  title="Send SMS Receipt to Member (English)"
-                                >
-                                  <MessageSquare size={13} />
-                                  <span className="text-[11px]">SMS</span>
-                                </button>
-                              </>
-                            ) : (
-                              <button
-                                type="button"
-                                className="btn-cell-reminder text-xs py-1 px-2 flex items-center gap-1 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 hover:bg-amber-500/20"
-                                onClick={() => handleSendReminder(m)}
-                                title={language === 'te' ? 'రిమైండర్ పంపండి' : 'Send Due Reminder'}
-                              >
-                                <Send size={13} />
-                                <span className="text-[11px]">{language === 'te' ? 'రిమైండర్' : 'Remind'}</span>
-                              </button>
-                            )}
-
-                            <button
-                              type="button"
-                              className="btn-cell-edit text-xs py-1 px-2 flex items-center gap-1 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 hover:bg-amber-500/20"
-                              onClick={() => handleOpenEditMember(m)}
-                              title={language === 'te' ? 'సభ్యుని వివరాలు సవరించండి' : 'Edit Member Details'}
-                            >
-                              <Edit2 size={13} />
-                              <span className="text-[11px]">{language === 'te' ? 'సవరించు' : 'Edit'}</span>
-                            </button>
-
-                            <button
-                              type="button"
-                              className="text-gray-500 hover:text-red-400 p-1.5 rounded transition-colors"
-                              onClick={() => {
-                                const ok = window.confirm(
-                                  language === 'te'
-                                    ? `మీరు "${m.name}" ని ఈ చిట్ గ్రూప్ నుండి తొలగించాలనుకుంటున్నారా?`
-                                    : `Are you sure you want to remove "${m.name}" from this group?`
-                                );
-                                if (ok) {
-                                  deleteMember(m.id);
-                                }
-                              }}
-                              title={language === 'te' ? 'సభ్యుని తొలగించండి' : 'Remove Member'}
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </>
         )}
           </div>
         )}
