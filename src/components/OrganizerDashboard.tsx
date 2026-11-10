@@ -492,8 +492,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               <div className="siva-org-switch-details">
                 <strong className="siva-org-switch-title">
                   {language === 'te'
-                    ? `మీ వ్యక్తిగత చిట్టీలు (${userChits.map(c => `#${c.memberNo}`).join(', ')})`
-                    : `Your Personal Chits (${userChits.map(c => `#${c.memberNo}`).join(', ')})`}
+                    ? `మీ వ్యక్తిగత చిట్టీలు (${userChits.map(c => c.memberNo).join(', ')})`
+                    : `Your Personal Chits (${userChits.map(c => c.memberNo).join(', ')})`}
                 </strong>
                 <span className="siva-org-switch-sub">
                   {language === 'te'
@@ -1138,7 +1138,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                     aria-expanded={isExpanded}
                   >
                     <div className="member-card-header-left">
-                      <span className="member-card-num">#{m.memberNo}</span>
+                      <span className="member-card-num">{m.memberNo}</span>
                       <div className="member-card-names">
                         <span className="member-name-primary">
                           {language === 'te' ? m.nameTe : m.name}
@@ -1372,7 +1372,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
 
                     return (
                       <tr key={m.id} className="ledger-row">
-                        <td className="font-bold text-center">#{m.memberNo}</td>
+                        <td className="font-bold text-center">{m.memberNo}</td>
                         <td>
                           <div className="member-name-cell">
                             <strong className="name-te">{language === 'te' ? m.nameTe : m.name}</strong>
@@ -2288,8 +2288,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                 <Edit2 size={18} className="text-amber-400 shrink-0" />
                 <span>
                   {language === 'te'
-                    ? `సభ్యుని వివరాలు సవరించండి (#${editingMember.memberNo})`
-                    : `Edit Member Details (#${editingMember.memberNo})`}
+                    ? `సభ్యుని వివరాలు సవరించండి (${editingMember.memberNo})`
+                    : `Edit Member Details (${editingMember.memberNo})`}
                 </span>
               </h3>
               <button

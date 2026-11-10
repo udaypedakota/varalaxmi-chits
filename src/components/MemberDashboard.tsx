@@ -206,7 +206,7 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
                   onClick={() => switchActiveChit(chit.id)}
                 >
                   <div className="chit-btn-left">
-                    <span className="chit-slot-badge">#{chit.memberNo}</span>
+                    <span className="chit-slot-badge">{chit.memberNo}</span>
                     <div className="chit-slot-details">
                       <strong className="chit-slot-name">{language === 'te' ? chit.nameTe : chit.name}</strong>
                       <span className="chit-slot-meta">{gName} • ₹{(chitGroup?.totalValue || 200000).toLocaleString('en-IN')}</span>
@@ -241,7 +241,7 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
             <span>{language === 'te' ? 'సభ్యుని ఖాతా పుస్తకం' : 'Member Passbook'}</span>
           </div>
           <div className="hero-member-id">
-            #{currentUser.memberNo} {language === 'te' ? currentUser.nameTe : currentUser.name}
+            {currentUser.memberNo} • {language === 'te' ? currentUser.nameTe : currentUser.name}
           </div>
         </div>
 

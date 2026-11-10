@@ -66,7 +66,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenLogin, onOpenInstall, isSt
                   <span className={`user-role-pill role-${currentUser.role}`}>
                     {currentUser.role === 'organizer' 
                       ? (language === 'te' ? 'ఆర్గనైజర్' : 'Admin')
-                      : (language === 'te' ? `#${currentUser.memberNo}` : `#${currentUser.memberNo}`)}
+                      : currentUser.memberNo}
                   </span>
                 </div>
                 <button 
