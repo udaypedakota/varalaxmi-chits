@@ -422,19 +422,23 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
   const totalCommissionEarned = groupLiftings.reduce((sum, l) => sum + (l.organizerCommission || 0), 0);
   const completedAuctionsCount = groupLiftings.length;
 
-  // Filtered members
-  const filteredMembers = groupMembers.filter(m => {
-    const matchesSearch =
-      m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      m.nameTe.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      m.phone.includes(searchTerm) ||
-      m.memberNo.toString().includes(searchTerm);
+  // Filtered members (always kept strictly in sequential ascending line: 1, 2, 3... 20)
+  const filteredMembers = useMemo(() => {
+    return groupMembers
+      .filter(m => {
+        const matchesSearch =
+          m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          m.nameTe.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          m.phone.includes(searchTerm) ||
+          m.memberNo.toString().includes(searchTerm);
 
-    if (!matchesSearch) return false;
-    if (filterStatus === 'lifted') return m.hasLiftedChit;
-    if (filterStatus === 'eligible') return !m.hasLiftedChit;
-    return true;
-  });
+        if (!matchesSearch) return false;
+        if (filterStatus === 'lifted') return m.hasLiftedChit;
+        if (filterStatus === 'eligible') return !m.hasLiftedChit;
+        return true;
+      })
+      .sort((a, b) => (Number(a.memberNo) || 0) - (Number(b.memberNo) || 0));
+  }, [groupMembers, searchTerm, filterStatus]);
 
   const handleSendReminder = (member: Member) => {
     const dueAmount = getInstallmentForMember(currentGroup.currentMonth, member, language);

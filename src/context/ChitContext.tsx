@@ -157,7 +157,9 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [members, setMembers] = useState<Member[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.MEMBERS) || localStorage.getItem('sv_chits_members_v5');
     const parsed = saved ? JSON.parse(saved) : [];
-    return (parsed || []).filter((m: Member) => m.role !== 'organizer');
+    return (parsed || [])
+      .filter((m: Member) => m.role !== 'organizer')
+      .sort((a: Member, b: Member) => (Number(a.memberNo) || 0) - (Number(b.memberNo) || 0));
   });
 
   // 3. Payments State (Clean Slate: Empty for live entry)
@@ -478,7 +480,7 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
                   m.id.startsWith('m-') && 
                   (Date.now() - Number(m.id.replace('m-', '')) < 25000)
                 );
-                return [...validMembers, ...recentLocal];
+                return [...validMembers, ...recentLocal].sort((a, b) => (Number(a.memberNo) || 0) - (Number(b.memberNo) || 0));
               });
               setCurrentUser(prev => {
                 if (!prev || prev.role === 'organizer') return prev;
@@ -588,8 +590,12 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem(STORAGE_KEYS.LANGUAGE, lang);
   };
 
-  // Group-Filtered Slices: strictly EXCLUDE organizer so groupMembers contains only the 20 real participants!
-  const groupMembers = members.filter(m => m.role !== 'organizer' && (!m.groupId || m.groupId === activeGroupId));
+  // Group-Filtered Slices: strictly EXCLUDE organizer so groupMembers contains only the 20 real participants in ascending line (1..20)!
+  const groupMembers = useMemo(() => {
+    return members
+      .filter(m => m.role !== 'organizer' && (!m.groupId || m.groupId === activeGroupId))
+      .sort((a, b) => (Number(a.memberNo) || 0) - (Number(b.memberNo) || 0));
+  }, [members, activeGroupId]);
   const groupPayments = payments.filter(p => !p.groupId || p.groupId === activeGroupId);
   const groupLotteryHistory = lotteryHistory.filter(l => !l.groupId || l.groupId === activeGroupId);
   const groupLiftings = liftings.filter(l => !l.groupId || l.groupId === activeGroupId);
@@ -599,7 +605,9 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!currentUser) return [];
     const cleanPhone = (currentUser.phone || '').trim().replace(/\D/g, '');
     if (!cleanPhone) return currentUser.role === 'organizer' ? [] : [currentUser];
-    const matching = members.filter(m => m.role !== 'organizer' && (m.phone || '').trim().replace(/\D/g, '') === cleanPhone);
+    const matching = members
+      .filter(m => m.role !== 'organizer' && (m.phone || '').trim().replace(/\D/g, '') === cleanPhone)
+      .sort((a, b) => (Number(a.memberNo) || 0) - (Number(b.memberNo) || 0));
     return matching.length > 0 ? matching : (currentUser.role === 'organizer' ? [] : [currentUser]);
   }, [currentUser, members]);
 

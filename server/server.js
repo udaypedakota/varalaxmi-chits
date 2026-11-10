@@ -568,10 +568,10 @@ app.get('/api/members', async (req, res) => {
   isMongoConnected = (mongoosePkg.connection.readyState === 1);
 
   if (isMongoConnected) {
-    const members = await MemberModel.find({});
+    const members = await MemberModel.find({}).sort({ memberNo: 1 });
     return res.json(members);
   }
-  res.json(memoryStore.members);
+  res.json(memoryStore.members.slice().sort((a, b) => (Number(a.memberNo) || 0) - (Number(b.memberNo) || 0)));
 });
 
 app.get('/api/members/lookup', async (req, res) => {
@@ -584,10 +584,10 @@ app.get('/api/members/lookup', async (req, res) => {
   isMongoConnected = (mongoosePkg.connection.readyState === 1);
 
   if (isMongoConnected) {
-    const members = await MemberModel.find({ phone: cleanPhone });
+    const members = await MemberModel.find({ phone: cleanPhone }).sort({ memberNo: 1 });
     return res.json(members);
   }
-  const members = memoryStore.members.filter(m => m.phone === cleanPhone);
+  const members = memoryStore.members.filter(m => m.phone === cleanPhone).sort((a, b) => (Number(a.memberNo) || 0) - (Number(b.memberNo) || 0));
   res.json(members);
 });
 
@@ -599,10 +599,10 @@ app.get('/api/groups/:groupId/members', async (req, res) => {
   isMongoConnected = (mongoosePkg.connection.readyState === 1);
 
   if (isMongoConnected) {
-    const members = await MemberModel.find({ groupId });
+    const members = await MemberModel.find({ groupId }).sort({ memberNo: 1 });
     return res.json(members);
   }
-  const members = memoryStore.members.filter(m => m.groupId === groupId);
+  const members = memoryStore.members.filter(m => m.groupId === groupId).sort((a, b) => (Number(a.memberNo) || 0) - (Number(b.memberNo) || 0));
   res.json(members);
 });
 
