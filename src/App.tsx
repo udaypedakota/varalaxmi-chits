@@ -10,6 +10,7 @@ import { MobileNotificationToast } from './components/MobileNotificationToast';
 import { InstallAppModal } from './components/InstallAppModal';
 import { InstallAppBanner } from './components/InstallAppBanner';
 import { LanguageToggle } from './components/LanguageToggle';
+import { ThemeToggle } from './components/ThemeToggle';
 import { PaymentRecord, Member } from './types/chit';
 import { ShieldCheck, UserCheck, Phone, ChevronRight, Sparkles, Download } from 'lucide-react';
 
@@ -117,6 +118,7 @@ const AppContent: React.FC = () => {
                 </button>
               )}
               <div className="landing-header-spacer"></div>
+              <ThemeToggle />
               <LanguageToggle />
             </header>
 

@@ -27,6 +27,9 @@ interface ChitContextType {
   switchActiveChit: (memberId: string) => void;
   switchToOrganizer: () => void;
   switchToMemberChit: (memberId?: string) => void;
+  theme: 'dark' | 'light';
+  setTheme: (theme: 'dark' | 'light') => void;
+  toggleTheme: () => void;
   language: 'te' | 'en';
   setLanguage: (lang: 'te' | 'en') => void;
   login: (phone: string, pin: string, targetRole?: 'member' | 'organizer', groupId?: string) => Promise<{ success: boolean; error?: string }>;
@@ -95,6 +98,7 @@ const STORAGE_KEYS = {
   LIFTINGS: 'sv_chits_liftings_v9',
   NOTIFICATIONS: 'sv_chits_notifs_v9',
   CURRENT_USER: 'sv_chits_user_v9',
+  THEME: 'sv_chits_theme_v9',
   LANGUAGE: 'sv_chits_lang_v9'
 };
 
@@ -409,13 +413,51 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  // 8. Language
+  // 8. Theme (Luxury Dark / Light Mode)
+  const [theme, setThemeState] = useState<'dark' | 'light'>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.THEME);
+      return (saved === 'light' || saved === 'dark') ? saved : 'dark';
+    } catch {
+      return 'dark';
+    }
+  });
+
+  const setTheme = useCallback((newTheme: 'dark' | 'light') => {
+    setThemeState(newTheme);
+    try {
+      localStorage.setItem(STORAGE_KEYS.THEME, newTheme);
+    } catch {}
+  }, []);
+
+  const toggleTheme = useCallback(() => {
+    setThemeState(prev => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      try {
+        localStorage.setItem(STORAGE_KEYS.THEME, next);
+      } catch {}
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', theme);
+      if (theme === 'light') {
+        document.body.classList.add('light-theme');
+      } else {
+        document.body.classList.remove('light-theme');
+      }
+    }
+  }, [theme]);
+
+  // 9. Language
   const [language, setLanguageState] = useState<'te' | 'en'>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.LANGUAGE);
     return (saved as 'te' | 'en') || 'te';
   });
 
-  // 9. DB Status (Live API check)
+  // 10. DB Status (Live API check)
   const [dbStatus, setDbStatus] = useState<DbStatus>({
     isOnline: false,
     isMongoConnected: false,
@@ -1452,6 +1494,9 @@ export const ChitProvider: React.FC<{ children: React.ReactNode }> = ({ children
         switchActiveChit,
         switchToOrganizer,
         switchToMemberChit,
+        theme,
+        setTheme,
+        toggleTheme,
         language,
         setLanguage,
         login,

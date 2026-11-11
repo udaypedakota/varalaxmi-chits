@@ -2,6 +2,7 @@ import React from 'react';
 import { useChit } from '../context/ChitContext';
 import { LogIn, LogOut, Download } from 'lucide-react';
 import { LanguageToggle } from './LanguageToggle';
+import { ThemeToggle } from './ThemeToggle';
 import { NotificationDropdown } from './NotificationDropdown';
 import { GroupSwitcher } from './GroupSwitcher';
 
@@ -111,6 +112,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenLogin, onOpenInstall, isSt
                 <span>{language === 'te' ? 'యాప్ ఇన్‌స్టాల్' : 'Install App'}</span>
               </button>
             )}
+            <ThemeToggle />
             <LanguageToggle />
             <NotificationDropdown />
           </div>
