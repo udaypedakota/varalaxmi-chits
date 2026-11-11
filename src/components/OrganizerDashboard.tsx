@@ -1093,9 +1093,12 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
         {filteredMembers.length > 0 && (
           <div className="member-directory-toolbar">
             <span className="member-count-badge">
-              {language === 'te'
-                ? <>మొత్తం సభ్యులు: <strong>{filteredMembers.length} మంది</strong></>
-                : <>Total Members: <strong>{filteredMembers.length}</strong></>}
+              <Users size={13} className="member-count-icon flex-shrink-0" />
+              <span>
+                {language === 'te'
+                  ? <>మొత్తం సభ్యులు: <strong className="font-mono">{filteredMembers.length}</strong> మంది</>
+                  : <>Total Members: <strong className="font-mono">{filteredMembers.length}</strong></>}
+              </span>
             </span>
           </div>
         )}
