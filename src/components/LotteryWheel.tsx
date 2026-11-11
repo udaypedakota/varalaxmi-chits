@@ -182,8 +182,8 @@ export const LotteryWheel: React.FC<LotteryWheelProps> = ({ isOpen, onClose }) =
               </h3>
               <p className="winner-sub">
                 {language === 'te' 
-                  ? `సభ్యత్వ సంఖ్య: #${selectedWinner.memberNo} • ఫోన్: ${selectedWinner.phone}` 
-                  : `Member #${selectedWinner.memberNo} • Phone: ${selectedWinner.phone}`}
+                  ? `సభ్యత్వ సంఖ్య: ${selectedWinner.memberNo} • ఫోన్: ${selectedWinner.phone}` 
+                  : `Member: ${selectedWinner.memberNo} • Phone: ${selectedWinner.phone}`}
               </p>
               <div className="winner-amount-box">
                 <span className="amount-label">{language === 'te' ? 'చిట్ మొత్తం' : 'Chit Value'}:</span>
@@ -212,7 +212,7 @@ export const LotteryWheel: React.FC<LotteryWheelProps> = ({ isOpen, onClose }) =
               <div className="audit-chips-wrap">
                 {eligibleMembers.map(m => (
                   <span key={m.id} className="member-chip eligible">
-                    #{m.memberNo} {language === 'te' ? m.nameTe : m.name}
+                    {m.memberNo}. {language === 'te' ? m.nameTe : m.name}
                   </span>
                 ))}
               </div>
@@ -231,7 +231,7 @@ export const LotteryWheel: React.FC<LotteryWheelProps> = ({ isOpen, onClose }) =
               <div className="audit-chips-wrap">
                 {excludedMembers.map(m => (
                   <span key={m.id} className="member-chip excluded">
-                    #{m.memberNo} {language === 'te' ? m.nameTe : m.name} 
+                    {m.memberNo}. {language === 'te' ? m.nameTe : m.name} 
                     <small> ({language === 'te' ? `నెల ${m.liftedMonth}` : `Month ${m.liftedMonth}`})</small>
                   </span>
                 ))}

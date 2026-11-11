@@ -149,8 +149,8 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
     if (targetGroupMembers.some(m => m.memberNo === Number(editMemberNo))) {
       setEditError(
         language === 'te'
-          ? `మెంబర్ నంబర్ #${editMemberNo} ఇప్పటికే వేరొక సభ్యునికి కేటాయించబడింది!`
-          : `Member #${editMemberNo} is already assigned to another member in this group!`
+          ? `మెంబర్ నంబర్ ${editMemberNo} ఇప్పటికే వేరొక సభ్యునికి కేటాయించబడింది!`
+          : `Member ${editMemberNo} is already assigned to another member in this group!`
       );
       return;
     }
@@ -166,7 +166,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
       });
       showToast(
         language === 'te' ? '✅ సభ్యుని వివరాలు అప్‌డేట్ అయ్యాయి!' : '✅ Member Updated!',
-        language === 'te' ? `#${editMemberNo} ${editName} వివరాలు సేవ్ చేయబడ్డాయి.` : `Member #${editMemberNo} saved successfully.`,
+        language === 'te' ? `${editMemberNo}. ${editName} వివరాలు సేవ్ చేయబడ్డాయి.` : `Member ${editMemberNo} saved successfully.`,
         'info'
       );
       setEditingMember(null);
@@ -240,7 +240,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
         pin: finalPin,
         groupName,
         chitNote: existingInGroup.length > 0
-          ? (language === 'te' ? `గమనిక: ఈ నంబర్‌పై ఇది ${existingInGroup.length + 1}వ చిట్టీగా (Ticket #${existingInGroup.length + 1}) విజయవంతంగా నమోదైంది.` : `Note: Registered as Chit #${existingInGroup.length + 1} for this member.`)
+          ? (language === 'te' ? `గమనిక: ఈ నంబర్‌పై ఇది ${existingInGroup.length + 1}వ చిట్టీగా (Ticket ${existingInGroup.length + 1}) విజయవంతంగా నమోదైంది.` : `Note: Registered as Chit ${existingInGroup.length + 1} for this member.`)
           : undefined
       });
 
@@ -287,7 +287,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
     const appUrl = window.location.origin;
     const msg = encodeURIComponent(
       `నమస్కారం ${m.nameTe || m.name} గారు,\n` +
-      `శ్రీ వరలక్ష్మి చిట్స్ లో మీ మెంబర్షిప్ #${m.memberNo} నమోదు చేయబడింది.\n\n` +
+      `శ్రీ వరలక్ష్మి చిట్స్ లో మీ సభ్యత్వ సంఖ్య ${m.memberNo} నమోదు చేయబడింది.\n\n` +
       `📱 మీ లాగిన్ మొబైల్: ${m.phone}\n` +
       `🔑 మీ సెక్యూరిటీ పిన్: ${m.pin}\n` +
       `🌐 పాస్‌బుక్ లాగిన్ లింక్: ${appUrl}\n\n` +
@@ -485,37 +485,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
           </div>
         </div>
 
-        {/* Siva's Personal Chits Switch Banner (When Organizer holds personal chits) */}
-        {userChits && userChits.length > 0 && (
-          <div className="siva-org-switch-banner animate-fade">
-            <div className="siva-org-switch-left">
-              <div className="siva-org-switch-badge">🎟️</div>
-              <div className="siva-org-switch-details">
-                <strong className="siva-org-switch-title">
-                  {language === 'te'
-                    ? `మీ వ్యక్తిగత చిట్టీలు (${userChits.map(c => c.memberNo).join(', ')})`
-                    : `Your Personal Chits (${userChits.map(c => c.memberNo).join(', ')})`}
-                </strong>
-                <span className="siva-org-switch-sub">
-                  {language === 'te'
-                    ? `మీ ${userChits.length} చిట్టీల పాస్‌బుక్ & వాయిదా చెల్లింపులు చూడండి`
-                    : `View passbook & installment records for your ${userChits.length} chits`}
-                </span>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => switchToMemberChit()}
-              className="btn-siva-view-chits"
-              title={language === 'te' ? 'మీ చిట్టీల పాస్‌బుక్ చూడండి' : 'View Your Chits Passbook'}
-            >
-              <span>🎟️</span>
-              <span>{language === 'te' ? 'నా చిట్టీల పాస్‌బుక్' : 'My Chits Passbook'}</span>
-              <ChevronRight size={14} />
-            </button>
-          </div>
-        )}
-
         {/* 4 Metric Cards */}
         <div className="org-metrics-grid">
           {/* Metric 1: Total Pool Collected So Far */}
@@ -632,7 +601,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                       <strong className="pending-member-name">
                         {language === 'te' ? (mem?.nameTe || p.memberName) : (mem?.name || p.memberName)}
                       </strong>
-                      <span className="pending-member-phone">#{mem?.memberNo} • {mem?.phone}</span>
+                      <span className="pending-member-phone">{mem?.memberNo} • {mem?.phone}</span>
                     </div>
                     <div className="pending-amount">₹{p.amount.toLocaleString('en-IN')}</div>
                   </div>
@@ -825,7 +794,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             >
               <div className="flex items-center gap-2.5 text-xs flex-wrap">
                 <span className="font-semibold text-amber-400">
-                  {language === 'te' ? `నెల #${currentGroup.currentMonth}:` : `Month #${currentGroup.currentMonth}:`}
+                  {language === 'te' ? `నెల ${currentGroup.currentMonth}:` : `Month ${currentGroup.currentMonth}:`}
                 </span>
 
                 {activeWinnerName ? (
@@ -899,7 +868,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                     <td className="td-month">
                       <div className="sched-cell-stack">
                         <div className="sched-month-top">
-                          <span className="sched-pill-no">#{item.month}</span>
+                          <span className="sched-pill-no">{item.month}</span>
                           {isCurrent && (
                             <span className="sched-current-dot-pill" title={language === 'te' ? 'ప్రస్తుత నెల' : 'Current Month'}>
                               {language === 'te' ? 'ప్రస్తుతం' : 'Active'}
@@ -914,7 +883,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                         {winnerName && (
                           <div className="flex items-center gap-1 mt-1 flex-wrap">
                             <span className="sched-winner-pill" title={language === 'te' ? `చిట్ తీసుకున్నవారు: ${winnerName}` : `Lifted by: ${winnerName}`}>
-                              👑 {winnerName} {monthLifting?.memberNo ? `(#${monthLifting.memberNo})` : ''}
+                              👑 {winnerName} {monthLifting?.memberNo ? `(${monthLifting.memberNo})` : ''}
                             </span>
                             <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
                               <Check size={10} className="text-emerald-400 font-bold" />
@@ -1898,7 +1867,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                   ) : (
                     eligibleWinningMembers.map(m => (
                       <option key={m.id} value={m.id}>
-                        #{m.memberNo} {language === 'te' ? m.nameTe : m.name} ({m.phone})
+                        {m.memberNo}. {language === 'te' ? m.nameTe : m.name} ({m.phone})
                       </option>
                     ))
                   )}
@@ -2108,7 +2077,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
             <form onSubmit={handleSaveEditMember} className="login-form mt-3 space-y-3.5">
               <div className="form-field">
                 <label className="field-label text-xs font-semibold text-gray-300">
-                  <span>{language === 'te' ? 'మెంబర్ నంబర్ / టికెట్ (#1 నుండి #20):' : 'Member / Ticket No (#1 to #20):'}</span>
+                  <span>{language === 'te' ? 'మెంబర్ నంబర్ / టికెట్ (1 నుండి 20):' : 'Member / Ticket No (1 to 20):'}</span>
                 </label>
                 <input
                   type="number"

@@ -133,7 +133,7 @@ export const FinancialReportsModal: React.FC<FinancialReportsModalProps> = ({ is
                   className={`reports-nav-btn ${activeReportTab === r.id ? 'active' : ''}`}
                   onClick={() => setActiveReportTab(r.id)}
                 >
-                  <span className="nav-number">#{r.id}</span>
+                  <span className="nav-number">{r.id}</span>
                   <span className="nav-name">{language === 'te' ? r.nameTe : r.name}</span>
                 </button>
               ))}
@@ -189,7 +189,7 @@ export const FinancialReportsModal: React.FC<FinancialReportsModalProps> = ({ is
                   <table className="ledger-table">
                     <thead>
                       <tr>
-                        <th>#</th>
+                        <th>No.</th>
                         <th>{language === 'te' ? 'సభ్యుని పేరు' : 'Name'}</th>
                         <th>{language === 'te' ? 'ఫోన్' : 'Phone'}</th>
                         <th>{language === 'te' ? 'చిట్ స్థితి' : 'Status'}</th>
@@ -199,7 +199,7 @@ export const FinancialReportsModal: React.FC<FinancialReportsModalProps> = ({ is
                     <tbody>
                       {groupMembers.map(m => (
                         <tr key={m.id}>
-                          <td>#{m.memberNo}</td>
+                          <td>{m.memberNo}</td>
                           <td><strong>{language === 'te' ? m.nameTe : m.name}</strong></td>
                           <td className="font-mono">{m.phone}</td>
                           <td>{m.hasLiftedChit ? `Lifted M${m.liftedMonth}` : 'Eligible'}</td>
@@ -220,7 +220,7 @@ export const FinancialReportsModal: React.FC<FinancialReportsModalProps> = ({ is
                 <table className="ledger-table">
                   <thead>
                     <tr>
-                      <th>#</th>
+                      <th>No.</th>
                       <th>{language === 'te' ? 'పేరు' : 'Name'}</th>
                       <th>{language === 'te' ? 'ఈ నెల బాకీ' : 'Current Due'}</th>
                       <th>{language === 'te' ? 'స్థితి' : 'Status'}</th>
@@ -231,7 +231,7 @@ export const FinancialReportsModal: React.FC<FinancialReportsModalProps> = ({ is
                       const cur = groupPayments.find(p => p.memberId === m.id && p.month === activeGroup.currentMonth);
                       return (
                         <tr key={m.id}>
-                          <td>#{m.memberNo}</td>
+                          <td>{m.memberNo}</td>
                           <td><strong>{language === 'te' ? m.nameTe : m.name}</strong></td>
                           <td>₹{m.hasLiftedChit ? activeGroup.fixedTakenInstallment.toLocaleString('en-IN') : activeGroup.monthlyInstallment.toLocaleString('en-IN')}</td>
                           <td>{cur?.status === 'approved' ? <span className="status-badge-paid">Paid</span> : <span className="status-badge-due">Pending</span>}</td>

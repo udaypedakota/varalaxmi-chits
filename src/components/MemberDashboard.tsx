@@ -408,8 +408,8 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
                   <Calendar size={15} className="text-amber-400" />
                   <span className="text-gray-300">
                     {language === 'te'
-                      ? <>రాబోయే వాయిదా: <strong className="text-amber-300">నెల #{currentGroup.currentMonth + 1} ({MONTH_CALENDAR_NAMES[currentGroup.currentMonth + 1]?.te || ''})</strong></>
-                      : <>Next Upcoming: <strong className="text-amber-300">Month #{currentGroup.currentMonth + 1} ({MONTH_CALENDAR_NAMES[currentGroup.currentMonth + 1]?.en || ''})</strong></>}
+                      ? <>రాబోయే వాయిదా: <strong className="text-amber-300">నెల {currentGroup.currentMonth + 1} ({MONTH_CALENDAR_NAMES[currentGroup.currentMonth + 1]?.te || ''})</strong></>
+                      : <>Next Upcoming: <strong className="text-amber-300">Month {currentGroup.currentMonth + 1} ({MONTH_CALENDAR_NAMES[currentGroup.currentMonth + 1]?.en || ''})</strong></>}
                   </span>
                 </div>
                 <span className="text-gray-400 text-[11px]">
@@ -474,8 +474,8 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
                   <Award size={16} className="text-yellow-400 shrink-0" />
                   <span>
                     {language === 'te'
-                      ? `నెల ${currentGroup.currentMonth} విజేత: ${currentMonthLifting.memberNameTe || currentMonthLifting.memberName} (#${currentMonthLifting.memberNo || ''})`
-                      : `Month ${currentGroup.currentMonth} Lifted By: ${currentMonthLifting.memberName} (#${currentMonthLifting.memberNo || ''})`}
+                      ? `నెల ${currentGroup.currentMonth} విజేత: ${currentMonthLifting.memberNameTe || currentMonthLifting.memberName} (${currentMonthLifting.memberNo || ''})`
+                      : `Month ${currentGroup.currentMonth} Lifted By: ${currentMonthLifting.memberName} (${currentMonthLifting.memberNo || ''})`}
                   </span>
                 </div>
                 <span className="text-emerald-400 font-bold">
@@ -669,7 +669,7 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
             >
               <div className="flex items-center gap-2.5 text-xs flex-wrap">
                 <span className="font-semibold text-amber-400">
-                  {language === 'te' ? `నెల #${currentGroup.currentMonth}:` : `Month #${currentGroup.currentMonth}:`}
+                  {language === 'te' ? `నెల ${currentGroup.currentMonth}:` : `Month ${currentGroup.currentMonth}:`}
                 </span>
 
                 {activeWinnerName ? (
@@ -742,7 +742,7 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
                       <td className="td-month">
                         <div className="sched-cell-stack">
                           <div className="sched-month-top">
-                            <span className="sched-pill-no">#{item.month}</span>
+                            <span className="sched-pill-no">{item.month}</span>
                             {isCurrent && (
                               <span className="sched-current-dot-pill" title={language === 'te' ? 'ప్రస్తుత నెల' : 'Current Month'}>
                                 {language === 'te' ? 'ప్రస్తుతం' : 'Active'}
@@ -756,7 +756,7 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({ onOpenReceipt 
                           </span>
                           {winnerName && (
                             <span className="sched-winner-pill" title={language === 'te' ? `చిట్ తీసుకున్నవారు: ${winnerName}` : `Lifted by: ${winnerName}`}>
-                              👑 {winnerName} {monthLifting?.memberNo ? `(#${monthLifting.memberNo})` : ''}
+                              👑 {winnerName} {monthLifting?.memberNo ? `(${monthLifting.memberNo})` : ''}
                             </span>
                           )}
                         </div>

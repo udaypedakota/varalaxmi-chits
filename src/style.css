@@ -271,7 +271,7 @@ body {
 }
 
 .brand-title span:first-child {
-  color: #FFFFFF !important;
+  color: #FFFFFF;
   font-weight: 800;
   text-shadow: none !important;
   filter: none !important;
@@ -4644,7 +4644,7 @@ select.form-input option,
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: #FFFFFF !important;
+    color: #FFFFFF;
     font-weight: 800;
     text-shadow: none !important;
     filter: none !important;
@@ -7482,19 +7482,30 @@ body.light-theme .app-navbar {
   box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
 }
 
-body.light-theme .brand-title {
-  color: #0F172A;
+body.light-theme .brand-title,
+body.light-theme .brand-title span,
+body.light-theme .brand-title span:first-child {
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  text-shadow: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
 }
 
 body.light-theme .brand-subtitle {
-  color: #475569;
+  color: #475569 !important;
+  font-weight: 600 !important;
 }
 
 body.light-theme .brand-group-pill {
-  background: #F8FAFC;
-  border: 1.5px solid rgba(217, 119, 6, 0.35);
-  color: #92400E;
-  font-weight: 800;
+  background: #F8FAFC !important;
+  border: 1.5px solid rgba(217, 119, 6, 0.35) !important;
+  color: #92400E !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .brand-group-pill span {
+  color: #92400E !important;
 }
 
 body.light-theme .user-profile-widget {
@@ -8523,6 +8534,40 @@ body.light-theme .status-lifted span {
 
 body.light-theme .status-lifted svg {
   color: #B45309 !important;
+}
+
+body.light-theme .hero-chit-status-pill .status-waiting,
+body.light-theme .hero-chit-status-pill .status-waiting span {
+  color: #065F46 !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .hero-chit-status-pill .status-waiting svg {
+  color: #059669 !important;
+}
+
+body.light-theme .hero-chit-status-pill .status-lifted,
+body.light-theme .hero-chit-status-pill .status-lifted span {
+  color: #92400E !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .hero-chit-status-pill .status-lifted svg {
+  color: #B45309 !important;
+}
+
+body.light-theme .login-title {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  -webkit-text-fill-color: #0F172A !important;
+  color: #0F172A !important;
+}
+
+body.light-theme .landing-install-pill span,
+body.light-theme .navbar-install-pill span {
+  color: #92400E !important;
+  font-weight: 800 !important;
 }
 
 /* Month Installment Card & Due Hero in Member Dashboard */

@@ -216,7 +216,7 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ payment, member, isO
             </div>
             <div className="receipt-row">
               <span className="row-label">{language === 'te' ? 'సభ్యత్వ సంఖ్య / Member No:' : 'Member No:'}</span>
-              <span className="row-value font-bold">#{member?.memberNo || '---'}</span>
+              <span className="row-value font-bold">{member?.memberNo || '---'}</span>
             </div>
             <div className="receipt-row">
               <span className="row-label">{language === 'te' ? 'వాయిదా నెల / Installment Month:' : 'Installment Month:'}</span>
