@@ -92,15 +92,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenLogin, onOpenInstall, isSt
           </div>
         </div>
 
-        {/* Sub Row: Group Switcher (Organizer) on Left, Language & Notifications on Right */}
+        {/* Sub Row: Group Switcher & Install Pill on Left, Theme, Language & Notifications on Right */}
         <div className="navbar-sub-row">
           <div className="navbar-sub-left">
             {currentUser?.role === 'organizer' && (
               <GroupSwitcher />
             )}
-          </div>
-
-          <div className="navbar-sub-right">
             {onOpenInstall && !isStandalone && (
               <button
                 type="button"
@@ -112,6 +109,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenLogin, onOpenInstall, isSt
                 <span>{language === 'te' ? 'యాప్ ఇన్‌స్టాల్' : 'Install App'}</span>
               </button>
             )}
+          </div>
+
+          <div className="navbar-sub-right">
             <ThemeToggle />
             <LanguageToggle />
             <NotificationDropdown />
