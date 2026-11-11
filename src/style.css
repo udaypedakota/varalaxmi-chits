@@ -9410,3 +9410,711 @@ body.light-theme .lifting-modal-actions .btn-lifting-modal-action:last-child:hov
   box-shadow: 0 6px 18px rgba(217, 119, 6, 0.4) !important;
 }
 
+/* ==========================================================================
+   ORGANIZER MEMBER DRAWER PASSBOOK QUICK CARD & MODAL (iPhone / Mobile Ready)
+   ========================================================================== */
+
+/* Drawer Quick Passbook Card */
+.drawer-passbook-quick-card {
+  background: rgba(13, 22, 54, 0.7);
+  border: 1.5px solid rgba(245, 158, 11, 0.25);
+  border-radius: 12px;
+  padding: 0.65rem 0.85rem;
+  margin-bottom: 0.65rem;
+  transition: all 0.2s ease;
+}
+
+.drawer-passbook-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.45rem;
+}
+
+.drawer-passbook-card-title {
+  font-size: 0.76rem;
+  font-weight: 750;
+  color: #FEF08A;
+  letter-spacing: 0.01em;
+}
+
+.btn-open-passbook-link {
+  background: none;
+  border: none;
+  color: #93C5FD;
+  font-size: 0.72rem;
+  font-weight: 750;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0.15rem 0.35rem;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.btn-open-passbook-link:hover {
+  color: #60A5FA;
+  background: rgba(59, 130, 246, 0.12);
+}
+
+.drawer-passbook-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.4rem;
+  text-align: center;
+}
+
+.drawer-passbook-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.drawer-passbook-stat .stat-label {
+  font-size: 0.65rem;
+  color: #94A3B8;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.drawer-passbook-stat .stat-value {
+  font-size: 0.84rem;
+  line-height: 1.2;
+}
+
+.drawer-passbook-bar-track {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-top: 0.55rem;
+}
+
+.drawer-passbook-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #F59E0B 0%, #10B981 100%);
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+/* Light Theme overrides for Drawer Quick Passbook Card */
+body.light-theme .drawer-passbook-quick-card {
+  background: #FFFBEB !important;
+  border: 1.5px solid #F59E0B !important;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.08) !important;
+}
+
+body.light-theme .drawer-passbook-card-title {
+  color: #78350F !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .btn-open-passbook-link {
+  color: #1D4ED8 !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .btn-open-passbook-link:hover {
+  background: #EFF6FF !important;
+}
+
+body.light-theme .drawer-passbook-stat .stat-label {
+  color: #64748B !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .drawer-passbook-stat .stat-value.text-amber-400 {
+  color: #B45309 !important;
+  font-weight: 900 !important;
+}
+
+body.light-theme .drawer-passbook-stat .stat-value.text-emerald-400 {
+  color: #059669 !important;
+  font-weight: 900 !important;
+}
+
+body.light-theme .drawer-passbook-stat .stat-value.text-gray-300 {
+  color: #334155 !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .drawer-passbook-bar-track {
+  background: #E2E8F0 !important;
+}
+
+/* ==========================================================================
+   MEMBER PASSBOOK MODAL (ORGANIZER VIEW)
+   ========================================================================== */
+.member-passbook-modal {
+  position: relative;
+  background: var(--navy-card);
+  border: 2px solid var(--gold-bright);
+  border-radius: 20px;
+  max-width: 600px;
+  width: 95%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 1.35rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), var(--gold-glow);
+  max-height: 90vh;
+  overflow-y: auto;
+  touch-action: pan-y;
+}
+
+.passbook-modal-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 0.75rem;
+}
+
+.passbook-member-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.passbook-num-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.18);
+  border: 1.5px solid #F59E0B;
+  color: #F59E0B;
+  font-size: 0.95rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.passbook-member-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.passbook-member-phone {
+  font-size: 0.74rem;
+  color: #94A3B8;
+  display: block;
+}
+
+.passbook-scheme-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  margin-bottom: 0.85rem;
+}
+
+.passbook-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.55rem;
+  margin-bottom: 0.85rem;
+}
+
+.passbook-stat-card {
+  padding: 0.7rem 0.85rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.passbook-stat-label {
+  font-size: 0.68rem;
+  color: #94A3B8;
+  font-weight: 600;
+}
+
+.passbook-stat-val {
+  font-size: 1.15rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.passbook-stat-sub {
+  font-size: 0.66rem;
+  color: #64748B;
+}
+
+.passbook-modal-progress-wrap {
+  margin-bottom: 0.85rem;
+}
+
+.passbook-progress-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.passbook-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #F59E0B 0%, #10B981 100%);
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+.passbook-share-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(5, 150, 105, 0.2) 100%);
+  border: 1.5px solid rgba(16, 185, 129, 0.35);
+  margin-bottom: 1rem;
+}
+
+.passbook-share-title {
+  font-size: 0.78rem;
+  color: #A7F3D0;
+  display: block;
+}
+
+.passbook-share-sub {
+  font-size: 0.68rem;
+  color: #6EE7B7;
+  display: block;
+}
+
+.btn-whatsapp-share-sm {
+  background: #10B981;
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 0.75rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  transition: all 0.15s ease;
+}
+
+.btn-whatsapp-share-sm:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.passbook-statement-section {
+  margin-top: 0.5rem;
+}
+
+.passbook-statement-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.55rem;
+}
+
+.statement-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #FEF08A;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.statement-count {
+  font-size: 0.7rem;
+  color: #94A3B8;
+  font-weight: 600;
+}
+
+.passbook-statement-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.statement-month-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.15s ease;
+}
+
+.statement-month-row.paid {
+  border-left: 3.5px solid #10B981;
+  background: rgba(16, 185, 129, 0.06);
+}
+
+.statement-month-row.active-month {
+  border-left: 3.5px solid #F59E0B;
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.month-row-left {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.month-badge-pill {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0.2rem 0.45rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #CBD5E1;
+  white-space: nowrap;
+}
+
+.month-name-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.month-title-text {
+  font-size: 0.78rem;
+  color: #FFFFFF;
+  line-height: 1.2;
+}
+
+.month-lift-pill {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #FEF08A;
+}
+
+.month-paid-date {
+  font-size: 0.66rem;
+  color: #34D399;
+}
+
+.month-pending-sub {
+  font-size: 0.66rem;
+  color: #FBBF24;
+}
+
+.month-row-right {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.month-amount-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.status-badge-paid {
+  font-size: 0.65rem;
+  font-weight: 750;
+  color: #34D399;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.paid-amount-text {
+  font-size: 0.82rem;
+  color: #34D399;
+}
+
+.status-badge-pending {
+  font-size: 0.65rem;
+  font-weight: 750;
+  color: #FBBF24;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.pending-amount-text {
+  font-size: 0.82rem;
+  color: #FBBF24;
+}
+
+.status-badge-due {
+  font-size: 0.65rem;
+  font-weight: 750;
+  color: #F59E0B;
+}
+
+.due-amount-text {
+  font-size: 0.82rem;
+  color: #F59E0B;
+}
+
+.status-badge-overdue {
+  font-size: 0.65rem;
+  font-weight: 750;
+  color: #F87171;
+}
+
+.overdue-amount-text {
+  font-size: 0.82rem;
+  color: #F87171;
+}
+
+.status-badge-future {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #64748B;
+}
+
+.future-amount-text {
+  font-size: 0.78rem;
+}
+
+.btn-statement-receipt {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #6EE7B7;
+  font-size: 0.7rem;
+  font-weight: 750;
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.btn-statement-receipt:hover {
+  background: #10B981;
+  color: #FFFFFF;
+}
+
+.passbook-modal-footer {
+  margin-top: 1rem;
+}
+
+/* ==========================================================================
+   MEMBER PASSBOOK MODAL IN LIGHT THEME
+   ========================================================================== */
+body.light-theme .member-passbook-modal {
+  background: #FFFFFF !important;
+  border: 2px solid #F59E0B !important;
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.15) !important;
+}
+
+body.light-theme .passbook-modal-top-bar {
+  border-bottom: 1px solid #E2E8F0 !important;
+}
+
+body.light-theme .passbook-num-badge {
+  background: #FEF3C7 !important;
+  border: 1.5px solid #F59E0B !important;
+  color: #78350F !important;
+}
+
+body.light-theme .passbook-member-name {
+  color: #0F172A !important;
+  font-weight: 900 !important;
+}
+
+body.light-theme .passbook-member-phone {
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
+body.light-theme .passbook-scheme-strip {
+  background: #FEF3C7 !important;
+  border: 1.5px solid #F59E0B !important;
+}
+
+body.light-theme .passbook-scheme-strip .text-amber-400 {
+  color: #78350F !important;
+}
+
+body.light-theme .passbook-scheme-strip .text-gray-400 {
+  color: #92400E !important;
+  font-weight: 600 !important;
+}
+
+body.light-theme .passbook-stat-card {
+  background: #F8FAFC !important;
+  border: 1.5px solid #E2E8F0 !important;
+}
+
+body.light-theme .passbook-stat-label {
+  color: #64748B !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .passbook-stat-val.text-amber-400 {
+  color: #B45309 !important;
+  font-weight: 900 !important;
+}
+
+body.light-theme .passbook-stat-val.text-emerald-400 {
+  color: #059669 !important;
+  font-weight: 900 !important;
+}
+
+body.light-theme .passbook-stat-val.text-blue-400 {
+  color: #1D4ED8 !important;
+  font-weight: 900 !important;
+}
+
+body.light-theme .passbook-stat-val.text-purple-400 {
+  color: #7C3AED !important;
+  font-weight: 900 !important;
+}
+
+body.light-theme .passbook-stat-sub {
+  color: #64748B !important;
+}
+
+body.light-theme .passbook-progress-bar {
+  background: #E2E8F0 !important;
+}
+
+body.light-theme .passbook-share-banner {
+  background: #ECFDF5 !important;
+  border: 1.5px solid #10B981 !important;
+}
+
+body.light-theme .passbook-share-title {
+  color: #065F46 !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .passbook-share-sub {
+  color: #047857 !important;
+  font-weight: 600 !important;
+}
+
+body.light-theme .statement-title {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .statement-title svg {
+  color: #D97706 !important;
+}
+
+body.light-theme .statement-count {
+  color: #475569 !important;
+}
+
+body.light-theme .statement-month-row {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+body.light-theme .statement-month-row.paid {
+  background: #F0FDF4 !important;
+  border: 1.2px solid #86EFAC !important;
+  border-left: 3.5px solid #10B981 !important;
+}
+
+body.light-theme .statement-month-row.active-month {
+  background: #FFFBEB !important;
+  border: 1.2px solid #FDE68A !important;
+  border-left: 3.5px solid #F59E0B !important;
+}
+
+body.light-theme .month-badge-pill {
+  background: #F1F5F9 !important;
+  color: #334155 !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .month-title-text {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .month-lift-pill {
+  color: #B45309 !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .month-paid-date {
+  color: #059669 !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .month-pending-sub {
+  color: #D97706 !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .status-badge-paid,
+body.light-theme .paid-amount-text {
+  color: #059669 !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .status-badge-pending,
+body.light-theme .pending-amount-text {
+  color: #D97706 !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .status-badge-due,
+body.light-theme .due-amount-text {
+  color: #B45309 !important;
+  font-weight: 900 !important;
+}
+
+body.light-theme .status-badge-overdue,
+body.light-theme .overdue-amount-text {
+  color: #DC2626 !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .status-badge-future,
+body.light-theme .future-amount-text {
+  color: #94A3B8 !important;
+}
+
+body.light-theme .btn-statement-receipt {
+  background: #ECFDF5 !important;
+  border: 1.5px solid #059669 !important;
+  color: #065F46 !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .btn-statement-receipt:hover {
+  background: #059669 !important;
+  color: #FFFFFF !important;
+}
+
+

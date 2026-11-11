@@ -36,7 +36,9 @@ import {
   MessageCircle,
   ChevronDown,
   ChevronUp,
-  Edit2
+  Edit2,
+  BookOpen,
+  FileText
 } from 'lucide-react';
 import {
   openDeviceSms,
@@ -116,6 +118,38 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
   const [editPin, setEditPin] = useState('');
   const [editError, setEditError] = useState('');
   const [isSavingEdit, setIsSavingEdit] = useState(false);
+
+  // Member Passbook Modal State (Organizer Inspection)
+  const [passbookModalMember, setPassbookModalMember] = useState<Member | null>(null);
+
+  const handleSharePassbookWhatsApp = (member: Member) => {
+    const memberApproved = groupPayments.filter(p => p.memberId === member.id && p.status === 'approved');
+    const paidCount = memberApproved.length;
+    const totPaid = memberApproved.reduce((sum, p) => sum + (Number(p.amount) || 0), 0) || member.totalPaidSoFar || 0;
+    const totalMos = currentGroup.totalMonths || 20;
+    const remMos = Math.max(0, totalMos - paidCount);
+    const statusStr = member.hasLiftedChit
+      ? (language === 'te' ? `నెల ${member.liftedMonth} లో ఎత్తారు (బహుమతి ₹2,00,000)` : `Lifted in Month ${member.liftedMonth} (Prize ₹2,00,000)`)
+      : (language === 'te' ? 'లక్కీ డ్రాకు అర్హులు (ఇంకా చిట్ తీసుకోలేదు)' : 'Eligible for Lucky Draw (Chit Not Yet Lifted)');
+
+    const text = 
+      `*శ్రీ వరలక్ష్మి చిట్స్ (${currentGroup.nameTe || currentGroup.name})*\n` +
+      `*డిజిటల్ ఖాతా పుస్తకం సారాంశం (Passbook Summary)*\n` +
+      `----------------------------------------\n` +
+      `👤 *సభ్యుడు:* ${language === 'te' ? member.nameTe : member.name} (నెం. ${member.memberNo})\n` +
+      `📱 *మొబైల్:* ${member.phone}\n` +
+      `🏷️ *స్కీమ్:* ₹${currentGroup.totalValue.toLocaleString('en-IN')} (${totalMos} నెలలు)\n` +
+      `💰 *ఇప్పటివరకు చెల్లించిన మొత్తం:* ₹${totPaid.toLocaleString('en-IN')}\n` +
+      `📅 *పూర్తయిన వాయిదాలు:* ${paidCount} / ${totalMos} నెలలు\n` +
+      `⏳ *మిగిలిన వాయిదాలు:* ${remMos} నెలలు\n` +
+      `🎯 *చిట్ స్థితి:* ${statusStr}\n` +
+      `----------------------------------------\n` +
+      `మరిన్ని వివరాలకు లేదా రసీదుల కోసం యాప్‌ను సందర్శించండి.\n` +
+      `నిర్వాహకుడు: శివ (${currentGroup.organizerPhone})\n` +
+      `UPI: ${currentGroup.organizerUpiId}`;
+
+    window.open(`https://wa.me/91${member.phone}?text=${encodeURIComponent(text)}`, '_blank');
+  };
 
   const handleOpenEditMember = (m: Member) => {
     setEditingMember(m);
@@ -1104,6 +1138,13 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
               const isPinVisible = Boolean(showMemberPins[m.id]);
               const isExpanded = expandedMemberId === m.id;
 
+              // Member Passbook & Payment Metrics for Organizer View
+              const memberApprovedPayments = groupPayments.filter(p => p.memberId === m.id && p.status === 'approved');
+              const memberPaidMonthsCount = memberApprovedPayments.length;
+              const totalMonths = currentGroup.totalMonths || 20;
+              const remainingMonthsCount = Math.max(0, totalMonths - memberPaidMonthsCount);
+              const calculatedTotalPaid = memberApprovedPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0) || m.totalPaidSoFar || 0;
+
               return (
                 <div
                   key={m.id}
@@ -1199,10 +1240,55 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                         </div>
                       </div>
 
-                      {/* Total Paid Row */}
-                      <div className="drawer-total-paid-strip">
-                        <span>{language === 'te' ? 'ఇప్పటివరకు మొత్తం చెల్లించినది:' : 'Total Paid So Far:'}</span>
-                        <strong className="text-amber-400 font-mono text-sm">₹{m.totalPaidSoFar.toLocaleString('en-IN')}</strong>
+                      {/* Member Payment & Passbook Summary Card (Owner Quick View) */}
+                      <div className="drawer-passbook-quick-card">
+                        <div className="drawer-passbook-card-top">
+                          <div className="flex items-center gap-1.5">
+                            <BookOpen size={14} className="text-amber-400" />
+                            <span className="drawer-passbook-card-title">
+                              {language === 'te' ? 'చెల్లింపుల ఖాతా పుస్తకం' : 'Payment Passbook'}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            className="btn-open-passbook-link"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPassbookModalMember(m);
+                            }}
+                            title={language === 'te' ? 'పూర్తి పాస్‌బుక్ చూడండి' : 'View Full Passbook'}
+                          >
+                            <span>{language === 'te' ? 'పూర్తి వివరాలు' : 'Full Details'}</span>
+                            <ChevronRight size={12} />
+                          </button>
+                        </div>
+
+                        <div className="drawer-passbook-stats-grid">
+                          <div className="drawer-passbook-stat">
+                            <span className="stat-label">{language === 'te' ? 'ఇప్పటివరకు కట్టినది' : 'Total Paid'}</span>
+                            <span className="stat-value font-mono text-amber-400 font-bold">₹{calculatedTotalPaid.toLocaleString('en-IN')}</span>
+                          </div>
+                          <div className="drawer-passbook-stat">
+                            <span className="stat-label">{language === 'te' ? 'కట్టిన నెలలు' : 'Months Paid'}</span>
+                            <span className="stat-value text-emerald-400 font-bold">
+                              {memberPaidMonthsCount} / {totalMonths} {language === 'te' ? 'నెలలు' : 'Mos'}
+                            </span>
+                          </div>
+                          <div className="drawer-passbook-stat">
+                            <span className="stat-label">{language === 'te' ? 'మిగిలినవి' : 'Remaining'}</span>
+                            <span className="stat-value text-gray-300 font-bold">
+                              {remainingMonthsCount} {language === 'te' ? 'నెలలు' : 'Mos'}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div className="drawer-passbook-bar-track">
+                          <div
+                            className="drawer-passbook-bar-fill"
+                            style={{ width: `${Math.min(100, Math.round((memberPaidMonthsCount / totalMonths) * 100))}%` }}
+                          />
+                        </div>
                       </div>
 
                       {/* Action Buttons Grid */}
@@ -1233,45 +1319,32 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                           <span>{language === 'te' ? 'వాట్సాప్' : 'WhatsApp'}</span>
                         </button>
 
-                        {isPaid && curPay ? (
-                          <>
-                            <button
-                              type="button"
-                              className="btn-drawer-action btn-drawer-receipt"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onOpenReceipt(curPay, m);
-                              }}
-                              title={language === 'te' ? 'రసీదు వీక్షించండి' : 'View Receipt'}
-                            >
-                              <FileCheck size={14} />
-                              <span>{language === 'te' ? 'రసీదు' : 'Receipt'}</span>
-                            </button>
-                            <button
-                              type="button"
-                              className="btn-drawer-action btn-drawer-sms"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleSendPaymentReceiptSms(curPay, m);
-                              }}
-                              title="Send Payment Receipt SMS"
-                            >
-                              <MessageSquare size={14} />
-                              <span>{language === 'te' ? 'రసీదు SMS' : 'SMS Receipt'}</span>
-                            </button>
-                          </>
-                        ) : (
+                        {/* Member Passbook Button (Replaces Remind Button) */}
+                        <button
+                          type="button"
+                          className="btn-drawer-action btn-drawer-passbook"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPassbookModalMember(m);
+                          }}
+                          title={language === 'te' ? 'సభ్యుని ఖాతా పుస్తకం & చెల్లింపులు' : 'Member Passbook'}
+                        >
+                          <BookOpen size={14} />
+                          <span>{language === 'te' ? 'పాస్‌బుక్' : 'Passbook'}</span>
+                        </button>
+
+                        {isPaid && curPay && (
                           <button
                             type="button"
-                            className="btn-drawer-action btn-drawer-reminder"
+                            className="btn-drawer-action btn-drawer-receipt"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleSendReminder(m);
+                              onOpenReceipt(curPay, m);
                             }}
-                            title="Send Due Reminder"
+                            title={language === 'te' ? 'రసీదు వీక్షించండి' : 'View Receipt'}
                           >
-                            <Send size={14} />
-                            <span>{language === 'te' ? 'రిమైండర్' : 'Remind'}</span>
+                            <FileCheck size={14} />
+                            <span>{language === 'te' ? 'రసీదు' : 'Receipt'}</span>
                           </button>
                         )}
 
@@ -2203,6 +2276,277 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
           </div>
         </div>
       )}
+
+      {/* 9. MEMBER PASSBOOK MODAL (Organizer Inspection & Payment Audit) */}
+      {passbookModalMember && (() => {
+        const memberPayments = groupPayments.filter(p => p.memberId === passbookModalMember.id);
+        const approvedPayments = memberPayments.filter(p => p.status === 'approved');
+        const totalMonths = currentGroup.totalMonths || 20;
+        const paidMonthsCount = approvedPayments.length;
+        const remainingMonths = Math.max(0, totalMonths - paidMonthsCount);
+        const totalPaidAmount = approvedPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0) || passbookModalMember.totalPaidSoFar || 0;
+        const completionPercent = Math.min(100, Math.round((paidMonthsCount / totalMonths) * 100));
+
+        return (
+          <div className="modal-backdrop animate-fade" onClick={() => setPassbookModalMember(null)}>
+            <div className="member-passbook-modal luxury-card animate-scale-up" onClick={e => e.stopPropagation()}>
+              {/* Top Bar with Member Identity and Close */}
+              <div className="passbook-modal-top-bar">
+                <div className="passbook-member-identity">
+                  <span className="passbook-num-badge">{passbookModalMember.memberNo}</span>
+                  <div>
+                    <h3 className="passbook-member-name">
+                      {language === 'te' ? passbookModalMember.nameTe : passbookModalMember.name}
+                    </h3>
+                    <span className="passbook-member-phone font-mono">{passbookModalMember.phone}</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="btn-modal-close static"
+                  onClick={() => setPassbookModalMember(null)}
+                  aria-label="Close"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Scheme & Status Strip */}
+              <div className="passbook-scheme-strip">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-amber-400 font-bold text-xs">
+                    🪙 {currentGroup.name} • ₹{currentGroup.totalValue.toLocaleString('en-IN')}
+                  </span>
+                  <span className="text-gray-400 text-xs">
+                    ({totalMonths} {language === 'te' ? 'నెలలు' : 'Months'})
+                  </span>
+                </div>
+                {passbookModalMember.hasLiftedChit ? (
+                  <span className="badge-status-lifted">
+                    <Award size={13} />
+                    <span>
+                      {language === 'te' 
+                        ? `చిట్ గ్రహీత (నెల ${passbookModalMember.liftedMonth})` 
+                        : `Lifted Month ${passbookModalMember.liftedMonth}`}
+                    </span>
+                  </span>
+                ) : (
+                  <span className="badge-status-eligible">
+                    <CheckCircle2 size={13} />
+                    <span>{language === 'te' ? 'లక్కీ డ్రాకు అర్హులు' : 'Draw Eligible'}</span>
+                  </span>
+                )}
+              </div>
+
+              {/* 4 Summary Metric Cards */}
+              <div className="passbook-stats-grid">
+                <div className="passbook-stat-card">
+                  <span className="passbook-stat-label">{language === 'te' ? 'ఇప్పటివరకు కట్టినది' : 'Total Paid'}</span>
+                  <strong className="passbook-stat-val font-mono text-amber-400">₹{totalPaidAmount.toLocaleString('en-IN')}</strong>
+                  <span className="passbook-stat-sub">
+                    {language === 'te' ? `${paidMonthsCount} వాయిదాల మొత్తం` : `from ${paidMonthsCount} installments`}
+                  </span>
+                </div>
+
+                <div className="passbook-stat-card">
+                  <span className="passbook-stat-label">{language === 'te' ? 'కట్టిన వాయిదాలు' : 'Months Paid'}</span>
+                  <strong className="passbook-stat-val text-emerald-400">
+                    {paidMonthsCount} / {totalMonths}
+                  </strong>
+                  <span className="passbook-stat-sub text-emerald-400 font-bold">
+                    {completionPercent}% {language === 'te' ? 'పూర్తయింది' : 'Completed'}
+                  </span>
+                </div>
+
+                <div className="passbook-stat-card">
+                  <span className="passbook-stat-label">{language === 'te' ? 'మిగిలిన వాయిదాలు' : 'Remaining Months'}</span>
+                  <strong className="passbook-stat-val text-blue-400">
+                    {remainingMonths} {language === 'te' ? 'నెలలు' : 'Mos'}
+                  </strong>
+                  <span className="passbook-stat-sub">
+                    {language === 'te' ? 'చెల్లించవలసినవి' : 'Pending to complete'}
+                  </span>
+                </div>
+
+                <div className="passbook-stat-card">
+                  <span className="passbook-stat-label">{language === 'te' ? 'మొత్తం చిట్ విలువ' : 'Chit Scheme Value'}</span>
+                  <strong className="passbook-stat-val font-mono text-purple-400">₹{currentGroup.totalValue.toLocaleString('en-IN')}</strong>
+                  <span className="passbook-stat-sub">
+                    {language === 'te' ? '20 నెలల పథకం' : '20-Month Mutual Benefit'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Progress Track */}
+              <div className="passbook-modal-progress-wrap">
+                <div className="flex justify-between items-center text-xs mb-1">
+                  <span className="text-gray-400 font-medium">
+                    {language === 'te' ? 'చెల్లింపుల పురోగతి (Payment Progress)' : 'Payment Progress'}
+                  </span>
+                  <span className="text-amber-400 font-bold font-mono">{completionPercent}%</span>
+                </div>
+                <div className="passbook-progress-bar">
+                  <div className="passbook-progress-fill" style={{ width: `${completionPercent}%` }} />
+                </div>
+              </div>
+
+              {/* WhatsApp Share Statement Banner */}
+              <div className="passbook-share-banner">
+                <div className="passbook-share-text">
+                  <strong className="passbook-share-title">
+                    {language === 'te' ? 'సభ్యునికి పాస్‌బుక్ వివరాలు పంపండి' : 'Share Passbook Statement with Member'}
+                  </strong>
+                  <span className="passbook-share-sub">
+                    {language === 'te' ? 'ఇప్పటివరకు కట్టిన పూర్తి వివరాలతో WhatsApp స్టేట్‌మెంట్' : 'Full summary statement via WhatsApp'}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className="btn-whatsapp-share-sm"
+                  onClick={() => handleSharePassbookWhatsApp(passbookModalMember)}
+                >
+                  <Send size={13} />
+                  <span>{language === 'te' ? 'WhatsApp స్టేట్‌మెంట్' : 'WhatsApp Statement'}</span>
+                </button>
+              </div>
+
+              {/* Month-by-Month Statement List */}
+              <div className="passbook-statement-section">
+                <div className="passbook-statement-header">
+                  <h4 className="statement-title">
+                    <Calendar size={15} className="text-amber-400" />
+                    <span>{language === 'te' ? '20 నెలల పూర్తి ఖాతా పుస్తకం పట్టిక' : '20-Month Complete Passbook Statement'}</span>
+                  </h4>
+                  <span className="statement-count">
+                    {language === 'te' ? `${totalMonths} నెలలు` : `${totalMonths} Months`}
+                  </span>
+                </div>
+
+                <div className="passbook-statement-list">
+                  {Array.from({ length: totalMonths }, (_, i) => i + 1).map(monthNum => {
+                    const monthExpectedDue = getInstallmentForMember(monthNum, passbookModalMember, language);
+                    const paidRecord = approvedPayments.find(p => Number(p.month) === monthNum);
+                    const pendingRecord = memberPayments.find(p => Number(p.month) === monthNum && p.status === 'pending');
+                    const isLiftMonth = passbookModalMember.hasLiftedChit && passbookModalMember.liftedMonth === monthNum;
+
+                    return (
+                      <div
+                        key={monthNum}
+                        className={`statement-month-row ${paidRecord ? 'paid' : pendingRecord ? 'pending' : monthNum === currentGroup.currentMonth ? 'active-month' : 'future'}`}
+                      >
+                        <div className="month-row-left">
+                          <span className="month-badge-pill">
+                            {language === 'te' ? `నెల ${monthNum}` : `M${monthNum}`}
+                          </span>
+                          <div className="month-name-wrap">
+                            <strong className="month-title-text">
+                              {getMonthDisplayName(monthNum, language)}
+                            </strong>
+                            {isLiftMonth && (
+                              <span className="month-lift-pill">
+                                🏆 {language === 'te' ? 'చిట్ ఎత్తిన నెల (₹2,00,000)' : 'Chit Lifted Month'}
+                              </span>
+                            )}
+                            {paidRecord && (
+                              <span className="month-paid-date font-mono">
+                                {paidRecord.date} • {paidRecord.paymentMode} • {paidRecord.receiptNo}
+                              </span>
+                            )}
+                            {pendingRecord && (
+                              <span className="month-pending-sub font-mono">
+                                {language === 'te' ? 'ఆమోదం కోసం వేచి ఉంది' : 'Awaiting Approval'} • {pendingRecord.date}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="month-row-right">
+                          <div className="month-amount-wrap">
+                            {paidRecord ? (
+                              <>
+                                <span className="status-badge-paid">
+                                  <CheckCircle2 size={12} />
+                                  <span>{language === 'te' ? 'చెల్లించారు' : 'Paid'}</span>
+                                </span>
+                                <span className="paid-amount-text font-mono font-bold">
+                                  ₹{paidRecord.amount.toLocaleString('en-IN')}
+                                </span>
+                              </>
+                            ) : pendingRecord ? (
+                              <>
+                                <span className="status-badge-pending">
+                                  <Clock size={12} />
+                                  <span>{language === 'te' ? 'పరిశీలనలో' : 'Pending'}</span>
+                                </span>
+                                <span className="pending-amount-text font-mono font-bold">
+                                  ₹{pendingRecord.amount.toLocaleString('en-IN')}
+                                </span>
+                              </>
+                            ) : monthNum === currentGroup.currentMonth ? (
+                              <>
+                                <span className="status-badge-due">
+                                  <span>{language === 'te' ? 'ప్రస్తుత వాయిదా' : 'Current Due'}</span>
+                                </span>
+                                <span className="due-amount-text font-mono font-bold text-amber-400">
+                                  ₹{monthExpectedDue.toLocaleString('en-IN')}
+                                </span>
+                              </>
+                            ) : monthNum < currentGroup.currentMonth ? (
+                              <>
+                                <span className="status-badge-overdue">
+                                  <span>{language === 'te' ? 'చెల్లించలేదు' : 'Unpaid'}</span>
+                                </span>
+                                <span className="overdue-amount-text font-mono font-bold text-red-400">
+                                  ₹{monthExpectedDue.toLocaleString('en-IN')}
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="status-badge-future">
+                                  <span>{language === 'te' ? 'రాబోయే నెల' : 'Upcoming'}</span>
+                                </span>
+                                <span className="future-amount-text font-mono text-gray-500">
+                                  ₹{monthExpectedDue.toLocaleString('en-IN')}
+                                </span>
+                              </>
+                            )}
+                          </div>
+
+                          {paidRecord && (
+                            <button
+                              type="button"
+                              className="btn-statement-receipt"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onOpenReceipt(paidRecord, passbookModalMember);
+                              }}
+                              title={language === 'te' ? 'రసీదు చూడండి' : 'View Receipt'}
+                            >
+                              <FileCheck size={13} />
+                              <span>{language === 'te' ? 'రసీదు' : 'Receipt'}</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="passbook-modal-footer">
+                <button
+                  type="button"
+                  className="btn-secondary w-full py-2.5 rounded-xl text-xs font-bold"
+                  onClick={() => setPassbookModalMember(null)}
+                >
+                  {language === 'te' ? 'మూసివేయి (Close)' : 'Close Passbook'}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };
