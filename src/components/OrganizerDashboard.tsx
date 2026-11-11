@@ -491,9 +491,9 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
         <div className="org-hero-top">
           <div className="month-picker-pill">
             <div className="month-picker-label">
-              <Calendar size={14} className="shrink-0 text-amber-400" />
-              <span className="hidden sm:inline font-semibold">{language === 'te' ? 'ప్రస్తుత నెల:' : 'Active Month:'}</span>
-              <span className="sm:hidden font-semibold">{language === 'te' ? 'నెల:' : 'Month:'}</span>
+              <Calendar size={14} className="shrink-0 text-amber-500" />
+              <span className="month-picker-text-full font-semibold">{language === 'te' ? 'ప్రస్తుత నెల:' : 'Active Month:'}</span>
+              <span className="month-picker-text-short font-semibold">{language === 'te' ? 'నెల:' : 'Month:'}</span>
             </div>
             <div className="month-select-wrapper">
               <select

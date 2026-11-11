@@ -1735,6 +1735,23 @@ select.form-input option,
   font-size: 0.82rem;
 }
 
+.month-picker-text-short {
+  display: none;
+}
+
+.month-picker-text-full {
+  display: inline;
+}
+
+@media (max-width: 480px) {
+  .month-picker-text-full {
+    display: none;
+  }
+  .month-picker-text-short {
+    display: inline;
+  }
+}
+
 .month-select-wrapper {
   position: relative;
   display: inline-flex;
@@ -1762,6 +1779,13 @@ select.form-input option,
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+}
+
+.month-select:focus,
+.month-select:active {
+  outline: none;
+  box-shadow: none;
+  border: none;
 }
 
 .month-select::-ms-expand {
@@ -7949,20 +7973,57 @@ body.light-theme .organizer-hero-banner {
 }
 
 body.light-theme .month-picker-pill {
-  background: #F1F5F9;
-  border: 1.5px solid rgba(217, 119, 6, 0.35);
-  color: #0F172A;
+  background: #FFFFFF !important;
+  border: 1.5px solid #F59E0B !important;
+  color: #0F172A !important;
+  box-shadow: 0 1px 3px rgba(217, 119, 6, 0.08) !important;
 }
 
-body.light-theme .month-select {
-  color: #0F172A;
-  background: transparent;
-  font-weight: 800;
+body.light-theme .month-picker-label {
+  color: #475569 !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .month-picker-label svg {
+  color: #D97706 !important;
+}
+
+body.light-theme .month-select-wrapper {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body.light-theme .month-select,
+body.light-theme .month-select:focus,
+body.light-theme .month-select:hover,
+body.light-theme .month-select:active {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  color: #92400E !important;
+  font-weight: 800 !important;
+  font-size: 0.88rem !important;
+  cursor: pointer !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  margin: 0 !important;
+  padding: 0 1.25rem 0 0.15rem !important;
+}
+
+body.light-theme .month-select-chevron {
+  color: #D97706 !important;
 }
 
 body.light-theme .month-select option {
-  background: #FFFFFF;
-  color: #0F172A;
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  font-weight: 600 !important;
 }
 
 body.light-theme .siva-org-switch-banner {
@@ -8912,7 +8973,7 @@ body.light-theme input[type="text"],
 body.light-theme input[type="tel"],
 body.light-theme input[type="password"],
 body.light-theme input[type="number"],
-body.light-theme select {
+body.light-theme select:not(.month-select) {
   background: #F8FAFC !important;
   border: 1.5px solid #CBD5E1 !important;
   color: #0F172A !important;
@@ -8923,7 +8984,7 @@ body.light-theme input[type="text"]:focus,
 body.light-theme input[type="tel"]:focus,
 body.light-theme input[type="password"]:focus,
 body.light-theme input[type="number"]:focus,
-body.light-theme select:focus {
+body.light-theme select:not(.month-select):focus {
   background: #FFFFFF !important;
   border-color: #D97706 !important;
   box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15) !important;
