@@ -1451,103 +1451,200 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
         const receiverPhone = customReceiverPhone.trim() || (winnerMember ? winnerMember.phone : (language === 'te' ? 'విజేత ఫోన్‌పే నంబర్' : 'Winner PhonePe Number'));
 
         const officialBroadcastText =
-          `📢 *${language === 'te' ? currentGroup.nameTe : currentGroup.name}*
-నెల ${currentGroup.currentMonth} వేలం పాట వివరాలు & వాయిదా నోటీస్
-━━━━━━━━━━━━━━━━━━━━━
-• Chit Scheme : ₹${currentGroup.totalValue.toLocaleString('en-IN')} (${currentGroup.totalMonths} Months)
-• Month       : నెల ${currentGroup.currentMonth} (${monthNameText})
-• చిట్టీ విజేత : ${broadcastWinnerName}
-• Loss (పాట తగ్గింపు)  : ${broadcastLoss}
-• Bonus (సభ్యుల లాభం) : ${broadcastBonus}
-• Amount to Pay (వాయిదా): ${broadcastAmountToPay}
-━━━━━━━━━━━━━━━━━━━━━
-⚠️ *Plz arrange amount with in 3 days.*
-(సభ్యులందరూ మీ వాయిదా సొమ్మును నేరుగా ఈ నెల చిట్టీ తీసుకున్న విజేతకు PhonePe/GPay ద్వారా పంపవలసిందిగా కోరుతున్నాము.)
-
-📱 PhonePe / GPay : ${receiverPhone}
-👤 Name (గ్రహీత)   : ${receiverName}
-━━━━━━━━━━━━━━━━━━━━━
-నిర్వాహకుడు: శివ (${currentGroup.organizerPhone})
-ధన్యవాదాలు! - శ్రీ వరలక్ష్మి చిట్స్`;
+          `📢 *${language === 'te' ? currentGroup.nameTe : currentGroup.name}*\n` +
+          `✨ *నెల ${currentGroup.currentMonth} వేలం పాట వివరాలు & వాయిదా నోటీస్*\n` +
+          `━━━━━━━━━━━━━━━━━━━━━━\n` +
+          `📋 *చిట్ స్కీమ్:* ₹${currentGroup.totalValue.toLocaleString('en-IN')} (${currentGroup.totalMonths} నెలలు)\n` +
+          `📅 *వాయిదా నెల:* నెల ${currentGroup.currentMonth} (${monthNameText})\n` +
+          `🏆 *చిట్ విజేత:* ${broadcastWinnerName}\n` +
+          `💰 *కట్టవలసిన వాయిదా:* ${broadcastAmountToPay}\n` +
+          `📉 *పాట తగ్గింపు (Discount):* ${broadcastLoss}\n` +
+          `🎁 *సభ్యుల లాభం (Bonus):* ${broadcastBonus}\n` +
+          `━━━━━━━━━━━━━━━━━━━━━━\n` +
+          `⚠️ *ముఖ్య గమనిక:*\n` +
+          `సభ్యులందరూ మీ వాయిదా సొమ్మును 3 రోజుల్లోపు నేరుగా ఈ నెల చిట్టీ తీసుకున్న విజేతకు PhonePe/GPay ద్వారా పంపవలసిందిగా కోరుతున్నాము.\n\n` +
+          `📱 *PhonePe / GPay:* ${receiverPhone}\n` +
+          `👤 *గ్రహీత పేరు:* ${receiverName}\n` +
+          `━━━━━━━━━━━━━━━━━━━━━━\n` +
+          `👤 *నిర్వాహకుడు:* శివ (${currentGroup.organizerPhone})\n` +
+          `🙏 ధన్యవాదాలు! - శ్రీ వరలక్ష్మి చిట్స్`;
 
         return (
           <div className="modal-backdrop animate-fade" onClick={() => setIsBroadcastModalOpen(false)}>
-            <div className="login-modal-card luxury-card max-w-lg" onClick={e => e.stopPropagation()}>
-              <div className="flex justify-between items-center mb-3">
+            <div className="broadcast-modal-card luxury-card animate-scale-up" onClick={e => e.stopPropagation()}>
+              {/* Header */}
+              <div className="broadcast-modal-header">
                 <div className="flex items-center gap-2">
-                  <MessageCircle size={20} className="text-emerald-400" />
-                  <h3 className="text-white font-bold text-base">
-                    {language === 'te' ? 'WhatsApp గ్రూప్ బ్రాడ్‌కాస్ట్ నోటీస్' : 'WhatsApp Group Broadcast Notice'}
-                  </h3>
+                  <div className="broadcast-header-icon">
+                    <MessageCircle size={20} />
+                  </div>
+                  <div>
+                    <h3 className="broadcast-modal-title">
+                      {language === 'te' ? 'WhatsApp గ్రూప్ బ్రాడ్‌కాస్ట్ నోటీస్' : 'WhatsApp Group Broadcast Notice'}
+                    </h3>
+                    <p className="broadcast-modal-sub">
+                      {language === 'te'
+                        ? 'ఈ క్రింది సందేశాన్ని మీ చిట్ వాట్సాప్ గ్రూప్‌లో షేర్ చేయండి'
+                        : 'Share this notice directly to your chit WhatsApp group'}
+                    </p>
+                  </div>
                 </div>
-                <button type="button" className="btn-modal-close static" onClick={() => setIsBroadcastModalOpen(false)}>
+                <button
+                  type="button"
+                  className="btn-modal-close static"
+                  onClick={() => setIsBroadcastModalOpen(false)}
+                  aria-label="Close"
+                >
                   <X size={18} />
                 </button>
               </div>
 
-              <p className="text-xs text-amber-300 mb-2.5">
-                {language === 'te'
-                  ? 'ఈ క్రింది సందేశాన్ని మీ చిట్ వాట్సాప్ గ్రూప్‌లో షేర్ చేయండి:'
-                  : 'Share this notice directly to your chit WhatsApp group:'}
-              </p>
-
               {/* Receiver Info Box (Winner Details) */}
-              <div className="bg-slate-900/90 border border-amber-500/30 rounded-xl p-3 mb-3 text-xs space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-amber-300">
-                    {language === 'te' ? '💰 డబ్బులు అందుకోవలసిన చిట్టీ విజేత (Receiver):' : '💰 Chit Winner (Money Receiver Details):'}
-                  </span>
+              <div className="broadcast-receiver-box">
+                <div className="broadcast-receiver-header">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-base">💰</span>
+                    <strong className="broadcast-receiver-title">
+                      {language === 'te' ? 'డబ్బులు అందుకోవలసిన చిట్టీ విజేత (Receiver):' : 'Chit Winner (Money Receiver Details):'}
+                    </strong>
+                  </div>
                   {winnerMember && (
-                    <span className="text-[11px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                      ✓ ఆటోమేటిక్ సెలెక్ట్
+                    <span className="broadcast-auto-badge">
+                      ✓ {language === 'te' ? 'ఆటోమేటిక్ ఎంపిక' : 'Auto Selected'}
                     </span>
                   )}
                 </div>
-                <div className="grid grid-cols-2 gap-2 pt-0.5">
-                  <div>
-                    <label className="text-gray-400 block mb-1 text-[11px]">
-                      {language === 'te' ? 'గ్రహీత పేరు (Name):' : 'Receiver Name:'}
+
+                <div className="broadcast-inputs-grid">
+                  <div className="broadcast-field">
+                    <label className="broadcast-label">
+                      {language === 'te' ? 'గ్రహీత పేరు (Receiver Name):' : 'Receiver Name:'}
                     </label>
                     <input
                       type="text"
-                      className="form-input text-xs py-1.5"
-                      placeholder={winnerMember ? (winnerMember.nameTe || winnerMember.name) : 'విజేత పేరు'}
+                      className="broadcast-input"
+                      placeholder={winnerMember ? (winnerMember.nameTe || winnerMember.name) : (language === 'te' ? 'విజేత పేరు' : 'Winner Name')}
                       value={customReceiverName}
                       onChange={e => setCustomReceiverName(e.target.value)}
                     />
                   </div>
-                  <div>
-                    <label className="text-gray-400 block mb-1 text-[11px]">
+
+                  <div className="broadcast-field">
+                    <label className="broadcast-label">
                       {language === 'te' ? 'PhonePe / GPay నంబర్:' : 'PhonePe / GPay No:'}
                     </label>
                     <input
                       type="tel"
                       maxLength={10}
-                      className="form-input text-xs py-1.5 font-mono"
+                      className="broadcast-input font-mono"
                       placeholder={winnerMember ? winnerMember.phone : '10-digit mobile'}
                       value={customReceiverPhone}
                       onChange={e => setCustomReceiverPhone(e.target.value.replace(/\D/g, ''))}
                     />
                   </div>
                 </div>
-                <p className="text-[11px] text-gray-400 m-0">
+
+                <p className="broadcast-receiver-note">
                   {language === 'te'
-                    ? '* సభ్యులందరూ ఈ నంబర్‌కే ఫోన్‌పే ద్వారా నేరుగా డబ్బులు పంపుతారు.'
-                    : '* All members will send payments directly to this PhonePe number.'}
+                    ? '* సభ్యులందరూ తమ వాయిదా సొమ్మును నేరుగా ఈ PhonePe నంబర్‌కే పంపుతారు.'
+                    : '* All members will send their monthly installment directly to this PhonePe number.'}
                 </p>
               </div>
 
-              {/* Live WhatsApp Chat Bubble Preview */}
-              <div className="bg-[#0b141a] border border-[#202c33] rounded-2xl p-3.5 mb-3.5 shadow-inner">
-                <div className="text-xs font-mono text-gray-200 whitespace-pre-wrap leading-relaxed select-all">
-                  {officialBroadcastText}
+              {/* Point-Wise WhatsApp Live Chat Card Preview */}
+              <div className="broadcast-chat-preview">
+                <div className="chat-preview-header">
+                  <div className="flex items-center gap-1.5">
+                    <span className="wa-dot" />
+                    <span className="chat-preview-title">
+                      {language === 'te' ? 'WhatsApp సందేశ ప్రివ్యూ (Live Preview)' : 'WhatsApp Message Preview'}
+                    </span>
+                  </div>
+                  <span className="chat-time-tag font-mono">Just now</span>
+                </div>
+
+                <div className="chat-preview-body">
+                  {/* Title Bar */}
+                  <div className="chat-brand-header">
+                    <h4 className="chat-brand-name">
+                      📢 {language === 'te' ? currentGroup.nameTe : currentGroup.name}
+                    </h4>
+                    <span className="chat-event-badge">
+                      ✨ {language === 'te' ? `నెల ${currentGroup.currentMonth} వేలం పాట & వాయిదా నోటీస్` : `Month ${currentGroup.currentMonth} Auction & Due Notice`}
+                    </span>
+                  </div>
+
+                  {/* Point-Wise Summary List */}
+                  <div className="chat-points-list">
+                    <div className="chat-point-row">
+                      <span className="chat-point-key">📋 {language === 'te' ? 'చిట్ స్కీమ్' : 'Chit Scheme'}:</span>
+                      <strong className="chat-point-val font-mono">₹{currentGroup.totalValue.toLocaleString('en-IN')} ({currentGroup.totalMonths} {language === 'te' ? 'నెలలు' : 'Mos'})</strong>
+                    </div>
+
+                    <div className="chat-point-row">
+                      <span className="chat-point-key">📅 {language === 'te' ? 'వాయిదా నెల' : 'Due Month'}:</span>
+                      <strong className="chat-point-val">{monthNameText}</strong>
+                    </div>
+
+                    <div className="chat-point-row">
+                      <span className="chat-point-key">🏆 {language === 'te' ? 'చిట్ విజేత' : 'Chit Winner'}:</span>
+                      <strong className="chat-point-val text-amber-400 font-bold">{broadcastWinnerName}</strong>
+                    </div>
+
+                    <div className="chat-point-row highlight-due">
+                      <span className="chat-point-key">💰 {language === 'te' ? 'కట్టవలసిన వాయిదా' : 'Amount to Pay'}:</span>
+                      <strong className="chat-point-val text-emerald-400 font-bold font-mono text-sm">{broadcastAmountToPay}</strong>
+                    </div>
+
+                    <div className="chat-point-row">
+                      <span className="chat-point-key">📉 {language === 'te' ? 'పాట తగ్గింపు (Discount)' : 'Auction Discount'}:</span>
+                      <span className="chat-point-val font-mono">{broadcastLoss}</span>
+                    </div>
+
+                    <div className="chat-point-row">
+                      <span className="chat-point-key">🎁 {language === 'te' ? 'సభ్యుల లాభం (Bonus)' : 'Member Dividend'}:</span>
+                      <span className="chat-point-val font-mono">{broadcastBonus}</span>
+                    </div>
+                  </div>
+
+                  {/* Payment Instructions Alert */}
+                  <div className="chat-alert-box">
+                    <div className="flex items-start gap-1.5">
+                      <span className="text-sm shrink-0">⚠️</span>
+                      <p className="m-0 text-[11px] leading-tight font-medium">
+                        <strong>{language === 'te' ? 'ముఖ్య గమనిక: ' : 'Important: '}</strong>
+                        {language === 'te'
+                          ? 'సభ్యులందరూ మీ వాయిదా సొమ్మును 3 రోజుల్లోపు నేరుగా ఈ నెల చిట్టీ తీసుకున్న విజేతకు PhonePe / GPay ద్వారా పంపవలసిందిగా కోరుతున్నాము.'
+                          : 'Please pay installment within 3 days directly to chit winner via PhonePe/GPay.'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Payment Account Details Box */}
+                  <div className="chat-payment-box">
+                    <div className="payment-line">
+                      <span className="pay-key">📱 PhonePe / GPay:</span>
+                      <strong className="pay-val font-mono text-emerald-400">{receiverPhone}</strong>
+                    </div>
+                    <div className="payment-line">
+                      <span className="pay-key">👤 {language === 'te' ? 'గ్రహీత పేరు' : 'Receiver Name'}:</span>
+                      <strong className="pay-val text-white">{receiverName}</strong>
+                    </div>
+                  </div>
+
+                  {/* Footer note */}
+                  <div className="chat-footer-note">
+                    <span>👤 {language === 'te' ? 'నిర్వాహకుడు' : 'Organizer'}: <strong>శివ ({currentGroup.organizerPhone})</strong></span>
+                    <span className="text-[11px] block text-gray-400 mt-0.5">🙏 {language === 'te' ? 'ధన్యవాదాలు! - శ్రీ వరలక్ష్మి చిట్స్' : 'Thank you! - Sri Varalaxmi Chits'}</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-2">
+              {/* Action Buttons */}
+              <div className="broadcast-modal-actions">
                 <button
                   type="button"
-                  className="btn-whatsapp-share w-full py-2.5 flex items-center justify-center gap-2 font-bold text-sm shadow-lg"
+                  className="btn-whatsapp-broadcast"
                   onClick={() => {
                     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(officialBroadcastText)}`, '_blank');
                   }}
@@ -1558,7 +1655,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
 
                 <button
                   type="button"
-                  className="btn-secondary w-full py-2 text-xs flex items-center justify-center gap-1.5"
+                  className="btn-secondary w-full py-2.5 text-xs flex items-center justify-center gap-1.5 font-bold rounded-xl"
                   onClick={() => {
                     navigator.clipboard.writeText(officialBroadcastText);
                     setIsBroadcastCopied(true);
@@ -1934,7 +2031,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
                         key={m}
                         value={m}
                         disabled={isCompleted}
-                        className={isCompleted ? 'text-gray-500 bg-gray-900 font-normal' : 'text-white font-bold'}
                       >
                         {isCompleted ? '✓ ' : ''}{getMonthDisplayName(m, language)}
                         {isCompleted
