@@ -5311,26 +5311,35 @@ select.form-input option,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.3) 100%);
-  border: 1.5px solid rgba(245, 158, 11, 0.6);
-  color: #FEF08A;
-  font-size: 0.8rem;
-  font-weight: 750;
-  padding: 0.5rem 0.95rem;
+  gap: 0.45rem;
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  border: 1.5px solid #F59E0B;
+  color: #FFFFFF !important;
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 0.52rem 1.1rem;
   border-radius: 9999px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
-  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.2);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
   line-height: 1;
 }
 
+.btn-add-member-pill span {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+.btn-add-member-pill svg {
+  color: #FFFFFF !important;
+}
+
 .btn-add-member-pill:hover {
-  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  background: linear-gradient(135deg, #D97706 0%, #B45309 100%);
   border-color: #FDE68A;
-  color: #FFFFFF;
-  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.45);
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.5);
   transform: translateY(-1px);
 }
 
@@ -8933,3 +8942,471 @@ body.light-theme .organizer-hero-banner .text-gray-400 {
 body.light-theme .text-gray-200 {
   color: #0F172A !important;
 }
+
+/* ==========================================================================
+   MEMBER DIRECTORY & LEDGER IN LIGHT THEME (Fixes Image 1 & 2)
+   ========================================================================== */
+body.light-theme .member-ledger-section {
+  background: #FFFFFF !important;
+  border: 1.5px solid rgba(217, 119, 6, 0.25) !important;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05) !important;
+}
+
+body.light-theme .ledger-header-row {
+  border-bottom: 1.5px solid #E2E8F0 !important;
+  padding-bottom: 0.85rem !important;
+}
+
+body.light-theme .section-title {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .section-subtitle {
+  color: #475569 !important;
+}
+
+body.light-theme .btn-add-member-pill {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
+  border: 1.5px solid #D97706 !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3) !important;
+}
+
+body.light-theme .btn-add-member-pill span {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .btn-add-member-pill svg {
+  color: #FFFFFF !important;
+}
+
+body.light-theme .btn-add-member-pill:hover {
+  background: linear-gradient(135deg, #D97706 0%, #B45309 100%) !important;
+  box-shadow: 0 6px 18px rgba(217, 119, 6, 0.4) !important;
+}
+
+body.light-theme .search-input-wrap {
+  background: #FFFFFF !important;
+  border: 1.5px solid #CBD5E1 !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+}
+
+body.light-theme .search-input-wrap:focus-within {
+  border-color: #D97706 !important;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15) !important;
+}
+
+body.light-theme .search-input-wrap svg {
+  color: #64748B !important;
+}
+
+body.light-theme .search-input {
+  color: #0F172A !important;
+  font-weight: 600 !important;
+}
+
+body.light-theme .search-input::placeholder {
+  color: #94A3B8 !important;
+}
+
+body.light-theme .filter-pill {
+  background: #F1F5F9 !important;
+  border: 1.5px solid #CBD5E1 !important;
+  color: #475569 !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .filter-pill:hover {
+  background: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+
+body.light-theme .filter-pill.active {
+  background: #FEF3C7 !important;
+  border-color: #F59E0B !important;
+  color: #92400E !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .member-count-badge {
+  background: #F8FAFC !important;
+  border: 1px solid #CBD5E1 !important;
+  color: #0F172A !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .member-expandable-card {
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+}
+
+body.light-theme .member-expandable-card:hover {
+  border-color: rgba(217, 119, 6, 0.45) !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08) !important;
+}
+
+body.light-theme .member-expandable-card.active {
+  border-color: #F59E0B !important;
+  box-shadow: 0 4px 16px rgba(217, 119, 6, 0.12) !important;
+}
+
+body.light-theme .member-name-primary {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .member-phone-label {
+  color: #64748B !important;
+}
+
+body.light-theme .card-badge-pending {
+  background: #FFFBEB !important;
+  border: 1.5px solid #F59E0B !important;
+  color: #92400E !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .card-badge-pending span {
+  color: #92400E !important;
+}
+
+body.light-theme .card-badge-pending svg {
+  color: #B45309 !important;
+}
+
+body.light-theme .card-badge-due {
+  background: #FEF2F2 !important;
+  border: 1.5px solid #EF4444 !important;
+  color: #B91C1C !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .card-badge-due span {
+  color: #B91C1C !important;
+}
+
+body.light-theme .member-card-chevron {
+  color: #64748B !important;
+}
+
+/* ==========================================================================
+   RECORD MONTHLY CHIT / LIFT MODAL IN LIGHT THEME (Fixes Image 4)
+   ========================================================================== */
+body.light-theme .lifting-modal-card {
+  background: #FFFFFF !important;
+  border: 1.8px solid rgba(217, 119, 6, 0.35) !important;
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.15) !important;
+}
+
+body.light-theme .auction-summary-card {
+  background: #FFFBEB !important;
+  border: 1.5px solid rgba(217, 119, 6, 0.35) !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
+}
+
+body.light-theme .summary-metric-row {
+  border-bottom: 1px dashed rgba(217, 119, 6, 0.25) !important;
+}
+
+body.light-theme .summary-metric-label {
+  color: #475569 !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .summary-metric-value {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .summary-metric-value.text-white {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .summary-metric-value.text-amber-300 {
+  color: #B45309 !important;
+  font-weight: 900 !important;
+}
+
+body.light-theme .summary-metric-value.text-emerald-400 {
+  color: #059669 !important;
+  font-weight: 900 !important;
+}
+
+body.light-theme .highlight-taken-box {
+  background: #FEF3C7 !important;
+  border: 1.5px solid #F59E0B !important;
+}
+
+body.light-theme .highlight-taken-box span {
+  color: #78350F !important;
+}
+
+body.light-theme .highlight-taken-box .text-amber-300 {
+  color: #92400E !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .highlight-taken-box .text-amber-200\/70 {
+  color: #78350F !important;
+  font-weight: 600 !important;
+}
+
+body.light-theme .highlight-taken-box .text-amber-400 {
+  color: #B45309 !important;
+  font-weight: 900 !important;
+}
+
+body.light-theme .highlight-prize-box {
+  background: #ECFDF5 !important;
+  border: 1.5px solid #10B981 !important;
+}
+
+body.light-theme .highlight-prize-box span {
+  color: #065F46 !important;
+  font-weight: 800 !important;
+}
+
+/* ==========================================================================
+   LOTTERY WHEEL MODAL IN LIGHT THEME (Fixes Image 5)
+   ========================================================================== */
+body.light-theme .exclusion-notice-pill {
+  background: #ECFDF5 !important;
+  border: 1.5px solid #10B981 !important;
+  color: #065F46 !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .exclusion-notice-pill span {
+  color: #065F46 !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .exclusion-notice-pill svg {
+  color: #059669 !important;
+}
+
+body.light-theme .eligible-count-bar {
+  background: #FEF3C7 !important;
+  border: 1.5px solid #F59E0B !important;
+  color: #92400E !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .eligible-count-bar span {
+  color: #92400E !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .eligible-count-bar svg {
+  color: #B45309 !important;
+}
+
+body.light-theme .lottery-title {
+  color: #0F172A !important;
+  font-weight: 900 !important;
+}
+
+body.light-theme .lottery-subtitle {
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
+body.light-theme .audit-section {
+  background: #F8FAFC !important;
+  border: 1.5px solid #E2E8F0 !important;
+}
+
+body.light-theme .audit-header h4 {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .member-chip.eligible {
+  background: #FFFFFF !important;
+  border: 1px solid #CBD5E1 !important;
+  color: #0F172A !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .member-chip.excluded {
+  background: #F1F5F9 !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #64748B !important;
+}
+
+body.light-theme .winner-announcement-card {
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%) !important;
+  border: 2px solid #F59E0B !important;
+  box-shadow: 0 10px 30px rgba(217, 119, 6, 0.2) !important;
+}
+
+body.light-theme .winner-name {
+  color: #0F172A !important;
+  font-weight: 900 !important;
+}
+
+body.light-theme .winner-sub {
+  color: #475569 !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .winner-amount-box {
+  background: #FFFFFF !important;
+  border: 1.5px solid rgba(217, 119, 6, 0.35) !important;
+}
+
+body.light-theme .amount-label {
+  color: #78350F !important;
+}
+
+body.light-theme .amount-val {
+  color: #D97706 !important;
+  font-weight: 900 !important;
+}
+
+body.light-theme .winner-note {
+  color: #065F46 !important;
+  font-weight: 700 !important;
+}
+
+/* ==========================================================================
+   SIVA'S PERSONAL CHITS SWITCH BANNER (High-Contrast & Perfect Margins)
+   ========================================================================== */
+body.light-theme .siva-org-switch-banner {
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%) !important;
+  border: 1.8px solid #F59E0B !important;
+  box-shadow: 0 4px 16px rgba(217, 119, 6, 0.12) !important;
+}
+
+body.light-theme .siva-org-switch-title {
+  color: #78350F !important;
+  font-weight: 900 !important;
+}
+
+body.light-theme .siva-org-switch-sub {
+  color: #92400E !important;
+  font-weight: 600 !important;
+}
+
+body.light-theme .btn-siva-view-chits {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
+  border: 1.5px solid #D97706 !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.25) !important;
+}
+
+body.light-theme .btn-siva-view-chits span {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .btn-siva-view-chits svg {
+  color: #FFFFFF !important;
+}
+
+body.light-theme .btn-siva-view-chits:hover {
+  background: linear-gradient(135deg, #D97706 0%, #B45309 100%) !important;
+  box-shadow: 0 6px 18px rgba(217, 119, 6, 0.35) !important;
+}
+
+/* ==========================================================================
+   GLOBAL LIGHT THEME TEXT CONTRAST & INSTALL APP REFINEMENTS
+   ========================================================================== */
+body.light-theme .text-amber-400 {
+  color: #D97706 !important;
+}
+
+body.light-theme .text-amber-300 {
+  color: #B45309 !important;
+}
+
+body.light-theme .text-yellow-400 {
+  color: #D97706 !important;
+}
+
+body.light-theme .text-emerald-400,
+body.light-theme .text-emerald-300 {
+  color: #059669 !important;
+}
+
+body.light-theme .navbar-install-pill,
+body.light-theme .landing-install-pill {
+  background: #FEF3C7 !important;
+  border: 1.5px solid #D97706 !important;
+  color: #78350F !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.18) !important;
+}
+
+body.light-theme .navbar-install-pill span,
+body.light-theme .landing-install-pill span {
+  color: #78350F !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .navbar-install-pill svg,
+body.light-theme .landing-install-pill svg {
+  color: #B45309 !important;
+}
+
+body.light-theme .navbar-install-pill:hover,
+body.light-theme .landing-install-pill:hover {
+  background: #FDE68A !important;
+  color: #78350F !important;
+  border-color: #B45309 !important;
+}
+
+body.light-theme .btn-add-member-pill {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
+  border: 1.5px solid #D97706 !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3) !important;
+}
+
+body.light-theme .btn-add-member-pill span {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .btn-add-member-pill svg {
+  color: #FFFFFF !important;
+}
+
+body.light-theme .btn-add-member-pill:hover {
+  background: linear-gradient(135deg, #D97706 0%, #B45309 100%) !important;
+  box-shadow: 0 6px 18px rgba(217, 119, 6, 0.4) !important;
+}
+
+/* Lifting Modal Action Buttons Contrast */
+body.light-theme .lifting-modal-actions .btn-lifting-modal-action:first-child {
+  background: #F1F5F9 !important;
+  border: 1.5px solid #CBD5E1 !important;
+  color: #475569 !important;
+  box-shadow: none !important;
+}
+
+body.light-theme .lifting-modal-actions .btn-lifting-modal-action:first-child:hover {
+  background: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+
+body.light-theme .lifting-modal-actions .btn-lifting-modal-action:last-child {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
+  border: 1.5px solid #D97706 !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3) !important;
+}
+
+body.light-theme .lifting-modal-actions .btn-lifting-modal-action:last-child:hover {
+  background: linear-gradient(135deg, #D97706 0%, #B45309 100%) !important;
+  box-shadow: 0 6px 18px rgba(217, 119, 6, 0.4) !important;
+}
+

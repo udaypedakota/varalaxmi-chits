@@ -485,6 +485,37 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
           </div>
         </div>
 
+        {/* Siva's Personal Chits Switch Banner (When Organizer holds personal chits) */}
+        {userChits && userChits.length > 0 && (
+          <div className="siva-org-switch-banner animate-fade">
+            <div className="siva-org-switch-left">
+              <div className="siva-org-switch-badge">🎟️</div>
+              <div className="siva-org-switch-details">
+                <strong className="siva-org-switch-title">
+                  {language === 'te'
+                    ? `మీ వ్యక్తిగత చిట్టీలు (${userChits.map(c => c.memberNo).join(', ')})`
+                    : `Your Personal Chits (${userChits.map(c => c.memberNo).join(', ')})`}
+                </strong>
+                <span className="siva-org-switch-sub">
+                  {language === 'te'
+                    ? `మీ ${userChits.length} చిట్టీల పాస్‌బుక్ & చెల్లింపులు చూడండి`
+                    : `View passbook & installment records for your ${userChits.length} chits`}
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => switchToMemberChit()}
+              className="btn-siva-view-chits"
+              title={language === 'te' ? 'మీ చిట్టీల పాస్‌బుక్ చూడండి' : 'View Your Chits Passbook'}
+            >
+              <span>🎟️</span>
+              <span>{language === 'te' ? 'నా చిట్టీల పాస్‌బుక్' : 'My Chits Passbook'}</span>
+              <ChevronRight size={14} />
+            </button>
+          </div>
+        )}
+
         {/* 4 Metric Cards */}
         <div className="org-metrics-grid">
           {/* Metric 1: Total Pool Collected So Far */}
@@ -913,7 +944,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onOpenRe
 
       {/* 4. MEMBER LEDGER & TOTAL PAID TABLE */}
       <section className="member-ledger-section luxury-card">
-        <div className="ledger-header-row flex justify-between items-start flex-wrap gap-3 pb-3 border-b border-gray-800">
+        <div className="ledger-header-row flex justify-between items-center flex-wrap gap-3 pb-3">
           <div
             className="cursor-pointer select-none flex-1 min-w-[240px]"
             onClick={() => setIsMembersExpanded(!isMembersExpanded)}
