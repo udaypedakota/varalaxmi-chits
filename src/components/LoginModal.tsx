@@ -126,7 +126,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, initial
             <ArrowLeft size={16} className="login-back-icon shrink-0" />
             <span className="login-back-title">{language === 'te' ? 'శ్రీ వరలక్ష్మి చిట్స్' : 'Sri Varalaxmi Chits'}</span>
           </button>
-          <div className="flex items-center gap-2">
+          <div className="login-top-actions">
             <ThemeToggle />
             <LanguageToggle />
           </div>

@@ -12,15 +12,15 @@ export const LanguageToggle: React.FC<LanguageToggleProps> = ({ className = '', 
 
   return (
     <div className={`lang-segmented-switch ${className}`} role="group" aria-label="Language selection">
-      {showIcon && <Globe size={15} className="lang-globe-icon" />}
+      {showIcon && <Globe size={13} className="lang-globe-icon" />}
       <button
         type="button"
         className={`lang-option-pill pill-te ${language === 'te' ? 'active' : ''}`}
         onClick={() => setLanguage('te')}
-        title="తెలుగు భాషను ఎంచుకోండి"
+        title="తెలుగు భాషను ఎంచుకోండి (Telugu)"
         aria-pressed={language === 'te'}
       >
-        తెలుగు
+        తె
       </button>
       <button
         type="button"
@@ -29,7 +29,7 @@ export const LanguageToggle: React.FC<LanguageToggleProps> = ({ className = '', 
         title="Switch to English"
         aria-pressed={language === 'en'}
       >
-        English
+        EN
       </button>
     </div>
   );

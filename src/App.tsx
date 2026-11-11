@@ -118,8 +118,10 @@ const AppContent: React.FC = () => {
                 </button>
               )}
               <div className="landing-header-spacer"></div>
-              <ThemeToggle />
-              <LanguageToggle />
+              <div className="landing-top-actions">
+                <ThemeToggle />
+                <LanguageToggle />
+              </div>
             </header>
 
             {/* Upper Flowing Golden Ribbons in Background */}
