@@ -5,6 +5,7 @@ import {
   ArrowRight, Eye, EyeOff, CheckCircle2, Info 
 } from 'lucide-react';
 import { LanguageToggle } from './LanguageToggle';
+import { ThemeToggle } from './ThemeToggle';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -125,7 +126,10 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, initial
             <ArrowLeft size={16} className="login-back-icon shrink-0" />
             <span className="login-back-title">{language === 'te' ? 'శ్రీ వరలక్ష్మి చిట్స్' : 'Sri Varalaxmi Chits'}</span>
           </button>
-          <LanguageToggle />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <LanguageToggle />
+          </div>
         </header>
 
         {/* Ambient Glows */}

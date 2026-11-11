@@ -7594,7 +7594,7 @@ body.light-theme .btn-add-group {
   color: #334155;
 }
 
-/* Install App Pill */
+/* Install App Pill in Navbar */
 body.light-theme .navbar-install-pill {
   background: #FEF3C7;
   border: 1.5px solid #F59E0B;
@@ -7648,7 +7648,180 @@ body.light-theme .btn-notification-trigger.active {
   color: #78350F;
 }
 
-/* Organizer Dashboard Hero Banner */
+/* ==========================================================================
+   LANDING / WELCOME SCREEN IN LIGHT THEME (Fixes Image 1)
+   ========================================================================== */
+body.light-theme .landing-viewport-wrap {
+  background: #F4F6FC !important;
+}
+
+body.light-theme .landing-mobile-frame {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 45%, #EEF2F9 100%) !important;
+  border: 1.8px solid rgba(217, 119, 6, 0.35) !important;
+  box-shadow: 0 25px 65px rgba(15, 23, 42, 0.08), 0 0 35px rgba(245, 158, 11, 0.1) !important;
+}
+
+body.light-theme .landing-hero-heading {
+  color: #0F172A !important;
+  text-shadow: none !important;
+}
+
+body.light-theme .landing-hero-caption {
+  color: #334155 !important;
+  font-weight: 600 !important;
+}
+
+body.light-theme .landing-install-pill {
+  background: #FEF3C7 !important;
+  border: 1.5px solid #F59E0B !important;
+  color: #92400E !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.15) !important;
+}
+
+body.light-theme .landing-install-pill svg {
+  color: #B45309 !important;
+}
+
+body.light-theme .btn-landing-organizer {
+  background: #F1F5F9 !important;
+  border: 1.5px solid #CBD5E1 !important;
+  color: #0F172A !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06) !important;
+}
+
+body.light-theme .btn-landing-organizer .btn-label {
+  color: #0F172A !important;
+}
+
+body.light-theme .btn-landing-organizer .btn-icon {
+  color: #B45309 !important;
+}
+
+body.light-theme .landing-footer-note,
+body.light-theme .landing-footer-note span {
+  color: #475569 !important;
+}
+
+/* ==========================================================================
+   LOGIN SCREEN & MODAL IN LIGHT THEME (Fixes Image 2)
+   ========================================================================== */
+body.light-theme .login-screen-overlay {
+  background: #F4F6FC !important;
+}
+
+body.light-theme .login-mobile-frame {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 50%, #EEF2F9 100%) !important;
+  border: 1.8px solid rgba(217, 119, 6, 0.35) !important;
+  box-shadow: 0 25px 65px rgba(15, 23, 42, 0.08), 0 0 35px rgba(245, 158, 11, 0.1) !important;
+}
+
+body.light-theme .login-frame-top-bar {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-bottom: 1px solid rgba(217, 119, 6, 0.25) !important;
+}
+
+body.light-theme .login-back-btn {
+  background: #F1F5F9 !important;
+  border: 1.5px solid rgba(217, 119, 6, 0.35) !important;
+  color: #0F172A !important;
+}
+
+body.light-theme .login-back-title {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .login-back-icon {
+  color: #B45309 !important;
+}
+
+body.light-theme .login-gold-sheet-card {
+  background: #FFFFFF !important;
+  border: 1.8px solid rgba(217, 119, 6, 0.35) !important;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08), 0 0 25px rgba(217, 119, 6, 0.1) !important;
+}
+
+body.light-theme .sheet-title {
+  color: #0F172A !important;
+  font-weight: 900 !important;
+}
+
+body.light-theme .sheet-subtitle {
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
+body.light-theme .sheet-segmented-tabs {
+  background: #F1F5F9 !important;
+  border: 1.5px solid #CBD5E1 !important;
+}
+
+body.light-theme .sheet-segment-btn {
+  color: #475569 !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .sheet-segment-btn.active {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3) !important;
+}
+
+body.light-theme .sheet-field-group label {
+  color: #334155 !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .sheet-field-wrap {
+  border: 1.5px solid #CBD5E1 !important;
+  background: #F8FAFC !important;
+}
+
+body.light-theme .sheet-field-wrap:focus-within {
+  border-color: #D97706 !important;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15) !important;
+  background: #FFFFFF !important;
+}
+
+body.light-theme .sheet-prefix-pill {
+  background: #E2E8F0 !important;
+  border-right: 1.5px solid #CBD5E1 !important;
+  color: #0F172A !important;
+  font-weight: 900 !important;
+}
+
+body.light-theme .sheet-field-wrap input {
+  background: transparent !important;
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .sheet-field-wrap input::placeholder {
+  color: #94A3B8 !important;
+}
+
+body.light-theme .sheet-btn-show-pin {
+  color: #64748B !important;
+}
+
+body.light-theme .sheet-btn-show-pin:hover {
+  color: #0F172A !important;
+}
+
+body.light-theme .sheet-info-footer {
+  background: #F8FAFC !important;
+  border: 1px solid #CBD5E1 !important;
+  color: #475569 !important;
+}
+
+body.light-theme .sheet-info-footer span {
+  color: #475569 !important;
+}
+
+/* ==========================================================================
+   ORGANIZER DASHBOARD HERO BANNER & METRICS
+   ========================================================================== */
 body.light-theme .organizer-hero-banner {
   background: linear-gradient(165deg, #FFFFFF 0%, #F8FAFC 100%);
   border: 1.5px solid rgba(217, 119, 6, 0.25);
@@ -7756,7 +7929,9 @@ body.light-theme .btn-tool-whatsapp:hover svg {
   color: #FFFFFF !important;
 }
 
-/* Master 20-Month Schedule Card */
+/* ==========================================================================
+   MASTER 20-MONTH SCHEDULE TABLE (Fixes Image 2)
+   ========================================================================== */
 body.light-theme .schedule-section {
   background: #FFFFFF;
   border: 1.5px solid rgba(217, 119, 6, 0.25);
@@ -7800,7 +7975,6 @@ body.light-theme .collapsed-preview-strip .text-emerald-300 {
   font-weight: 800;
 }
 
-/* Master Table Columns & Rows */
 body.light-theme .master-table {
   background: #FFFFFF;
 }
@@ -7841,7 +8015,7 @@ body.light-theme .schedule-row:hover td {
   background: #F8FAFC;
 }
 
-/* Active Month Row (Fixes invisible #1 & white text in Image 2) */
+/* Active Month Row */
 body.light-theme .schedule-row.current-active-row {
   background: #FFFBEB !important;
   box-shadow: inset 4px 0 0 #D97706;
@@ -7893,7 +8067,9 @@ body.light-theme .sched-winner-pill {
   font-weight: 800;
 }
 
-/* Member Search Box */
+/* ==========================================================================
+   MEMBER DIRECTORY, CARDS & DRAWER (Fixes Image 3 & Image 4)
+   ========================================================================== */
 body.light-theme .member-search-box input {
   background: #FFFFFF;
   border: 1.5px solid #CBD5E1;
@@ -7906,7 +8082,6 @@ body.light-theme .member-search-box input:focus {
   box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
 }
 
-/* Filter Pills */
 body.light-theme .filter-pill {
   background: #F1F5F9;
   border: 1.5px solid #CBD5E1;
@@ -7926,7 +8101,6 @@ body.light-theme .filter-pill.active {
   font-weight: 800;
 }
 
-/* Member Count Badge (Fixes invisible '20' in Image 3) */
 body.light-theme .member-count-badge {
   background: #F1F5F9;
   border: 1px solid #CBD5E1;
@@ -7939,7 +8113,6 @@ body.light-theme .member-count-badge strong {
   font-weight: 900;
 }
 
-/* Member Expandable Cards */
 body.light-theme .member-expandable-card {
   background: #FFFFFF;
   border: 1.5px solid #E2E8F0;
@@ -7986,7 +8159,7 @@ body.light-theme .member-card-chevron.open {
   color: #D97706 !important;
 }
 
-/* Status Badges on Cards (Fixes washed out 'Auction Pending' in Image 3) */
+/* Status Badges on Member Cards */
 body.light-theme .card-badge-pending,
 body.light-theme .card-badge-pending * {
   background: #FFFBEB !important;
@@ -8068,7 +8241,7 @@ body.light-theme .drawer-total-paid-strip strong {
   font-weight: 900;
 }
 
-/* ALL 6 Quick Action Buttons in Drawer (Fixes invisible text in Image 4) */
+/* ALL 6 Quick Action Buttons in Drawer */
 body.light-theme .btn-drawer-action {
   font-weight: 800 !important;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
@@ -8177,7 +8350,9 @@ body.light-theme .btn-drawer-receipt svg {
   color: #065F46 !important;
 }
 
-/* Member Dashboard in Light Theme */
+/* ==========================================================================
+   MEMBER DASHBOARD (Fixes Image 3)
+   ========================================================================== */
 body.light-theme .siva-org-banner {
   background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
   border: 1.5px solid rgba(217, 119, 6, 0.4);
@@ -8250,132 +8425,226 @@ body.light-theme .chit-slot-meta {
   font-weight: 600;
 }
 
-/* Member Hero Total Card */
+body.light-theme .chit-active-pill {
+  background: #ECFDF5 !important;
+  border: 1.5px solid #10B981 !important;
+  color: #065F46 !important;
+  font-weight: 800 !important;
+}
+
+/* Member Hero Total Card (Fixes missing '0' in Image 3) */
 body.light-theme .hero-total-card {
-  background: linear-gradient(145deg, #FFFFFF 0%, #FFFBEB 45%, #FEF3C7 100%);
-  border: 1.5px solid rgba(217, 119, 6, 0.35);
-  box-shadow: 0 12px 30px rgba(217, 119, 6, 0.12);
+  background: linear-gradient(145deg, #FFFFFF 0%, #FFFBEB 45%, #FEF3C7 100%) !important;
+  border: 1.8px solid rgba(217, 119, 6, 0.35) !important;
+  box-shadow: 0 12px 30px rgba(217, 119, 6, 0.12) !important;
 }
 
 body.light-theme .hero-chip {
-  background: #FEF3C7;
-  color: #78350F;
-  border-color: rgba(217, 119, 6, 0.35);
-  font-weight: 800;
+  background: #FEF3C7 !important;
+  color: #78350F !important;
+  border: 1px solid rgba(217, 119, 6, 0.35) !important;
+  font-weight: 800 !important;
 }
 
 body.light-theme .hero-member-id {
-  background: #F1F5F9;
-  color: #0F172A;
-  border-color: #CBD5E1;
-  font-weight: 800;
+  background: #F1F5F9 !important;
+  color: #0F172A !important;
+  border: 1px solid #CBD5E1 !important;
+  font-weight: 800 !important;
 }
 
 body.light-theme .hero-label {
-  color: #78350F;
-  font-weight: 700;
+  color: #78350F !important;
+  font-weight: 700 !important;
 }
 
 body.light-theme .hero-amount-display .currency-symbol {
-  color: #D97706;
-  font-weight: 900;
+  color: #D97706 !important;
+  font-weight: 900 !important;
 }
 
+/* Solid high-contrast amount number */
 body.light-theme .hero-amount-display .amount-number {
-  color: #0F172A;
-  font-weight: 900;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  -webkit-text-fill-color: #0F172A !important;
+  color: #0F172A !important;
+  font-weight: 900 !important;
 }
 
 body.light-theme .hero-mini-stat {
-  background: #FFFFFF;
-  border: 1.5px solid rgba(217, 119, 6, 0.2);
+  background: #FFFFFF !important;
+  border: 1.5px solid rgba(217, 119, 6, 0.25) !important;
 }
 
 body.light-theme .mini-stat-label {
-  color: #78350F;
-  font-weight: 700;
+  color: #78350F !important;
+  font-weight: 700 !important;
 }
 
 body.light-theme .mini-stat-val {
-  color: #0F172A;
-  font-weight: 800;
+  color: #0F172A !important;
+  font-weight: 900 !important;
 }
 
-body.light-theme .progress-track {
-  background: #E2E8F0;
+body.light-theme .progress-track-bar {
+  background: #E2E8F0 !important;
 }
 
-body.light-theme .chit-lift-banner {
-  background: #FFFFFF;
-  border: 1.5px solid rgba(217, 119, 6, 0.25);
-  color: #0F172A;
-  font-weight: 700;
+/* Status Strips inside Hero Card (Fixes washed out green in Image 3) */
+body.light-theme .status-waiting {
+  background: #ECFDF5 !important;
+  border: 1.5px solid #10B981 !important;
+  color: #065F46 !important;
+  font-weight: 800 !important;
 }
 
-/* Member Month Installment Card & Payment Records */
-body.light-theme .luxury-card,
-body.light-theme .dashboard-card {
-  background: #FFFFFF;
-  border: 1.5px solid #E2E8F0;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
-  color: #0F172A;
+body.light-theme .status-waiting span {
+  color: #065F46 !important;
+  font-weight: 800 !important;
 }
 
-body.light-theme .installment-due-amount {
-  color: #0F172A;
-  font-weight: 900;
+body.light-theme .status-waiting svg {
+  color: #059669 !important;
+}
+
+body.light-theme .status-lifted {
+  background: #FEF3C7 !important;
+  border: 1.5px solid #F59E0B !important;
+  color: #92400E !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .status-lifted span {
+  color: #92400E !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .status-lifted svg {
+  color: #B45309 !important;
+}
+
+/* Month Installment Card & Due Hero in Member Dashboard */
+body.light-theme .current-month-card {
+  background: #FFFFFF !important;
+  border: 1.5px solid rgba(217, 119, 6, 0.25) !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05) !important;
+}
+
+body.light-theme .current-month-card .section-tag {
+  color: #92400E !important;
+  font-weight: 900 !important;
+}
+
+body.light-theme .due-amount-hero {
+  background: linear-gradient(145deg, #FFFFFF 0%, #FFFBEB 100%) !important;
+  border: 1.5px solid rgba(217, 119, 6, 0.35) !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
+}
+
+body.light-theme .due-amount-number {
+  color: #0F172A !important;
+  font-weight: 900 !important;
+}
+
+body.light-theme .due-amount-number.text-emerald-400 {
+  color: #059669 !important;
+}
+
+body.light-theme .due-amount-number.text-amber-400\/80 {
+  color: #B45309 !important;
+}
+
+body.light-theme .due-label {
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
+body.light-theme .due-date-pill {
+  background: #F1F5F9 !important;
+  border: 1px solid #CBD5E1 !important;
+  color: #334155 !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .due-date-pill.text-amber-300 {
+  background: #FFFBEB !important;
+  border-color: #F59E0B !important;
+  color: #92400E !important;
+}
+
+body.light-theme .due-date-pill.text-emerald-300 {
+  background: #ECFDF5 !important;
+  border-color: #10B981 !important;
+  color: #065F46 !important;
+}
+
+body.light-theme .badge-paid {
+  background: #ECFDF5 !important;
+  border: 1.5px solid #10B981 !important;
+  color: #065F46 !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .badge-pending {
+  background: #FFFBEB !important;
+  border: 1.5px solid #F59E0B !important;
+  color: #92400E !important;
+  font-weight: 800 !important;
 }
 
 body.light-theme .upi-pay-strip {
-  background: #F8FAFC;
-  border: 1.5px solid #E2E8F0;
-  color: #0F172A;
+  background: #F8FAFC !important;
+  border: 1.5px solid #E2E8F0 !important;
+  color: #0F172A !important;
 }
 
 body.light-theme .history-row,
 body.light-theme .payment-record-card {
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
-  color: #0F172A;
+  background: #F8FAFC !important;
+  border: 1.5px solid #E2E8F0 !important;
+  color: #0F172A !important;
 }
 
 body.light-theme .history-row:hover {
-  background: #F1F5F9;
+  background: #F1F5F9 !important;
 }
 
 body.light-theme .history-amount {
-  color: #0F172A;
-  font-weight: 800;
+  color: #0F172A !important;
+  font-weight: 900 !important;
 }
 
-/* Modals & Dialogs in Light Theme */
+/* ==========================================================================
+   MODALS, DIALOGS, NOTIFICATIONS & FOOTER IN LIGHT THEME
+   ========================================================================== */
 body.light-theme .modal-backdrop,
 body.light-theme .modal-backdrop-luxury {
-  background: rgba(15, 23, 42, 0.65);
+  background: rgba(15, 23, 42, 0.65) !important;
 }
 
-body.light-theme .login-modal-card,
 body.light-theme .install-pwa-modal,
 body.light-theme .receipt-dialog,
 body.light-theme .modal-card,
 body.light-theme .member-modal-content,
 body.light-theme .lifting-modal-card,
 body.light-theme .broadcast-modal-card {
-  background: #FFFFFF;
-  border: 1.5px solid rgba(217, 119, 6, 0.35);
-  box-shadow: 0 25px 65px rgba(15, 23, 42, 0.2);
-  color: #0F172A;
+  background: #FFFFFF !important;
+  border: 1.8px solid rgba(217, 119, 6, 0.35) !important;
+  box-shadow: 0 25px 65px rgba(15, 23, 42, 0.2) !important;
+  color: #0F172A !important;
 }
 
 body.light-theme .btn-modal-close {
-  background: #F1F5F9;
-  border: 1px solid #CBD5E1;
-  color: #64748B;
+  background: #F1F5F9 !important;
+  border: 1px solid #CBD5E1 !important;
+  color: #64748B !important;
 }
 
 body.light-theme .btn-modal-close:hover {
-  background: #FEE2E2;
-  color: #DC2626;
+  background: #FEE2E2 !important;
+  color: #DC2626 !important;
 }
 
 body.light-theme input[type="text"],
@@ -8383,10 +8652,10 @@ body.light-theme input[type="tel"],
 body.light-theme input[type="password"],
 body.light-theme input[type="number"],
 body.light-theme select {
-  background: #F8FAFC;
-  border: 1.5px solid #CBD5E1;
-  color: #0F172A;
-  font-weight: 600;
+  background: #F8FAFC !important;
+  border: 1.5px solid #CBD5E1 !important;
+  color: #0F172A !important;
+  font-weight: 600 !important;
 }
 
 body.light-theme input[type="text"]:focus,
@@ -8394,148 +8663,94 @@ body.light-theme input[type="tel"]:focus,
 body.light-theme input[type="password"]:focus,
 body.light-theme input[type="number"]:focus,
 body.light-theme select:focus {
-  background: #FFFFFF;
-  border-color: #D97706;
-  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+  background: #FFFFFF !important;
+  border-color: #D97706 !important;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15) !important;
 }
 
 body.light-theme .btn-cancel,
 body.light-theme .btn-secondary {
-  background: #F1F5F9;
-  border: 1px solid #CBD5E1;
-  color: #475569;
-  font-weight: 700;
+  background: #F1F5F9 !important;
+  border: 1px solid #CBD5E1 !important;
+  color: #475569 !important;
+  font-weight: 700 !important;
 }
 
 body.light-theme .btn-cancel:hover,
 body.light-theme .btn-secondary:hover {
-  background: #E2E8F0;
-  color: #0F172A;
-}
-
-/* Landing / Welcome Screen */
-body.light-theme .landing-viewport-wrap {
-  background: #F4F6FC;
-}
-
-body.light-theme .landing-mobile-frame {
-  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 45%, #EEF2F9 100%);
-  border: 1.8px solid rgba(217, 119, 6, 0.35);
-  box-shadow: 0 25px 65px rgba(15, 23, 42, 0.08), 0 0 35px rgba(245, 158, 11, 0.1);
-}
-
-body.light-theme .landing-mobile-frame .brand-title {
-  color: #0F172A;
-}
-
-body.light-theme .landing-badge-trust {
-  background: #FEF3C7;
-  border: 1.5px solid rgba(217, 119, 6, 0.35);
-  color: #92400E;
-  font-weight: 800;
-}
-
-body.light-theme .landing-badge-scheme {
-  background: #EFF6FF;
-  border: 1.5px solid #BFDBFE;
-  color: #1E40AF;
-  font-weight: 800;
-}
-
-body.light-theme .landing-auth-card {
-  background: #FFFFFF;
-  border: 1.5px solid rgba(217, 119, 6, 0.25);
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
-}
-
-body.light-theme .landing-auth-card:hover {
-  border-color: rgba(217, 119, 6, 0.5);
-  box-shadow: 0 8px 24px rgba(217, 119, 6, 0.12);
-}
-
-body.light-theme .landing-auth-title {
-  color: #0F172A;
-  font-weight: 800;
-}
-
-body.light-theme .landing-auth-sub {
-  color: #475569;
-  font-weight: 600;
-}
-
-body.light-theme .landing-phone-link {
-  color: #475569;
+  background: #E2E8F0 !important;
+  color: #0F172A !important;
 }
 
 /* Notifications Dropdown */
 body.light-theme .notif-dropdown-card {
-  background: #FFFFFF;
-  border: 1.5px solid rgba(217, 119, 6, 0.3);
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.15);
-  color: #0F172A;
+  background: #FFFFFF !important;
+  border: 1.5px solid rgba(217, 119, 6, 0.3) !important;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.15) !important;
+  color: #0F172A !important;
 }
 
 body.light-theme .notif-dropdown-header {
-  border-bottom: 1px solid #E2E8F0;
+  border-bottom: 1px solid #E2E8F0 !important;
 }
 
 body.light-theme .notif-item {
-  border-bottom: 1px solid #F1F5F9;
-  color: #0F172A;
+  border-bottom: 1px solid #F1F5F9 !important;
+  color: #0F172A !important;
 }
 
 body.light-theme .notif-item:hover {
-  background: #F8FAFC;
+  background: #F8FAFC !important;
 }
 
 body.light-theme .notif-item-title {
-  color: #0F172A;
-  font-weight: 800;
+  color: #0F172A !important;
+  font-weight: 800 !important;
 }
 
 body.light-theme .notif-item-desc {
-  color: #475569;
+  color: #475569 !important;
 }
 
 body.light-theme .notif-item-time {
-  color: #64748B;
+  color: #64748B !important;
 }
 
 /* Mobile Push Toast */
 body.light-theme .mobile-toast-card {
-  background: #FFFFFF;
-  border: 1.5px solid rgba(217, 119, 6, 0.35);
-  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.18);
-  color: #0F172A;
+  background: #FFFFFF !important;
+  border: 1.5px solid rgba(217, 119, 6, 0.35) !important;
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.18) !important;
+  color: #0F172A !important;
 }
 
 body.light-theme .mobile-toast-title {
-  color: #0F172A;
-  font-weight: 800;
+  color: #0F172A !important;
+  font-weight: 800 !important;
 }
 
 body.light-theme .mobile-toast-body {
-  color: #334155;
-  font-weight: 600;
+  color: #334155 !important;
+  font-weight: 600 !important;
 }
 
 /* Footer in Light Theme */
 body.light-theme .app-footer {
-  background: #FFFFFF;
-  border-top: 1.5px solid #E2E8F0;
-  color: #475569;
+  background: #FFFFFF !important;
+  border-top: 1.5px solid #E2E8F0 !important;
+  color: #475569 !important;
 }
 
 body.light-theme .app-footer strong {
-  color: #0F172A;
-  font-weight: 800;
+  color: #0F172A !important;
+  font-weight: 800 !important;
 }
 
 body.light-theme .footer-contact {
-  color: #334155;
+  color: #334155 !important;
 }
 
-/* Strict High-Contrast Color Overrides inside Light Theme Cards */
+/* Universal High-Contrast Overrides inside Light Theme */
 body.light-theme .luxury-card .text-white,
 body.light-theme .dashboard-card .text-white,
 body.light-theme .schedule-section .text-white,
